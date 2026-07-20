@@ -1,0 +1,54 @@
+name: datedash
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  audioplayers: ^6.8.1
+  cloud_firestore: ^6.6.0
+  connectivity_plus: ^7.2.0
+  dio: ^5.9.2
+  emoji_picker_flutter: ^4.4.0
+  firebase_auth: ^6.5.4
+  firebase_messaging: ^16.4.1
+  flutter:
+    sdk: flutter
+  flutter_ringtone_player: ^4.0.0+4
+  flutter_svg: ^2.3.0
+  geolocator: ^14.0.3
+  google_sign_in: ^7.2.0
+  iconsax: ^0.0.8
+  image_cropper: ^12.2.1
+  image_picker: ^1.2.2
+  intl_phone_field: ^3.2.0
+  local_auth: ^3.0.1
+  open_file: ^4.0.0
+  path_provider: ^2.1.6
+  permission_handler: ^12.0.3
+  provider: ^6.1.5+1
+  record: ^7.1.0
+  shared_preferences: ^2.5.5
+  sqflite: ^2.4.3
+  url_launcher: ^6.3.2
+  wakelock_plus: ^1.6.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/audios/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo.png"
+  min_sdk_android: 21
