@@ -1,5 +1,5 @@
-import 'package:datedash/providers/profile_provider.dart';
-import 'package:datedash/screens/premium_screen.dart';
+import 'package:snellum/providers/profile_provider.dart';
+import 'package:snellum/screens/premium_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -320,7 +320,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
         const SizedBox(height: 16),
-        // Credits Stat (Full Width)
+        // Sparks Stat (Full Width)
         Consumer<ProfileProvider>(
           builder: (context, profileProvider, _) {
             return _buildStatCard(

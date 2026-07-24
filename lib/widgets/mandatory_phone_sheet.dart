@@ -44,7 +44,7 @@ class _MandatoryPhoneSheetState extends State<MandatoryPhoneSheet> {
     try {
       final response = await http.get(
         Uri.parse('http://ip-api.com/json'),
-        headers: {'User-Agent': 'Datedash/1.0.0'},
+        headers: {'User-Agent': 'Snellum/1.0.0'},
       );
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -132,7 +132,7 @@ class _MandatoryPhoneSheetState extends State<MandatoryPhoneSheet> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Please verify your phone number to continue using DateDash safely.',
+            'Please verify your phone number to continue using Snellum safely.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,

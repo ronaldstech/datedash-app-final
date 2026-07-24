@@ -1,7 +1,7 @@
-import 'package:datedash/providers/profile_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
+import 'package:snellum/providers/profile_provider.dart';
 import '../widgets/bordered_search_bar.dart';
 
 import '../services/profile_service.dart';
@@ -36,10 +36,7 @@ class ExploreScreen extends StatelessWidget {
             centerTitle: false,
             floating: true,
             snap: true,
-            actions: const [
-              BorderedSearchBar(),
-              SizedBox(width: 8),
-            ],
+            actions: const [BorderedSearchBar(), SizedBox(width: 8)],
           ),
           SliverToBoxAdapter(
             child: Padding(
@@ -62,7 +59,9 @@ class ExploreScreen extends StatelessWidget {
   }
 
   Widget _buildCategoryGrid(
-      BuildContext context, LanguageProvider languageProvider) {
+    BuildContext context,
+    LanguageProvider languageProvider,
+  ) {
     final profileProvider = context.read<ProfileProvider>();
     final ProfileService profileService = ProfileService();
 
@@ -169,135 +168,135 @@ class ExploreScreen extends StatelessWidget {
           crossAxisSpacing: 14,
           mainAxisSpacing: 14,
         ),
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final cat = categories[index];
-            final accent = cat['accent'] as Color;
-            final photo = cat['photo'] as String;
+        delegate: SliverChildBuilderDelegate((context, index) {
+          final cat = categories[index];
+          final accent = cat['accent'] as Color;
+          final photo = cat['photo'] as String;
 
-            return GestureDetector(
-              onTap: () {
-                profileProvider.setExploreCategory(cat['key'] as String);
-              },
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(22),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    // ── Photo background
-                    Image.network(
-                      photo,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(color: accent),
-                      loadingBuilder: (_, child, progress) {
-                        if (progress == null) return child;
-                        return Container(color: accent.withValues(alpha: 	0.6));
-                      },
-                    ),
+          return GestureDetector(
+            onTap: () {
+              profileProvider.setExploreCategory(cat['key'] as String);
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(22),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // ── Photo background
+                  Image.network(
+                    photo,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => Container(color: accent),
+                    loadingBuilder: (_, child, progress) {
+                      if (progress == null) return child;
+                      return Container(color: accent.withValues(alpha: 0.6));
+                    },
+                  ),
 
-                    // ── Dark gradient overlay (bottom-heavy for text legibility)
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.transparent,
-                            Colors.black.withValues(alpha: 	0.35),
-                            Colors.black.withValues(alpha: 	0.82),
-                          ],
-                          stops: const [0.0, 0.45, 1.0],
-                        ),
-                      ),
-                    ),
-
-                    // ── Content
-                    Padding(
-                      padding: const EdgeInsets.all(14),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Icon badge
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 	0.35),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                  color: Colors.white.withValues(alpha: 	0.15),
-                                  width: 0.5),
-                            ),
-                            child: Icon(
-                              cat['icon'] as IconData,
-                              color: Colors.white,
-                              size: 18,
-                            ),
-                          ),
-
-                          const Spacer(),
-
-                          // Title
-                          Text(
-                            cat['title'] as String,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              height: 1.2,
-                              letterSpacing: -0.3,
-                            ),
-                          ),
-                          const SizedBox(height: 3),
-
-                          // Subtitle
-                          Text(
-                            cat['subtitle'] as String,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 	0.72),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 8),
-
-                          // People count pill
-                          StreamBuilder<int>(
-                            stream: profileService
-                                .getCategoryCountStream(cat['key'] as String),
-                            builder: (context, countSnapshot) {
-                              final count = countSnapshot.data ?? 0;
-                              return Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: accent.withValues(alpha: 	0.75),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  '$count ${languageProvider.getString('people_count_suffix')}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
+                  // ── Dark gradient overlay (bottom-heavy for text legibility)
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.35),
+                          Colors.black.withValues(alpha: 0.82),
                         ],
+                        stops: const [0.0, 0.45, 1.0],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+
+                  // ── Content
+                  Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Icon badge
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.35),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.15),
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Icon(
+                            cat['icon'] as IconData,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                        ),
+
+                        const Spacer(),
+
+                        // Title
+                        Text(
+                          cat['title'] as String,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            height: 1.2,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+
+                        // Subtitle
+                        Text(
+                          cat['subtitle'] as String,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.72),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 8),
+
+                        // People count pill
+                        StreamBuilder<int>(
+                          stream: profileService.getCategoryCountStream(
+                            cat['key'] as String,
+                          ),
+                          builder: (context, countSnapshot) {
+                            final count = countSnapshot.data ?? 0;
+                            return Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: accent.withValues(alpha: 0.75),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                '$count ${languageProvider.getString('people_count_suffix')}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            );
-          },
-          childCount: categories.length,
-        ),
+            ),
+          );
+        }, childCount: categories.length),
       ),
     );
   }
 }
-

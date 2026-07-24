@@ -59,9 +59,9 @@ class _SignInScreenState extends State<SignInScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -83,7 +83,7 @@ class _SignInScreenState extends State<SignInScreen> {
               const SizedBox(height: 12),
               Center(
                 child: Image.asset(
-                  'assets/images/signlogo.png',
+                  'assets/images/newlogo.png',
                   height: 120,
                   fit: BoxFit.cover,
                 ),
@@ -142,7 +142,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   elevation: 5,
-                  shadowColor: const Color(0xFFFF4D85).withValues(alpha: 	0.5),
+                  shadowColor: const Color(0xFFFF4D85).withValues(alpha: 0.5),
                 ),
                 child: _isLoading
                     ? const SizedBox(
@@ -186,12 +186,16 @@ class _SignInScreenState extends State<SignInScreen> {
               SocialLoginButton(
                 text: 'Continue with Phone',
                 icon: Iconsax.mobile,
-                onPressed: _isLoading ? () {} : () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const PhoneAuthScreen()),
-                  );
-                },
+                onPressed: _isLoading
+                    ? () {}
+                    : () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PhoneAuthScreen(),
+                          ),
+                        );
+                      },
               ),
               const SizedBox(height: 8),
               Row(
@@ -239,7 +243,7 @@ class _SignInScreenState extends State<SignInScreen> {
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).dividerColor.withValues(alpha: 	0.4),
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.4),
         ),
       ),
       child: TextField(
@@ -249,8 +253,9 @@ class _SignInScreenState extends State<SignInScreen> {
         style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle:
-              TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+          hintStyle: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
           prefixIcon: Icon(icon, color: Theme.of(context).colorScheme.primary),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
@@ -267,4 +272,3 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 }
-

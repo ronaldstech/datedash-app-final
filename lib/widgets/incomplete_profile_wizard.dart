@@ -51,7 +51,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
   final ImagePicker _picker = ImagePicker();
   bool _isUploading = false;
   double _uploadProgress = 0.0;
-  final String _uploadUrl = 'https://unimarket-mw.com/datedash/api/upload.php';
+  final String _uploadUrl = 'https://unimarket-mw.com/snellum/api/upload.php';
   
   final Color _primaryColor = const Color(0xFFFF4D85);
 
@@ -1039,7 +1039,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                               // PAGE 3: Status & Goals
                               _buildWizardPage(
                                 title: 'Goals & Status',
-                                subtitle: 'What are you looking for on DateDash?',
+                                subtitle: 'What are you looking for on Snellum?',
                                 children: [
                                   _buildCustomSelectGrid(
                                     label: languageProvider.getString('relationship_status_label'),

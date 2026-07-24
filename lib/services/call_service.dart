@@ -30,7 +30,7 @@ class CallService {
     required bool isVideo,
   }) async {
     final chatId = getChatId(callerId, receiverId);
-    final roomName = 'datedash-${chatId.replaceAll('_', '-')}';
+    final roomName = 'snellum-${chatId.replaceAll('_', '-')}';
 
     final callerDoc = await _firestore.collection('users').doc(callerId).get();
     final callerData = callerDoc.data() ?? {};

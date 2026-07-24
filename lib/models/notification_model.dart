@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class DatedashNotification {
+class SnellumNotification {
   final String id;
   final String recipientId;
   final String senderId;
@@ -10,7 +10,7 @@ class DatedashNotification {
   final bool isRead;
   final String? message;
 
-  DatedashNotification({
+  SnellumNotification({
     required this.id,
     required this.recipientId,
     required this.senderId,
@@ -33,8 +33,8 @@ class DatedashNotification {
     };
   }
 
-  factory DatedashNotification.fromMap(Map<String, dynamic> map, String id) {
-    return DatedashNotification(
+  factory SnellumNotification.fromMap(Map<String, dynamic> map, String id) {
+    return SnellumNotification(
       id: id,
       recipientId: map['recipientId'] ?? '',
       senderId: map['senderId'] ?? '',

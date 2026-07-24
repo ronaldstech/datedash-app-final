@@ -74,7 +74,7 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _hasReply = false;
   int _messagesFromMeCount = 0;
   int _messagesFromOtherCount = 0;
-  bool _otherUserAllowsBooking =
+  bool _otherUserAllowsMeetup =
       false; // respects target user's privacy setting
 
   @override
@@ -113,7 +113,7 @@ class _ChatScreenState extends State<ChatScreen> {
     ProfileService().getUserProfile(widget.otherUserId).then((profile) {
       if (mounted) {
         setState(() {
-          _otherUserAllowsBooking = profile?.allowMeetupRequests ?? false;
+          _otherUserAllowsMeetup = profile?.allowMeetupRequests ?? false;
         });
       }
     });
@@ -837,20 +837,17 @@ class _ChatScreenState extends State<ChatScreen> {
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                             ),
-                            Text(
-                              isRecipientOnline
-                                  ? languageProvider.getString('active_now')
-                                  : languageProvider.getString('offline'),
-                              style: TextStyle(
-                                color: isRecipientOnline
-                                    ? Colors.green
-                                    : Colors.grey,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
+                            if (isRecipientOnline)
+                              Text(
+                                languageProvider.getString('active_now'),
+                                style: const TextStyle(
+                                  color: Colors.green,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
                               ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
                           ],
                         ),
                       ),
@@ -888,7 +885,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         : _showCallLockedSnack,
                     iconSize: 17,
                   ),
-                  if (_otherUserAllowsBooking)
+                  if (_otherUserAllowsMeetup)
                     IconButton(
                       icon: const Icon(Iconsax.calendar_add,
                           color: Color(0xFFFF4D85)),

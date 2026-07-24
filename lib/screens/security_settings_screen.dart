@@ -164,7 +164,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'This PIN will secure your access to DateDash.',
+                    'This PIN will secure your access to Snellum.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Theme.of(context).hintColor),
                   ),
@@ -560,7 +560,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                                   }
                                   
                                   final user = snapshot.data;
-                                  final name = user?.firstName ?? 'Datedash User';
+                                  final name = user?.firstName ?? 'Snellum User';
                                   final photo = user?.photos.isNotEmpty == true ? user!.photos.first : '';
                                   
                                   return Container(

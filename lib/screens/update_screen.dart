@@ -83,7 +83,7 @@ class _UpdateScreenState extends State<UpdateScreen>
       final dir =
           await getExternalStorageDirectory() ??
           await getApplicationDocumentsDirectory();
-      final savePath = '${dir.path}/datedash_update.apk';
+      final savePath = '${dir.path}/snellum_update.apk';
       final old = File(savePath);
       if (old.existsSync()) old.deleteSync();
 
@@ -231,7 +231,7 @@ class _UpdateScreenState extends State<UpdateScreen>
           ),
           const SizedBox(width: 12),
           const Text(
-            'DateDash',
+            'Snellum',
             style: TextStyle(
               color: _textPrimary,
               fontSize: 16,

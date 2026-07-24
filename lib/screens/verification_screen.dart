@@ -27,7 +27,7 @@ class _VerificationScreenState extends State<VerificationScreen> with TickerProv
   double _uploadProgress = 0.0;
 
   final ImagePicker _picker = ImagePicker();
-  final String _uploadUrl = 'https://unimarket-mw.com/datedash/api/upload.php';
+  final String _uploadUrl = 'https://unimarket-mw.com/snellum/api/upload.php';
   final Color _primaryColor = const Color(0xFFFF4D85);
 
   // Animations

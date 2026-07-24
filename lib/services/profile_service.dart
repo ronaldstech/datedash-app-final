@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:datedash/models/transaction_model.dart';
+import 'package:snellum/models/transaction_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import '../models/user_profile_model.dart';
@@ -637,7 +637,7 @@ class ProfileService {
         'premiumExpiry': Timestamp.fromDate(expiry),
       };
 
-      // If Elite, add 2000 credits
+      // If Elite, add 2000 sparks
       if (plan == 'Elite') {
         updates['credits'] = FieldValue.increment(2000);
       }
@@ -650,28 +650,28 @@ class ProfileService {
     }
   }
 
-  /// Adds credits to a user's account
+  /// Adds sparks to a user's account
   Future<void> addCredits(String uid, int amount) async {
     try {
       await _usersCollection.doc(uid).update({
         'credits': FieldValue.increment(amount),
       });
-      debugPrint('ProfileService: Added $amount credits to $uid');
+      debugPrint('ProfileService: Added $amount sparks to $uid');
     } catch (e) {
-      debugPrint('Error adding credits: $e');
+      debugPrint('Error adding sparks: $e');
       rethrow;
     }
   }
 
-  /// Deducts credits from a user's account
+  /// Deducts sparks from a user's account
   Future<void> deductCredits(String uid, int amount) async {
     try {
       await _usersCollection.doc(uid).update({
         'credits': FieldValue.increment(-amount),
       });
-      debugPrint('ProfileService: Deducted $amount credits from $uid');
+      debugPrint('ProfileService: Deducted $amount sparks from $uid');
     } catch (e) {
-      debugPrint('Error deducting credits: $e');
+      debugPrint('Error deducting sparks: $e');
       rethrow;
     }
   }
@@ -765,7 +765,7 @@ class ProfileService {
 
       await _usersCollection.doc(uid).update(updates);
       debugPrint(
-        'ProfileService: Claimed $rewardId for $uid (+$amount credits)',
+        'ProfileService: Claimed $rewardId for $uid (+$amount sparks)',
       );
     } catch (e) {
       debugPrint('Error claiming reward in service: $e');

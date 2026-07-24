@@ -106,7 +106,7 @@ class RewardsScreen extends StatelessWidget {
                   _ChallengeCard(
                     id: 'daily_explorer',
                     title: 'Daily Explorer',
-                    description: 'Use Datedash for 3 hours today',
+                    description: 'Use Snellum for 3 hours today',
                     reward: 50,
                     progress:
                         (profile.dailyUsageDuration / 10800).clamp(0.0, 1.0),
@@ -158,7 +158,7 @@ class RewardsScreen extends StatelessWidget {
                   const _ChallengeCard(
                     id: 'welcome_bonus',
                     title: 'Welcome Gift',
-                    description: 'Join the Datedash community',
+                    description: 'Join the Snellum community',
                     reward: 50,
                     progress: 1.0,
                     progressLabel: 'Completed',
@@ -198,7 +198,7 @@ class RewardsScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildStatItem('Credits', profile.credits.toString(),
+          _buildStatItem('Sparks', profile.credits.toString(),
               Iconsax.wallet_3, Colors.orangeAccent),
           Container(width: 1, height: 40, color: Colors.grey.withValues(alpha: 	0.2)),
           _buildStatItem('Claimed', profile.claimedRewards.length.toString(),
@@ -285,7 +285,7 @@ class _ChallengeCardState extends State<_ChallengeCard> {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Succesfully claimed ${widget.reward} credits!'),
+            content: Text('Succesfully claimed ${widget.reward} sparks!'),
             backgroundColor: Colors.green,
           ),
         );

@@ -86,7 +86,7 @@ class _GiftsScreenState extends State<GiftsScreen> {
           ),
 
           if (profileProvider.currentUser != null)
-            StreamBuilder<List<DatedashNotification>>(
+            StreamBuilder<List<SnellumNotification>>(
               stream: _notificationService
                   .getNotificationsStream(profileProvider.currentUser!.uid),
               builder: (context, snapshot) {
@@ -128,7 +128,7 @@ class _GiftsScreenState extends State<GiftsScreen> {
   }
 
   Widget _buildHeaderContent(ProfileProvider pp, LanguageProvider lp) {
-    final credits = pp.userProfile?.credits ?? 0;
+    final sparks = pp.userProfile?.credits ?? 0;
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -153,7 +153,7 @@ class _GiftsScreenState extends State<GiftsScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              credits.toString().replaceAllMapped(
+              sparks.toString().replaceAllMapped(
                   RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},'),
               style: const TextStyle(
                 color: Colors.white,
@@ -163,7 +163,7 @@ class _GiftsScreenState extends State<GiftsScreen> {
               ),
             ),
             Text(
-              'TOTAL CREDITS RECEIVED',
+              'TOTAL SPARKS RECEIVED',
               style: TextStyle(
                 color: Colors.white.withValues(alpha: 	0.8),
                 fontSize: 12,
@@ -216,7 +216,7 @@ class _GiftsScreenState extends State<GiftsScreen> {
 }
 
 class _GiftRewardCard extends StatelessWidget {
-  final DatedashNotification notification;
+  final SnellumNotification notification;
   final ProfileService profileService;
 
   const _GiftRewardCard({
@@ -268,7 +268,7 @@ class _GiftRewardCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               notification.message ??
-                  (isReward ? '+50 Credits' : 'You received a gift!'),
+                  (isReward ? '+50 Sparks' : 'You received a gift!'),
               style: TextStyle(
                 color: isReward
                     ? Colors.orangeAccent

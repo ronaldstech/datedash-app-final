@@ -45,7 +45,8 @@ class ProfileDrawer extends StatelessWidget {
               builder: (context, profileProvider, _) {
                 final photoUrl = profileProvider.photoURL;
                 final displayName = profileProvider.displayName;
-                final email = profileProvider.currentUser?.email ??
+                final email =
+                    profileProvider.currentUser?.email ??
                     languageProvider.getString('join_community');
 
                 return Container(
@@ -73,14 +74,15 @@ class ProfileDrawer extends StatelessWidget {
                                 gradient: LinearGradient(
                                   colors: [
                                     Color(0xFFFF4D85),
-                                    Color(0xFFFF8E8E)
+                                    Color(0xFFFF8E8E),
                                   ],
                                 ),
                               ),
                               child: CircleAvatar(
                                 radius: 42,
-                                backgroundColor:
-                                    isDark ? Colors.black : Colors.white,
+                                backgroundColor: isDark
+                                    ? Colors.black
+                                    : Colors.white,
                                 child: ClipOval(
                                   child: photoUrl != null
                                       ? Image.network(
@@ -89,8 +91,11 @@ class ProfileDrawer extends StatelessWidget {
                                           height: 84,
                                           fit: BoxFit.cover,
                                         )
-                                      : const Icon(Iconsax.user,
-                                          size: 40, color: Color(0xFFFF4D85)),
+                                      : const Icon(
+                                          Iconsax.user,
+                                          size: 40,
+                                          color: Color(0xFFFF4D85),
+                                        ),
                                 ),
                               ),
                             ),
@@ -104,8 +109,11 @@ class ProfileDrawer extends StatelessWidget {
                                     color: Color(0xFFFF4D85),
                                     shape: BoxShape.circle,
                                   ),
-                                  child: const Icon(Icons.check,
-                                      color: Colors.white, size: 14),
+                                  child: const Icon(
+                                    Icons.check,
+                                    color: Colors.white,
+                                    size: 14,
+                                  ),
                                 ),
                               ),
                           ],
@@ -126,8 +134,11 @@ class ProfileDrawer extends StatelessWidget {
                           if (profileProvider.userProfile?.isVerified ==
                               true) ...[
                             const SizedBox(width: 6),
-                            const Icon(Icons.verified,
-                                color: Color(0xFFFF4D85), size: 18),
+                            const Icon(
+                              Icons.verified,
+                              color: Color(0xFFFF4D85),
+                              size: 18,
+                            ),
                           ],
                         ],
                       ),
@@ -145,12 +156,13 @@ class ProfileDrawer extends StatelessWidget {
                           Expanded(
                             child: _buildDrawerTile(
                               context,
-                              title: 'Credits',
+                              title: 'Sparks',
                               value: (profileProvider.userProfile?.credits ?? 0)
                                   .toString()
                                   .replaceAllMapped(
-                                      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                                      (Match m) => '${m[1]},'),
+                                    RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                                    (Match m) => '${m[1]},',
+                                  ),
                               icon: Iconsax.wallet_3,
                               iconColor: const Color(0xFFFFB300),
                               onTap: () {
@@ -167,12 +179,12 @@ class ProfileDrawer extends StatelessWidget {
                               title: 'Membership',
                               value:
                                   profileProvider.userProfile?.isPremium == true
-                                      ? 'Premium'
-                                      : 'Free',
+                                  ? 'Premium'
+                                  : 'Free',
                               icon:
                                   profileProvider.userProfile?.isPremium == true
-                                      ? Iconsax.crown5
-                                      : Iconsax.star5,
+                                  ? Iconsax.crown5
+                                  : Iconsax.star5,
                               iconColor: const Color(0xFFFF4D85),
                               onTap: () {
                                 Navigator.pop(context);
@@ -197,7 +209,9 @@ class ProfileDrawer extends StatelessWidget {
 
                   // Account Section
                   _buildSectionHeader(
-                      context, languageProvider.getString('account_section')),
+                    context,
+                    languageProvider.getString('account_section'),
+                  ),
                   _buildItem(
                     context,
                     Iconsax.user,
@@ -206,9 +220,11 @@ class ProfileDrawer extends StatelessWidget {
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const ProfileScreen()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ProfileScreen(),
+                        ),
+                      );
                     },
                   ),
                   _buildItem(
@@ -220,9 +236,11 @@ class ProfileDrawer extends StatelessWidget {
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const LiveListScreen()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const LiveListScreen(),
+                        ),
+                      );
                     },
                   ),
                   _buildItem(
@@ -232,23 +250,32 @@ class ProfileDrawer extends StatelessWidget {
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const SettingsScreen()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SettingsScreen(),
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(height: 4),
 
                   // Discovery Section
                   _buildSectionHeader(
-                      context, languageProvider.getString('discovery_section')),
-                  _buildItem(context, Iconsax.discover_1,
-                      languageProvider.getString('explore_people')),
+                    context,
+                    languageProvider.getString('discovery_section'),
+                  ),
+                  _buildItem(
+                    context,
+                    Iconsax.discover_1,
+                    languageProvider.getString('explore_people'),
+                  ),
                   const SizedBox(height: 4),
 
                   // Activity Section
                   _buildSectionHeader(
-                      context, languageProvider.getString('activity_section')),
+                    context,
+                    languageProvider.getString('activity_section'),
+                  ),
                   _buildItem(
                     context,
                     Iconsax.heart_tick,
@@ -257,9 +284,11 @@ class ProfileDrawer extends StatelessWidget {
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const ChatListScreen()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ChatListScreen(),
+                        ),
+                      );
                     },
                   ),
                   myUid == null
@@ -271,13 +300,16 @@ class ProfileDrawer extends StatelessWidget {
                           onTap: () {
                             Navigator.pop(context);
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => const MeetupsScreen()));
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const MeetupsScreen(),
+                              ),
+                            );
                           },
                         )
                       : StreamBuilder<List<MeetupModel>>(
-                          stream: MeetupService().getPendingReceivedMeetupsStream(myUid),
+                          stream: MeetupService()
+                              .getPendingReceivedMeetupsStream(myUid),
                           builder: (context, snapshot) {
                             final pendingCount = snapshot.data?.length ?? 0;
                             Widget? trailingWidget;
@@ -287,7 +319,9 @@ class ProfileDrawer extends StatelessWidget {
                                 children: [
                                   Container(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 4),
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFFF4D85),
                                       borderRadius: BorderRadius.circular(12),
@@ -302,11 +336,13 @@ class ProfileDrawer extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  Icon(Icons.arrow_forward_ios,
-                                      size: 12,
-                                      color: Theme.of(context)
-                                          .hintColor
-                                          .withValues(alpha: 0.5)),
+                                  Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 12,
+                                    color: Theme.of(
+                                      context,
+                                    ).hintColor.withValues(alpha: 0.5),
+                                  ),
                                 ],
                               );
                             }
@@ -319,9 +355,11 @@ class ProfileDrawer extends StatelessWidget {
                               onTap: () {
                                 Navigator.pop(context);
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) => const MeetupsScreen()));
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const MeetupsScreen(),
+                                  ),
+                                );
                               },
                             );
                           },
@@ -333,13 +371,18 @@ class ProfileDrawer extends StatelessWidget {
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => ProfileViewersScreen()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ProfileViewersScreen(),
+                        ),
+                      );
                     },
                   ),
-                  _buildItem(context, Iconsax.document_text,
-                      languageProvider.getString('blog')),
+                  _buildItem(
+                    context,
+                    Iconsax.document_text,
+                    languageProvider.getString('blog'),
+                  ),
 
                   _buildItem(
                     context,
@@ -348,15 +391,19 @@ class ProfileDrawer extends StatelessWidget {
                     color: const Color(0xFFFF4D85),
                     onTap: () {
                       Navigator.pop(context);
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (_) => LikesScreen()));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => LikesScreen()),
+                      );
                     },
                   ),
                   const SizedBox(height: 20),
 
                   // Finance Section - Subscription & Credits
                   _buildSectionHeader(
-                      context, languageProvider.getString('finance_section')),
+                    context,
+                    languageProvider.getString('finance_section'),
+                  ),
                   _buildItem(
                     context,
                     Iconsax.cup,
@@ -365,9 +412,11 @@ class ProfileDrawer extends StatelessWidget {
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const RewardsScreen()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const RewardsScreen(),
+                        ),
+                      );
                     },
                   ),
                   _buildItem(
@@ -378,9 +427,9 @@ class ProfileDrawer extends StatelessWidget {
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const GiftsScreen()));
+                        context,
+                        MaterialPageRoute(builder: (_) => const GiftsScreen()),
+                      );
                     },
                   ),
                   _buildItem(
@@ -390,26 +439,38 @@ class ProfileDrawer extends StatelessWidget {
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const TransactionsScreen()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const TransactionsScreen(),
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(height: 20),
 
                   // Appearance Section
-                  _buildSectionHeader(context,
-                      languageProvider.getString('appearance_section')),
+                  _buildSectionHeader(
+                    context,
+                    languageProvider.getString('appearance_section'),
+                  ),
                   _buildThemeToggle(context, languageProvider),
                   const SizedBox(height: 20),
 
                   // Support Section
                   _buildSectionHeader(
-                      context, languageProvider.getString('support_section')),
-                  _buildItem(context, Iconsax.info_circle,
-                      languageProvider.getString('about_us')),
-                  _buildItem(context, Iconsax.security_safe,
-                      languageProvider.getString('safety_tips')),
+                    context,
+                    languageProvider.getString('support_section'),
+                  ),
+                  _buildItem(
+                    context,
+                    Iconsax.info_circle,
+                    languageProvider.getString('about_us'),
+                  ),
+                  _buildItem(
+                    context,
+                    Iconsax.security_safe,
+                    languageProvider.getString('safety_tips'),
+                  ),
                   const SizedBox(height: 32),
                   _buildLogoutButton(context, languageProvider),
                   const SizedBox(height: 40),
@@ -441,7 +502,9 @@ class ProfileDrawer extends StatelessWidget {
               : Colors.black.withValues(alpha: 0.03),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+            color: isDark
+                ? Colors.white10
+                : Colors.black.withValues(alpha: 0.05),
           ),
         ),
         child: Column(
@@ -495,25 +558,35 @@ class ProfileDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildItem(BuildContext context, IconData icon, String title,
-      {Color? color, Color? backgroundColor, Color? borderColor, Widget? trailing, VoidCallback? onTap}) {
+  Widget _buildItem(
+    BuildContext context,
+    IconData icon,
+    String title, {
+    Color? color,
+    Color? backgroundColor,
+    Color? borderColor,
+    Widget? trailing,
+    VoidCallback? onTap,
+  }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: backgroundColor ??
+        color:
+            backgroundColor ??
             (isDark
                 ? Colors.white.withValues(alpha: 0.03)
                 : Colors.black.withValues(alpha: 0.02)),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: borderColor ??
+          color:
+              borderColor ??
               (backgroundColor != null
                   ? backgroundColor.withValues(alpha: 0.3)
                   : (isDark
-                      ? Colors.white.withValues(alpha: 0.05)
-                      : Colors.black.withValues(alpha: 0.05))),
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : Colors.black.withValues(alpha: 0.05))),
         ),
       ),
       child: Material(
@@ -529,26 +602,38 @@ class ProfileDrawer extends StatelessWidget {
                   : (color ?? const Color(0xFFFF4D85)).withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon,
-                color: backgroundColor != null
-                    ? Colors.white
-                    : (color ?? Theme.of(context).iconTheme.color),
-                size: 20),
+            child: Icon(
+              icon,
+              color: backgroundColor != null
+                  ? Colors.white
+                  : (color ?? Theme.of(context).iconTheme.color),
+              size: 20,
+            ),
           ),
           title: Text(
             title,
             style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: backgroundColor != null ? Colors.white : null),
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: backgroundColor != null ? Colors.white : null,
+            ),
           ),
-          trailing: trailing ?? Icon(Icons.arrow_forward_ios,
-              size: 12,
-              color: backgroundColor != null
-                  ? Colors.white.withValues(alpha: 0.7)
-                  : Theme.of(context).hintColor.withValues(alpha: 0.5)),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+          trailing:
+              trailing ??
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 12,
+                color: backgroundColor != null
+                    ? Colors.white.withValues(alpha: 0.7)
+                    : Theme.of(context).hintColor.withValues(alpha: 0.5),
+              ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 0,
+          ),
           visualDensity: VisualDensity.compact,
         ),
       ),
@@ -556,7 +641,9 @@ class ProfileDrawer extends StatelessWidget {
   }
 
   Widget _buildThemeToggle(
-      BuildContext context, LanguageProvider languageProvider) {
+    BuildContext context,
+    LanguageProvider languageProvider,
+  ) {
     final themeProvider = context.watch<ThemeProvider>();
     final isDark = themeProvider.isDarkMode;
 
@@ -577,8 +664,10 @@ class ProfileDrawer extends StatelessWidget {
                 isDark
                     ? languageProvider.getString('dark_mode')
                     : languageProvider.getString('light_mode'),
-                style:
-                    const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
@@ -593,7 +682,9 @@ class ProfileDrawer extends StatelessWidget {
   }
 
   Widget _buildLogoutButton(
-      BuildContext context, LanguageProvider languageProvider) {
+    BuildContext context,
+    LanguageProvider languageProvider,
+  ) {
     return Container(
       margin: const EdgeInsets.only(top: 12),
       child: ListTile(
@@ -609,12 +700,15 @@ class ProfileDrawer extends StatelessWidget {
         title: Text(
           languageProvider.getString('logout'),
           style: const TextStyle(
-              color: Colors.redAccent,
-              fontSize: 15,
-              fontWeight: FontWeight.w800),
+            color: Colors.redAccent,
+            fontSize: 15,
+            fontWeight: FontWeight.w800,
+          ),
         ),
-        subtitle: Text(languageProvider.getString('logout_sub'),
-            style: const TextStyle(fontSize: 12)),
+        subtitle: Text(
+          languageProvider.getString('logout_sub'),
+          style: const TextStyle(fontSize: 12),
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(color: Colors.redAccent.withValues(alpha: 0.2)),
@@ -625,4 +719,3 @@ class ProfileDrawer extends StatelessWidget {
     );
   }
 }
-

@@ -19,7 +19,7 @@ class LocalDbService {
 
   Future<Database> _initDatabase() async {
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'datedash.db');
+    final path = join(dbPath, 'snellum.db');
 
     return await openDatabase(
       path,

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,12 +21,11 @@ import 'services/push_notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await PushNotificationService().initialize();
   await GoogleSignIn.instance.initialize(
-    serverClientId: '409694106333-8703fkvopn9me0nauro1ki5frbbmamld.apps.googleusercontent.com',
+    serverClientId:
+        '409694106333-8703fkvopn9me0nauro1ki5frbbmamld.apps.googleusercontent.com',
   );
 
   runApp(
@@ -35,31 +35,34 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => LanguageProvider()),
       ],
-      child: const DateDashApp(),
+      child: const SnellumApp(),
     ),
   );
 }
 
-class DateDashApp extends StatefulWidget {
-  const DateDashApp({super.key});
+class SnellumApp extends StatefulWidget {
+  const SnellumApp({super.key});
 
   @override
-  State<DateDashApp> createState() => _DateDashAppState();
+  State<SnellumApp> createState() => _SnellumAppState();
 }
 
-class _DateDashAppState extends State<DateDashApp> with WidgetsBindingObserver {
+class _SnellumAppState extends State<SnellumApp> with WidgetsBindingObserver {
   final ChatService _chatService = ChatService();
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  Timer? _heartbeatTimer;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _setUserOnline(true);
+    _startHeartbeat();
   }
 
   @override
   void dispose() {
+    _stopHeartbeat();
     WidgetsBinding.instance.removeObserver(this);
     _setUserOnline(false);
     super.dispose();
@@ -69,10 +72,24 @@ class _DateDashAppState extends State<DateDashApp> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       _setUserOnline(true);
+      _startHeartbeat();
     } else if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.detached) {
+      _stopHeartbeat();
       _setUserOnline(false);
     }
+  }
+
+  void _startHeartbeat() {
+    _stopHeartbeat();
+    _heartbeatTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+      _setUserOnline(true);
+    });
+  }
+
+  void _stopHeartbeat() {
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = null;
   }
 
   Future<void> _setUserOnline(bool isOnline) async {
@@ -88,16 +105,13 @@ class _DateDashAppState extends State<DateDashApp> with WidgetsBindingObserver {
 
     return MaterialApp(
       navigatorKey: _navigatorKey,
-      title: 'DateDash',
+      title: 'Snellum',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeProvider.themeMode,
       builder: (context, child) => AppNotificationWrapper(
         navigatorKey: _navigatorKey,
-        child: CallListenerWrapper(
-          navigatorKey: _navigatorKey,
-          child: child!,
-        ),
+        child: CallListenerWrapper(navigatorKey: _navigatorKey, child: child!),
       ),
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
@@ -121,7 +135,7 @@ class _DateDashAppState extends State<DateDashApp> with WidgetsBindingObserver {
                         children: [
                           ClipOval(
                             child: Image.asset(
-                              'assets/images/signlogo.png',
+                              'assets/images/logo.png',
                               width: 90,
                               height: 90,
                               fit: BoxFit.cover,

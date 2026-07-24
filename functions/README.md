@@ -1,4 +1,4 @@
-# DateDash Email Verification Functions
+# Snellum Email Verification Functions
 
 These Firebase Cloud Functions send and verify 6-digit signup codes through Resend.
 
@@ -20,13 +20,13 @@ firebase functions:secrets:set EMAIL_VERIFICATION_SECRET
 Set the sender address with a Functions environment file. `onboarding@resend.dev` is useful for testing, but production should use a verified Resend domain.
 
 ```sh
-echo EMAIL_FROM="DateDash <onboarding@resend.dev>" > .env.datedash-35789
+echo EMAIL_FROM="Snellum <onboarding@resend.dev>" > .env.datedash-35789
 ```
 
 For local development, you can also create `functions/.env`:
 
 ```sh
-EMAIL_FROM="DateDash <onboarding@resend.dev>"
+EMAIL_FROM="Snellum <onboarding@resend.dev>"
 ```
 
 Deploy:

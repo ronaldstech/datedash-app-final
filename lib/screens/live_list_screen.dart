@@ -45,7 +45,7 @@ class _LiveListScreenState extends State<LiveListScreen>
     'Português',
   ];
 
-  final List<String> _genders = ['Any', 'Male', 'Female', 'Non-Binary'];
+  final List<String> _genders = ['Any', 'Male', 'Female'];
 
   final List<String> _countries = [
     'Any',
@@ -480,7 +480,7 @@ class _LiveListScreenState extends State<LiveListScreen>
           // Partner Language
           _buildFilterLabel('Partner Language', Iconsax.language_square),
           const SizedBox(height: 12),
-          _buildLanguageChips(isDark),
+          _buildLanguagePickerButton(context, isDark),
           const SizedBox(height: 24),
 
           // Desired Gender
@@ -647,9 +647,6 @@ class _LiveListScreenState extends State<LiveListScreen>
       case 'Female':
         iconData = Iconsax.woman;
         break;
-      case 'Non-Binary':
-        iconData = Iconsax.profile_2user;
-        break;
       default:
         iconData = Iconsax.people;
     }
@@ -707,61 +704,178 @@ class _LiveListScreenState extends State<LiveListScreen>
     );
   }
 
-  Widget _buildLanguageChips(bool isDark) {
-    return SizedBox(
-      height: 42,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _languages.length,
-        itemBuilder: (context, index) {
-          final lang = _languages[index];
-          final isSelected = _selectedLanguage == lang;
-          return Padding(
-            padding: EdgeInsets.only(
-              left: index == 0 ? 0 : 8,
-              right: index == _languages.length - 1 ? 0 : 0,
+  String _getLanguageFlag(String language) {
+    switch (language) {
+      case 'English':
+        return '🇬🇧';
+      case 'Kiswahili':
+        return '🇹🇿';
+      case 'Español':
+        return '🇪🇸';
+      case 'Français':
+        return '🇫🇷';
+      case 'Deutsch':
+        return '🇩🇪';
+      case 'Português':
+        return '🇵🇹';
+      default:
+        return '🌐';
+    }
+  }
+
+  Widget _buildLanguagePickerButton(BuildContext context, bool isDark) {
+    return InkWell(
+      onTap: () => _showLanguageSelectorBottomSheet(context, isDark),
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.05)
+              : Colors.black.withValues(alpha: 0.04),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.08)
+                : Colors.black.withValues(alpha: 0.05),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Text(
+              _getLanguageFlag(_selectedLanguage),
+              style: const TextStyle(fontSize: 20),
             ),
-            child: ChoiceChip(
-              label: Text(
-                lang,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                  color: isSelected
-                      ? Colors.white
-                      : (isDark ? Colors.white70 : Colors.black87),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                _selectedLanguage,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              selected: isSelected,
-              selectedColor: const Color(0xFFFF4D85),
-              backgroundColor: isDark
-                  ? Colors.white.withValues(alpha: 0.05)
-                  : Colors.black.withValues(alpha: 0.04),
-              onSelected: (selected) {
-                if (selected) {
-                  setState(() {
-                    _selectedLanguage = lang;
-                  });
-                }
-              },
-              showCheckmark: false,
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: BorderSide(
-                  color: isSelected
-                      ? const Color(0xFFFF4D85)
-                      : (isDark
-                            ? Colors.white.withValues(alpha: 0.08)
-                            : Colors.black.withValues(alpha: 0.05)),
-                  width: 1,
-                ),
-              ),
             ),
-          );
-        },
+            const Icon(Iconsax.arrow_down_1, size: 18),
+          ],
+        ),
       ),
+    );
+  }
+
+  void _showLanguageSelectorBottomSheet(BuildContext context, bool isDark) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        String searchQuery = '';
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final filteredLanguages = _languages
+                .where(
+                  (l) => l.toLowerCase().contains(searchQuery.toLowerCase()),
+                )
+                .toList();
+
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.6,
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF14141A) : Colors.white,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(24),
+                ),
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 8),
+                  Container(
+                    width: 40,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.white24 : Colors.black12,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Select Partner Language',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: TextField(
+                      onChanged: (val) {
+                        setModalState(() {
+                          searchQuery = val;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Search language...',
+                        prefixIcon: const Icon(Icons.search, size: 20),
+                        filled: true,
+                        fillColor: isDark
+                            ? Colors.white.withValues(alpha: 0.05)
+                            : Colors.black.withValues(alpha: 0.04),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: filteredLanguages.length,
+                      itemBuilder: (context, index) {
+                        final lang = filteredLanguages[index];
+                        final isSelected = lang == _selectedLanguage;
+
+                        return ListTile(
+                          leading: Text(
+                            _getLanguageFlag(lang),
+                            style: const TextStyle(fontSize: 22),
+                          ),
+                          title: Text(
+                            lang,
+                            style: TextStyle(
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: isSelected
+                                  ? const Color(0xFFFF4D85)
+                                  : null,
+                            ),
+                          ),
+                          trailing: isSelected
+                              ? const Icon(
+                                  Icons.check_circle,
+                                  color: Color(0xFFFF4D85),
+                                )
+                              : null,
+                          onTap: () {
+                            setState(() {
+                              _selectedLanguage = lang;
+                            });
+                            Navigator.pop(context);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 

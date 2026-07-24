@@ -1,5 +1,5 @@
-import 'package:datedash/models/user_profile_model.dart';
-import 'package:datedash/services/profile_service.dart';
+import 'package:snellum/models/user_profile_model.dart';
+import 'package:snellum/services/profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';

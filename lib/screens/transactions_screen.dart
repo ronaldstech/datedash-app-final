@@ -44,8 +44,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           final isMonthly = tx.plan!.toLowerCase().contains('monthly') || 
                             tx.amount > 10000; // Hard fallback logic if needed
           await _profileService.updatePremiumStatus(tx.uid, tx.plan!, isMonthly);
-        } else if (tx.type == 'credits' && tx.creditAmount != null) {
-          await _profileService.addCredits(tx.uid, tx.creditAmount!);
+        } else if (tx.type == 'credits' && tx.sparkAmount != null) {
+          await _profileService.addCredits(tx.uid, tx.sparkAmount!);
         }
 
         if (mounted) {
@@ -216,7 +216,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isSubscription ? (tx.plan ?? 'Premium') : '${tx.creditAmount} Credits',
+                    isSubscription ? (tx.plan ?? 'Premium') : '${tx.sparkAmount} Sparks',
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   const SizedBox(height: 4),

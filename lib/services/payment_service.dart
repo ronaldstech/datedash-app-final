@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:datedash/models/payment_operator_model.dart';
+import 'package:snellum/models/payment_operator_model.dart';
 
 class PaymentService {
   static const String _operatorsEndpoint =
-      'https://unimarket-mw.com/datedash/api/paychangu/get_operators.php';
+      'https://unimarket-mw.com/snellum/api/paychangu/get_operators.php';
   static const String _initEndpoint =
-      'https://unimarket-mw.com/datedash/api/paychangu/initialize_payment.php';
+      'https://unimarket-mw.com/snellum/api/paychangu/initialize_payment.php';
   static const String _verifyEndpoint =
-      'https://unimarket-mw.com/datedash/api/paychangu/verify_payment.php';
+      'https://unimarket-mw.com/snellum/api/paychangu/verify_payment.php';
 
   /// Fetches the supported mobile money operators from the remote backend.
   Future<List<PaymentOperator>> getMobileOperators() async {

@@ -65,7 +65,7 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 20),
           _buildPrivacySection(context, languageProvider),
           const SizedBox(height: 20),
-          _buildBookingSection(context, languageProvider),
+          _buildMeetupSection(context, languageProvider),
           const SizedBox(height: 20),
           _buildSectionHeader(languageProvider.getString('preferences')),
           _buildThemeTile(context, themeProvider, languageProvider),
@@ -298,8 +298,8 @@ class SettingsScreen extends StatelessWidget {
       return;
     }
 
-    // Non-premium: Show credit cost dialog
-    final credits = profileProvider.userProfile?.credits ?? 0;
+    // Non-premium: Show spark cost dialog
+    final sparks = profileProvider.userProfile?.sparks ?? 0;
 
     showDialog(
       context: context,
@@ -316,7 +316,7 @@ class SettingsScreen extends StatelessWidget {
         content: Text(
           languageProvider
               .getString('refresh_cost_content')
-              .replaceAll('{credits}', credits.toString()),
+              .replaceAll('{credits}', sparks.toString()),
           style: const TextStyle(height: 1.5),
         ),
         actions: [
@@ -333,7 +333,7 @@ class SettingsScreen extends StatelessWidget {
             ),
             onPressed: () async {
               Navigator.pop(ctx);
-              if (credits < 50) {
+              if (sparks < 50) {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content:
                       Text(languageProvider.getString('not_enough_credits')),
@@ -722,7 +722,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBookingSection(
+  Widget _buildMeetupSection(
       BuildContext context, LanguageProvider languageProvider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -755,7 +755,7 @@ class SettingsScreen extends StatelessWidget {
                   Iconsax.calendar_edit,
                   languageProvider.getString('booking_details'),
                   languageProvider.getString('booking_details_sub'),
-                  onTap: () => _showBookingPreferencesSheet(context),
+                  onTap: () => _showMeetupPreferencesSheet(context),
                 ),
               ],
             );
@@ -844,7 +844,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  void _showBookingPreferencesSheet(BuildContext context) {
+  void _showMeetupPreferencesSheet(BuildContext context) {
     final languageProvider = context.read<LanguageProvider>();
     final profileProvider = context.read<ProfileProvider>();
     final profile = profileProvider.userProfile;

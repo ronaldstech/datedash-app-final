@@ -278,12 +278,29 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: 56,
-              height: 56,
-              child: CircularProgressIndicator(
-                color: const Color(0xFFFF4D85),
-                strokeWidth: 3,
-                backgroundColor: const Color(0xFFFF4D85).withValues(alpha: 0.15),
+              width: 100,
+              height: 100,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  ClipOval(
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 100,
+                    height: 100,
+                    child: CircularProgressIndicator(
+                      color: const Color(0xFFFF4D85),
+                      strokeWidth: 3,
+                      backgroundColor: const Color(0xFFFF4D85).withValues(alpha: 0.15),
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 24),

@@ -108,7 +108,7 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
       _scanProgressController.repeat();
 
       final bool didAuthenticate = await _auth.authenticate(
-        localizedReason: 'Verify your biometric signature to unlock DateDash',
+        localizedReason: 'Verify your biometric signature to unlock Snellum',
         biometricOnly: true,
         persistAcrossBackgrounding: true,
       );
@@ -204,7 +204,7 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
     return Scaffold(
       body: Stack(
         children: [
-          // Background elegant gradient matching DateDash aesthetic
+          // Background elegant gradient matching Snellum aesthetic
           Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
@@ -291,7 +291,7 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Enter PIN to unlock DateDash',
+                    'Enter PIN to unlock Snellum',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.white.withValues(alpha: 	0.6),

@@ -27,7 +27,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   double _uploadProgress = 0.0;
   final _profileService = ProfileService();
   final ImagePicker _picker = ImagePicker();
-  final String _uploadUrl = 'https://unimarket-mw.com/datedash/api/upload.php';
+  final String _uploadUrl = 'https://unimarket-mw.com/snellum/api/upload.php';
 
   late PageController _pageController;
   int _currentPage = 0;

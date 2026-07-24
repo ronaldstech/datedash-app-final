@@ -1,11 +1,10 @@
-import 'package:datedash/services/profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:datedash/services/payment_service.dart';
-import 'package:datedash/models/payment_operator_model.dart';
-import 'package:datedash/providers/profile_provider.dart';
 import 'package:provider/provider.dart';
-import 'edit_profile_screen.dart';
+import 'package:snellum/models/payment_operator_model.dart';
+import 'package:snellum/providers/profile_provider.dart';
+import 'package:snellum/services/payment_service.dart';
+import 'package:snellum/services/profile_service.dart';
 
 class PremiumScreen extends StatefulWidget {
   final int initialTab;
@@ -207,7 +206,7 @@ class _PremiumScreenState extends State<PremiumScreen>
     'Unlimited video calls',
     'See missed matches',
     '2 free profile boosts',
-    'Get 2000 free credits',
+    'Get 2000 free sparks',
     'Hide your age on profile',
     'Green card',
     'Lock your profile',
@@ -244,7 +243,9 @@ class _PremiumScreenState extends State<PremiumScreen>
 
   String _formatNumber(int number) {
     return number.toString().replaceAllMapped(
-        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]},',
+    );
   }
 
   @override
@@ -286,35 +287,42 @@ class _PremiumScreenState extends State<PremiumScreen>
             height: 38,
             decoration: BoxDecoration(
               color: isDark
-                  ? Colors.white.withValues(alpha: 	0.05)
-                  : Colors.black.withValues(alpha: 	0.03),
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : Colors.black.withValues(alpha: 0.03),
               borderRadius: BorderRadius.circular(19),
-              border:
-                  Border.all(color: isDark ? Colors.white12 : Colors.black12),
+              border: Border.all(
+                color: isDark ? Colors.white12 : Colors.black12,
+              ),
             ),
             padding: const EdgeInsets.all(2),
             child: TabBar(
               controller: _tabController,
               indicatorSize: TabBarIndicatorSize.tab,
               indicator: BoxDecoration(
-                  color: isDark ? Colors.white.withValues(alpha: 	0.1) : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: isDark
-                      ? []
-                      : [
-                          BoxShadow(
-                              color: Colors.black.withValues(alpha: 	0.05),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2))
-                        ]),
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: isDark
+                    ? []
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+              ),
               labelColor: isDark ? Colors.white : Colors.black,
               unselectedLabelColor: isDark ? Colors.white54 : Colors.black54,
-              labelStyle:
-                  const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              labelStyle: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
               dividerColor: Colors.transparent,
               tabs: const [
                 Tab(text: 'Subscriptions'),
-                Tab(text: 'Credits'),
+                Tab(text: 'Sparks'),
               ],
             ),
           ),
@@ -389,11 +397,12 @@ class _PremiumScreenState extends State<PremiumScreen>
     );
   }
 
-  Widget _buildModernToggle(
-      {required String title,
-      required bool isSelected,
-      required VoidCallback onTap,
-      required bool isDark}) {
+  Widget _buildModernToggle({
+    required String title,
+    required bool isSelected,
+    required VoidCallback onTap,
+    required bool isDark,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -410,9 +419,10 @@ class _PremiumScreenState extends State<PremiumScreen>
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                      color: const Color(0xFFFF4D85).withValues(alpha: 	0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4))
+                    color: const Color(0xFFFF4D85).withValues(alpha: 0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
                 ]
               : [],
         ),
@@ -433,7 +443,7 @@ class _PremiumScreenState extends State<PremiumScreen>
   Widget _getPlanCardForIndex(int index, bool isDark) {
     final profileProvider = context.read<ProfileProvider>();
     String? countryCode = profileProvider.userProfile?.countryCode;
-    
+
     // Smart fallback: if countryCode is null but phone exists, try to detect from prefix
     if (countryCode == null || countryCode.isEmpty) {
       final phone = profileProvider.userProfile?.phoneNumber;
@@ -486,8 +496,13 @@ class _PremiumScreenState extends State<PremiumScreen>
     }
   }
 
-  void _showFeaturesSheet(BuildContext context, String title,
-      List<String> features, Color accentColor, bool isDark) {
+  void _showFeaturesSheet(
+    BuildContext context,
+    String title,
+    List<String> features,
+    Color accentColor,
+    bool isDark,
+  ) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -507,10 +522,10 @@ class _PremiumScreenState extends State<PremiumScreen>
             borderRadius: const BorderRadius.vertical(top: Radius.circular(40)),
             boxShadow: [
               BoxShadow(
-                color: accentColor.withValues(alpha: 	0.15),
+                color: accentColor.withValues(alpha: 0.15),
                 blurRadius: 40,
                 offset: const Offset(0, -10),
-              )
+              ),
             ],
           ),
           child: Stack(
@@ -524,7 +539,7 @@ class _PremiumScreenState extends State<PremiumScreen>
                   height: 200,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: accentColor.withValues(alpha: 	0.05),
+                    color: accentColor.withValues(alpha: 0.05),
                   ),
                 ),
               ),
@@ -547,10 +562,10 @@ class _PremiumScreenState extends State<PremiumScreen>
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: accentColor.withValues(alpha: 	0.1),
+                          color: accentColor.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: accentColor.withValues(alpha: 	0.2),
+                            color: accentColor.withValues(alpha: 0.2),
                             width: 1.5,
                           ),
                         ),
@@ -558,8 +573,8 @@ class _PremiumScreenState extends State<PremiumScreen>
                           title == 'PRO'
                               ? Iconsax.flash5
                               : (title == 'PREMIUM'
-                                  ? Iconsax.star5
-                                  : Iconsax.crown5),
+                                    ? Iconsax.star5
+                                    : Iconsax.crown5),
                           color: accentColor,
                           size: 28,
                         ),
@@ -581,7 +596,10 @@ class _PremiumScreenState extends State<PremiumScreen>
                           itemCount: features.length,
                           itemBuilder: (context, index) {
                             return _buildPremiumFeatureItem(
-                                features[index], accentColor, isDark);
+                              features[index],
+                              accentColor,
+                              isDark,
+                            );
                           },
                         ),
                       ),
@@ -595,16 +613,16 @@ class _PremiumScreenState extends State<PremiumScreen>
                           gradient: LinearGradient(
                             colors: [
                               accentColor,
-                              accentColor.withValues(alpha: 	0.8)
+                              accentColor.withValues(alpha: 0.8),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(18),
                           boxShadow: [
                             BoxShadow(
-                              color: accentColor.withValues(alpha: 	0.3),
+                              color: accentColor.withValues(alpha: 0.3),
                               blurRadius: 15,
                               offset: const Offset(0, 8),
-                            )
+                            ),
                           ],
                         ),
                         child: ElevatedButton(
@@ -639,26 +657,25 @@ class _PremiumScreenState extends State<PremiumScreen>
   }
 
   Widget _buildPremiumFeatureItem(
-      String feature, Color accentColor, bool isDark) {
+    String feature,
+    Color accentColor,
+    bool isDark,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: isDark
-            ? Colors.white.withValues(alpha: 	0.03)
-            : Colors.black.withValues(alpha: 	0.02),
+            ? Colors.white.withValues(alpha: 0.03)
+            : Colors.black.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 	0.05),
+          color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
         ),
       ),
       child: Row(
         children: [
-          Icon(
-            Iconsax.tick_circle5,
-            color: accentColor,
-            size: 18,
-          ),
+          Icon(Iconsax.tick_circle5, color: accentColor, size: 18),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -676,7 +693,11 @@ class _PremiumScreenState extends State<PremiumScreen>
   }
 
   Widget _buildFeatureRow(
-      String feature, bool isPopular, Color accentColor, bool isDark) {
+    String feature,
+    bool isPopular,
+    Color accentColor,
+    bool isDark,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -694,7 +715,7 @@ class _PremiumScreenState extends State<PremiumScreen>
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: isPopular
-                    ? Colors.white.withValues(alpha: 	0.9)
+                    ? Colors.white.withValues(alpha: 0.9)
                     : (isDark ? Colors.white70 : Colors.black87),
               ),
             ),
@@ -728,32 +749,31 @@ class _PremiumScreenState extends State<PremiumScreen>
             ? LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [themePink, themePink.withValues(alpha: 	0.8)],
+                colors: [themePink, themePink.withValues(alpha: 0.8)],
               )
             : LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: isDark
                     ? [
-                        Colors.white.withValues(alpha: 	0.12),
-                        Colors.white.withValues(alpha: 	0.05),
+                        Colors.white.withValues(alpha: 0.12),
+                        Colors.white.withValues(alpha: 0.05),
                       ]
-                    : [
-                        Colors.white,
-                        Colors.white.withValues(alpha: 	0.9),
-                      ],
+                    : [Colors.white, Colors.white.withValues(alpha: 0.9)],
               ),
         border: Border.all(
           color: isPopular
-              ? Colors.white.withValues(alpha: 	0.3)
+              ? Colors.white.withValues(alpha: 0.3)
               : (isDark ? Colors.white12 : Colors.black12),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
             color: isPopular
-                ? themePink.withValues(alpha: 	0.4)
-                : (isDark ? Colors.black45 : Colors.black.withValues(alpha: 	0.05)),
+                ? themePink.withValues(alpha: 0.4)
+                : (isDark
+                      ? Colors.black45
+                      : Colors.black.withValues(alpha: 0.05)),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -775,7 +795,7 @@ class _PremiumScreenState extends State<PremiumScreen>
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        themePinkLight.withValues(alpha: 	0.4),
+                        themePinkLight.withValues(alpha: 0.4),
                         Colors.transparent,
                       ],
                     ),
@@ -795,8 +815,8 @@ class _PremiumScreenState extends State<PremiumScreen>
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: isPopular
-                              ? Colors.white.withValues(alpha: 	0.2)
-                              : accentColor.withValues(alpha: 	0.1),
+                              ? Colors.white.withValues(alpha: 0.2)
+                              : accentColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Icon(
@@ -808,7 +828,9 @@ class _PremiumScreenState extends State<PremiumScreen>
                       if (isPopular)
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
@@ -870,7 +892,11 @@ class _PremiumScreenState extends State<PremiumScreen>
                   Column(
                     children: features.take(3).map((feature) {
                       return _buildFeatureRow(
-                          feature, isPopular, accentColor, isDark);
+                        feature,
+                        isPopular,
+                        accentColor,
+                        isDark,
+                      );
                     }).toList(),
                   ),
                   // See all features button
@@ -879,13 +905,20 @@ class _PremiumScreenState extends State<PremiumScreen>
                     child: Center(
                       child: TextButton(
                         onPressed: () => _showFeaturesSheet(
-                            context, title, features, accentColor, isDark),
+                          context,
+                          title,
+                          features,
+                          accentColor,
+                          isDark,
+                        ),
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           backgroundColor: isPopular
-                              ? Colors.white.withValues(alpha: 	0.15)
-                              : accentColor.withValues(alpha: 	0.05),
+                              ? Colors.white.withValues(alpha: 0.15)
+                              : accentColor.withValues(alpha: 0.05),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -929,8 +962,8 @@ class _PremiumScreenState extends State<PremiumScreen>
                         backgroundColor: isPopular
                             ? Colors.white
                             : (isDark
-                                ? Colors.white.withValues(alpha: 	0.1)
-                                : Colors.black87),
+                                  ? Colors.white.withValues(alpha: 0.1)
+                                  : Colors.black87),
                         foregroundColor: isPopular ? themePink : Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
@@ -966,25 +999,27 @@ class _PremiumScreenState extends State<PremiumScreen>
                 // Modern Balance Card
                 Container(
                   width: double.infinity,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 32,
+                    horizontal: 24,
+                  ),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: isDark
                           ? [
-                              Colors.white.withValues(alpha: 	0.08),
-                              Colors.white.withValues(alpha: 	0.02)
+                              Colors.white.withValues(alpha: 0.08),
+                              Colors.white.withValues(alpha: 0.02),
                             ]
                           : [
-                              const Color(0xFFFFB300).withValues(alpha: 	0.1),
-                              const Color(0xFFFFB300).withValues(alpha: 	0.05)
+                              const Color(0xFFFFB300).withValues(alpha: 0.1),
+                              const Color(0xFFFFB300).withValues(alpha: 0.05),
                             ],
                     ),
                     borderRadius: BorderRadius.circular(32),
                     border: Border.all(
                       color: isDark
                           ? Colors.white12
-                          : const Color(0xFFFFB300).withValues(alpha: 	0.2),
+                          : const Color(0xFFFFB300).withValues(alpha: 0.2),
                     ),
                   ),
                   child: Column(
@@ -992,11 +1027,16 @@ class _PremiumScreenState extends State<PremiumScreen>
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFB300).withValues(alpha: 	0.15),
+                          color: const Color(
+                            0xFFFFB300,
+                          ).withValues(alpha: 0.15),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Iconsax.wallet_3,
-                            size: 32, color: Color(0xFFFFB300)),
+                        child: const Icon(
+                          Iconsax.wallet_3,
+                          size: 32,
+                          color: Color(0xFFFFB300),
+                        ),
                       ),
                       const SizedBox(height: 16),
                       Text(
@@ -1017,7 +1057,8 @@ class _PremiumScreenState extends State<PremiumScreen>
                             builder: (context, provider, _) {
                               return Text(
                                 _formatNumber(
-                                    provider.userProfile?.credits ?? 0),
+                                  provider.userProfile?.credits ?? 0,
+                                ),
                                 style: const TextStyle(
                                   fontSize: 48,
                                   fontWeight: FontWeight.w900,
@@ -1031,7 +1072,7 @@ class _PremiumScreenState extends State<PremiumScreen>
                           const Padding(
                             padding: EdgeInsets.only(bottom: 6),
                             child: Text(
-                              'CREDITS',
+                              'SPARKS',
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w900,
@@ -1044,35 +1085,11 @@ class _PremiumScreenState extends State<PremiumScreen>
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
-                // Withdrawal Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: OutlinedButton.icon(
-                    onPressed: () => _showWithdrawalSheet(context, isDark),
-                    icon: const Icon(Iconsax.export_1, size: 20),
-                    label: const Text(
-                      'Withdraw Funds',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFFFFB300),
-                      side: BorderSide(
-                        color: const Color(0xFFFFB300).withValues(alpha: 	0.5),
-                        width: 1.5,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                  ),
-                ),
                 const SizedBox(height: 32),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Purchase Credits',
+                    'Purchase Sparks',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
@@ -1112,8 +1129,12 @@ class _PremiumScreenState extends State<PremiumScreen>
     );
   }
 
-  Widget _buildCreditGlassBundle(int amount, bool isDark,
-      {bool isPopular = false, String? bonus}) {
+  Widget _buildCreditGlassBundle(
+    int amount,
+    bool isDark, {
+    bool isPopular = false,
+    String? bonus,
+  }) {
     const themePink = Color(0xFFFF4D85);
     final profileProvider = context.read<ProfileProvider>();
     String? countryCode = profileProvider.userProfile?.countryCode;
@@ -1134,25 +1155,31 @@ class _PremiumScreenState extends State<PremiumScreen>
     final pricing = _getPricing(countryCode?.toUpperCase());
     final prefix = pricing['credit_prefix'];
     final multiplier = pricing['credit_multiplier'] as num;
-    final priceValue = (amount * multiplier).toStringAsFixed(multiplier < 1 ? 2 : 0);
+    final priceValue = (amount * multiplier).toStringAsFixed(
+      multiplier < 1 ? 2 : 0,
+    );
 
     return Container(
       decoration: BoxDecoration(
         color: isPopular
             ? themePink
-            : (isDark ? Colors.white.withValues(alpha: 	0.05) : Colors.white),
+            : (isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white),
         borderRadius: BorderRadius.circular(32),
         border: Border.all(
           color: isPopular
-              ? Colors.white.withValues(alpha: 	0.3)
-              : (isDark ? Colors.white12 : Colors.black.withValues(alpha: 	0.05)),
+              ? Colors.white.withValues(alpha: 0.3)
+              : (isDark
+                    ? Colors.white12
+                    : Colors.black.withValues(alpha: 0.05)),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
             color: isPopular
-                ? themePink.withValues(alpha: 	0.3)
-                : (isDark ? Colors.black45 : Colors.black.withValues(alpha: 	0.05)),
+                ? themePink.withValues(alpha: 0.3)
+                : (isDark
+                      ? Colors.black45
+                      : Colors.black.withValues(alpha: 0.05)),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -1171,8 +1198,8 @@ class _PremiumScreenState extends State<PremiumScreen>
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: isPopular
-                          ? Colors.white.withValues(alpha: 	0.2)
-                          : const Color(0xFFFFB300).withValues(alpha: 	0.1),
+                          ? Colors.white.withValues(alpha: 0.2)
+                          : const Color(0xFFFFB300).withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -1194,7 +1221,7 @@ class _PremiumScreenState extends State<PremiumScreen>
                     ),
                   ),
                   Text(
-                    'Credits',
+                    'Sparks',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -1211,14 +1238,14 @@ class _PremiumScreenState extends State<PremiumScreen>
                       color: isPopular
                           ? Colors.white
                           : (isDark
-                              ? Colors.white.withValues(alpha: 	0.1)
-                              : Colors.black87),
+                                ? Colors.white.withValues(alpha: 0.1)
+                                : Colors.black87),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: ElevatedButton(
                       onPressed: () => _showPaymentSheet(
                         context,
-                        title: '$amount Credits',
+                        title: '$amount Sparks',
                         price: double.parse(priceValue.replaceAll(',', '')),
                         type: 'credits',
                       ),
@@ -1227,7 +1254,8 @@ class _PremiumScreenState extends State<PremiumScreen>
                         backgroundColor: Colors.transparent,
                         shadowColor: Colors.transparent,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16)),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
                       child: Text(
                         '$prefix $priceValue',
@@ -1322,485 +1350,6 @@ class _PremiumScreenState extends State<PremiumScreen>
     );
   }
 
-  void _showWithdrawalSheet(BuildContext context, bool isDark) {
-    final profileProvider = context.read<ProfileProvider>();
-    final percentage = profileProvider.userProfile?.completionPercentage ?? 0;
-    if (percentage < 100) {
-      _showProfileIncompleteDialog(context, percentage);
-      return;
-    }
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) {
-        return _WithdrawalSheet(isDark: isDark);
-      },
-    );
-  }
-
-  void _showProfileIncompleteDialog(BuildContext context, int percentage) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Row(
-          children: [
-            Icon(Icons.warning_amber_rounded, color: Color(0xFFFF4D85), size: 28),
-            SizedBox(width: 8),
-            Text(
-              'Profile Incomplete',
-              style: TextStyle(fontWeight: FontWeight.w900),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Your profile is currently $percentage% complete.',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'For verification and security purposes, you must complete your profile to 100% before you can withdraw funds.',
-              style: TextStyle(color: Colors.grey, fontSize: 13),
-            ),
-            const SizedBox(height: 16),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: LinearProgressIndicator(
-                value: percentage / 100,
-                backgroundColor: Colors.grey.withValues(alpha: 	0.2),
-                color: const Color(0xFFFF4D85),
-                minHeight: 8,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const EditProfileScreen()),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF4D85),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            child: const Text('Complete Profile'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _WithdrawalSheet extends StatefulWidget {
-  final bool isDark;
-  const _WithdrawalSheet({required this.isDark});
-
-  @override
-  State<_WithdrawalSheet> createState() => _WithdrawalSheetState();
-}
-
-class _WithdrawalSheetState extends State<_WithdrawalSheet> {
-  final TextEditingController _amountController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  PaymentOperator? _selectedOperator;
-  bool _isProcessing = false;
-  String? _errorMessage; // shown inline inside the sheet
-
-  // 1 Credit = 1 MWK (example conversion)
-  // Fees: 20% Service, 5% Gateway = 25% total
-  double get _serviceFeePercent => 0.20;
-  double get _gatewayFeePercent => 0.05;
-  double get _totalFeePercent => _serviceFeePercent + _gatewayFeePercent;
-
-  @override
-  void dispose() {
-    _amountController.dispose();
-    _phoneController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final profileProvider = Provider.of<ProfileProvider>(context);
-    final balance = profileProvider.userProfile?.credits ?? 0;
-
-    int amount = int.tryParse(_amountController.text) ?? 0;
-    double fee = amount * _totalFeePercent;
-    double payout = amount - fee;
-
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.85,
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      decoration: BoxDecoration(
-        color: widget.isDark ? const Color(0xFF1A1A22) : Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-      ),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: widget.isDark ? Colors.white12 : Colors.black12,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Withdraw Funds',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Convert your credits to MWK and withdraw to your mobile wallet.',
-              style: TextStyle(
-                color: widget.isDark ? Colors.white60 : Colors.black54,
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Inline error banner
-            if (_errorMessage != null)
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: Colors.red.shade200),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.error_outline_rounded,
-                        color: Colors.red.shade700, size: 20),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        _errorMessage!,
-                        style: TextStyle(
-                          color: Colors.red.shade800,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => setState(() => _errorMessage = null),
-                      child: Icon(Icons.close_rounded,
-                          color: Colors.red.shade400, size: 18),
-                    ),
-                  ],
-                ),
-              ),
-
-            // Amount Input
-            Text(
-              'AMOUNT TO WITHDRAW (Available: $balance)',
-              style: const TextStyle(
-                  fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _amountController,
-              keyboardType: TextInputType.number,
-              onChanged: (_) => setState(() {}),
-              decoration: InputDecoration(
-                hintText: 'Minimum 5,000 Credits',
-                prefixIcon: const Icon(Iconsax.coin),
-                filled: true,
-                fillColor: widget.isDark
-                    ? Colors.white.withValues(alpha: 	0.05)
-                    : Colors.black.withValues(alpha: 	0.03),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Operator Selection
-            const Text(
-              'SELECT OPERATOR',
-              style: TextStyle(
-                  fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                _buildOperatorOption(
-                    'Airtel Money', 'airtel', 'assets/images/airtel_logo.png'),
-                const SizedBox(width: 12),
-                _buildOperatorOption(
-                    'TNM Mpamba', 'tnm', 'assets/images/tnm_logo.png'),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Phone Number
-            const Text(
-              'MOBILE WALLET NUMBER',
-              style: TextStyle(
-                  fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _phoneController,
-              keyboardType: TextInputType.phone,
-              decoration: InputDecoration(
-                hintText: '09xxxxxxx or 08xxxxxxx',
-                prefixIcon: const Icon(Iconsax.mobile),
-                filled: true,
-                fillColor: widget.isDark
-                    ? Colors.white.withValues(alpha: 	0.05)
-                    : Colors.black.withValues(alpha: 	0.03),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none),
-              ),
-            ),
-            const SizedBox(height: 32),
-
-            // Fee Breakdown Card
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFB300).withValues(alpha: 	0.05),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                    color: const Color(0xFFFFB300).withValues(alpha: 	0.1)),
-              ),
-              child: Column(
-                children: [
-                  _buildFeeRow(
-                      'Gross Amount', 'MK ${amount.toStringAsFixed(0)}'),
-                  const Divider(height: 24),
-                  _buildFeeRow('Service Fee (20%)',
-                      '- MK ${(amount * _serviceFeePercent).toStringAsFixed(0)}'),
-                  _buildFeeRow('Payment Gateway (5%)',
-                      '- MK ${(amount * _gatewayFeePercent).toStringAsFixed(0)}'),
-                  const Divider(height: 24),
-                  _buildFeeRow('Total Payout', 'MK ${payout.toStringAsFixed(0)}',
-                      isTotal: true),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'Note: Withdrawals are processed within 24-48 hours.',
-              style: TextStyle(
-                  fontSize: 12,
-                  fontStyle: FontStyle.italic,
-                  color: Colors.grey),
-            ),
-            const SizedBox(height: 32),
-
-            // Submit Button
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: _isProcessing ? null : _submitWithdrawal,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFFB300),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18)),
-                  elevation: 0,
-                ),
-                child: _isProcessing
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('Confirm Withdrawal',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w900)),
-              ),
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildOperatorOption(String name, String id, String asset) {
-    bool isSelected = _selectedOperator?.name == name;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            _selectedOperator = PaymentOperator(
-              id: 0,
-              name: name,
-              refId: id,
-              shortCode: id,
-              logo: asset,
-              supportsWithdrawals: true,
-            );
-          });
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? const Color(0xFFFFB300).withValues(alpha: 	0.1)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isSelected
-                  ? const Color(0xFFFFB300)
-                  : (widget.isDark ? Colors.white12 : Colors.black12),
-              width: 2,
-            ),
-          ),
-          child: Column(
-            children: [
-              Icon(id == 'airtel' ? Icons.phone_android : Icons.mobile_friendly,
-                  color: isSelected ? const Color(0xFFFFB300) : Colors.grey),
-              const SizedBox(height: 8),
-              Text(
-                name,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-                  color: isSelected ? const Color(0xFFFFB300) : Colors.grey,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFeeRow(String label, String value, {bool isTotal = false}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: isTotal ? 16 : 14,
-            fontWeight: isTotal ? FontWeight.w900 : FontWeight.w500,
-            color: isTotal
-                ? (widget.isDark ? Colors.white : Colors.black87)
-                : Colors.grey,
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: isTotal ? 20 : 14,
-            fontWeight: isTotal ? FontWeight.w900 : FontWeight.w700,
-            color: isTotal
-                ? const Color(0xFFFFB300)
-                : (widget.isDark ? Colors.white : Colors.black87),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _submitWithdrawal() async {
-    final amountText = _amountController.text.trim();
-    final amount = int.tryParse(amountText) ?? 0;
-    final phone = _phoneController.text.trim();
-
-    if (amount < 5000) {
-      _showError('Minimum withdrawal is 5,000 Credits');
-      return;
-    }
-
-    if (_selectedOperator == null) {
-      _showError('Please select a mobile operator');
-      return;
-    }
-
-    if (phone.length < 9) {
-      _showError('Please enter a valid mobile number');
-      return;
-    }
-
-    final lp = Provider.of<ProfileProvider>(context, listen: false);
-    if ((lp.userProfile?.credits ?? 0) < amount) {
-      _showError('Insufficient balance');
-      return;
-    }
-
-    setState(() => _isProcessing = true);
-
-    try {
-      // Consume credits
-      await lp.useCredits(amount);
-
-      // Simulate API Call for withdrawal record
-      await Future.delayed(const Duration(seconds: 2));
-
-      if (mounted) {
-        setState(() => _isProcessing = false);
-        Navigator.pop(context);
-        _showSuccessDialog();
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isProcessing = false);
-        _showError('Failed to process withdrawal: $e');
-      }
-    }
-  }
-
-  void _showError(String msg) {
-    setState(() => _errorMessage = msg);
-  }
-
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Icon(Icons.check_circle, color: Colors.green, size: 64),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Withdrawal Submitted!',
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
-            SizedBox(height: 8),
-            Text(
-                'Your request is being processed. You will receive MWK in your mobile wallet soon.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey)),
-          ],
-        ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Got it!')),
-        ],
-      ),
-    );
-  }
 }
 
 class _PaymentSheetContent extends StatefulWidget {
@@ -1839,8 +1388,10 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
   }
 
   Future<void> _startPayment() async {
-    final profileProvider =
-        Provider.of<ProfileProvider>(context, listen: false);
+    final profileProvider = Provider.of<ProfileProvider>(
+      context,
+      listen: false,
+    );
     final user = profileProvider.userProfile;
     if (user == null) return;
 
@@ -1858,7 +1409,7 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
       final responseData = await widget.paymentService.initializePayment(
         mobile: _phoneController.text.trim(),
         amount: widget.price,
-        email: profileProvider.currentUser?.email ?? 'user@datedash.com',
+        email: profileProvider.currentUser?.email ?? 'user@snellum.com',
         operatorId: _selectedOperator!.refId,
         txRef: uniqueRef,
         firstName: user.firstName,
@@ -1957,8 +1508,10 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
   }
 
   Future<void> _handleSuccess() async {
-    final profileProvider =
-        Provider.of<ProfileProvider>(context, listen: false);
+    final profileProvider = Provider.of<ProfileProvider>(
+      context,
+      listen: false,
+    );
     final uid = profileProvider.currentUser?.uid;
     if (uid == null) return;
 
@@ -1968,7 +1521,10 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
     // Update user profile
     if (widget.type == 'subscription') {
       await _profileService.updatePremiumStatus(
-          uid, widget.title, widget.isMonthly);
+        uid,
+        widget.title,
+        widget.isMonthly,
+      );
     } else {
       final amount = int.parse(widget.title.split(' ')[0]);
       await _profileService.addCredits(uid, amount);
@@ -1985,14 +1541,18 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 	isDark ? 0.5 : 0.1),
+            color: Colors.black.withValues(alpha: isDark ? 0.5 : 0.1),
             blurRadius: 20,
             spreadRadius: 5,
-          )
+          ),
         ],
       ),
       padding: EdgeInsets.fromLTRB(
-          24, 12, 24, 32 + MediaQuery.of(context).viewInsets.bottom),
+        24,
+        12,
+        24,
+        32 + MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: SafeArea(
         child: SingleChildScrollView(
           child: AnimatedSwitcher(
@@ -2042,15 +1602,18 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
         Text(
           'Select Payment Method',
           style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
-              color: isDark ? Colors.white : Colors.black87),
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
         ),
         const SizedBox(height: 8),
         Text(
           'Choose your preferred mobile money operator',
           style: TextStyle(
-              fontSize: 14, color: isDark ? Colors.white54 : Colors.black54),
+            fontSize: 14,
+            color: isDark ? Colors.white54 : Colors.black54,
+          ),
         ),
         const SizedBox(height: 24),
         FutureBuilder<List<PaymentOperator>>(
@@ -2060,22 +1623,26 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
               return const Padding(
                 padding: EdgeInsets.symmetric(vertical: 40),
                 child: Center(
-                    child: CircularProgressIndicator(color: Color(0xFFFF4D85))),
+                  child: CircularProgressIndicator(color: Color(0xFFFF4D85)),
+                ),
               );
             } else if (snapshot.hasError) {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 child: Center(
-                  child: Text('Failed to load operators.',
-                      style: TextStyle(color: Colors.red.shade300)),
+                  child: Text(
+                    'Failed to load operators.',
+                    style: TextStyle(color: Colors.red.shade300),
+                  ),
                 ),
               );
             } else if (snapshot.hasData) {
               return Column(
                 children: snapshot.data!.map((op) {
                   final bool isAirtel = op.shortCode == 'airtel';
-                  final Color opColor =
-                      isAirtel ? Colors.red : const Color(0xFF00C853);
+                  final Color opColor = isAirtel
+                      ? Colors.red
+                      : const Color(0xFF00C853);
 
                   return GestureDetector(
                     onTap: () => setState(() {
@@ -2086,19 +1653,20 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
                       margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
                         color: isDark
-                            ? Colors.white.withValues(alpha: 	0.05)
+                            ? Colors.white.withValues(alpha: 0.05)
                             : Colors.white,
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                            color: isDark
-                                ? Colors.white.withValues(alpha: 	0.1)
-                                : Colors.black.withValues(alpha: 	0.05)),
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.1)
+                              : Colors.black.withValues(alpha: 0.05),
+                        ),
                         boxShadow: [
                           BoxShadow(
-                            color: opColor.withValues(alpha: 	0.1),
+                            color: opColor.withValues(alpha: 0.1),
                             blurRadius: 15,
                             offset: const Offset(0, 8),
-                          )
+                          ),
                         ],
                       ),
                       child: Padding(
@@ -2113,20 +1681,22 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: 	0.1),
+                                    color: Colors.black.withValues(alpha: 0.1),
                                     blurRadius: 10,
                                     offset: const Offset(0, 4),
-                                  )
+                                  ),
                                 ],
                                 border: Border.all(
-                                    color: opColor.withValues(alpha: 	0.2), width: 2),
+                                  color: opColor.withValues(alpha: 0.2),
+                                  width: 2,
+                                ),
                               ),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(18),
                                 child: Image.asset(
                                   'assets/images/${op.shortCode}.png',
                                   fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) =>
+                                  errorBuilder: (_, _, _) =>
                                       Icon(Iconsax.wallet_35, color: opColor),
                                 ),
                               ),
@@ -2139,19 +1709,21 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
                                   Text(
                                     op.name,
                                     style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: isDark
-                                            ? Colors.white
-                                            : Colors.black87),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDark
+                                          ? Colors.white
+                                          : Colors.black87,
+                                    ),
                                   ),
                                   Text(
                                     '${op.supportedCountry?.name ?? 'Malawi'} • ${op.supportedCountry?.currency ?? 'MWK'}',
                                     style: TextStyle(
-                                        fontSize: 13,
-                                        color: isDark
-                                            ? Colors.white54
-                                            : Colors.black54),
+                                      fontSize: 13,
+                                      color: isDark
+                                          ? Colors.white54
+                                          : Colors.black54,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -2159,11 +1731,14 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: opColor.withValues(alpha: 	0.1),
+                                color: opColor.withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
-                              child: Icon(Iconsax.arrow_right_3,
-                                  size: 18, color: opColor),
+                              child: Icon(
+                                Iconsax.arrow_right_3,
+                                size: 18,
+                                color: opColor,
+                              ),
                             ),
                           ],
                         ),
@@ -2190,22 +1765,24 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
         Text(
           'Confirm Details',
           style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w900,
-              color: isDark ? Colors.white : Colors.black87),
+            fontSize: 22,
+            fontWeight: FontWeight.w900,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
         ),
         const SizedBox(height: 24),
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: isDark
-                ? Colors.white.withValues(alpha: 	0.05)
-                : Colors.black.withValues(alpha: 	0.03),
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.black.withValues(alpha: 0.03),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 	0.1)
-                    : Colors.black.withValues(alpha: 	0.05)),
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : Colors.black.withValues(alpha: 0.05),
+            ),
           ),
           child: Column(
             children: [
@@ -2219,16 +1796,17 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
                       borderRadius: BorderRadius.circular(15),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 	0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10,
-                        )
+                        ),
                       ],
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Image.asset(
-                          'assets/images/${_selectedOperator!.shortCode}.png',
-                          fit: BoxFit.contain),
+                        'assets/images/${_selectedOperator!.shortCode}.png',
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -2236,18 +1814,23 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(widget.title.toUpperCase(),
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w900,
-                                fontSize: 13,
-                                color: Color(0xFFFF4D85),
-                                letterSpacing: 1.2)),
-                        Text('${_selectedOperator!.name} Payment',
-                            style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color:
-                                    isDark ? Colors.white70 : Colors.black54)),
+                        Text(
+                          widget.title.toUpperCase(),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 13,
+                            color: Color(0xFFFF4D85),
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        Text(
+                          '${_selectedOperator!.name} Payment',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white70 : Colors.black54,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -2260,14 +1843,20 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Amount to Pay',
-                      style: TextStyle(
-                          color: isDark ? Colors.white54 : Colors.black54)),
-                  Text('${widget.price.toInt()} MWK',
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w900,
-                          color: isDark ? Colors.white : Colors.black87)),
+                  Text(
+                    'Amount to Pay',
+                    style: TextStyle(
+                      color: isDark ? Colors.white54 : Colors.black54,
+                    ),
+                  ),
+                  Text(
+                    '${widget.price.toInt()} MWK',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -2278,28 +1867,39 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
           controller: _phoneController,
           keyboardType: TextInputType.phone,
           style: const TextStyle(
-              fontWeight: FontWeight.bold, letterSpacing: 2, fontSize: 18),
+            fontWeight: FontWeight.bold,
+            letterSpacing: 2,
+            fontSize: 18,
+          ),
           decoration: InputDecoration(
             labelText: 'Mobile Number',
             labelStyle: const TextStyle(
-                fontSize: 14, fontWeight: FontWeight.normal, letterSpacing: 0),
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
+              letterSpacing: 0,
+            ),
             hintText: _selectedOperator?.shortCode == 'airtel'
                 ? '09xxxxxxx'
                 : '08xxxxxxx',
             prefixIcon: Icon(Iconsax.mobile5, color: opColor),
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
-                borderSide: BorderSide.none),
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide.none,
+            ),
             enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
-                borderSide: BorderSide.none),
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide.none,
+            ),
             focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
-                borderSide: BorderSide(color: opColor, width: 2)),
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide(color: opColor, width: 2),
+            ),
             filled: true,
             fillColor: isDark ? Colors.black26 : Colors.grey.shade100,
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 20,
+              horizontal: 20,
+            ),
           ),
         ),
         const SizedBox(height: 24),
@@ -2315,7 +1915,7 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFFF4D85).withValues(alpha: 	0.3),
+                color: const Color(0xFFFF4D85).withValues(alpha: 0.3),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
               ),
@@ -2324,8 +1924,9 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
           child: ElevatedButton(
             onPressed: () {
               if (_phoneController.text.length < 9) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Please enter a valid number')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please enter a valid number')),
+                );
                 return;
               }
               _startPayment();
@@ -2334,13 +1935,17 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
-            child: const Text('Confirm & Pay',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16)),
+            child: const Text(
+              'Confirm & Pay',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
           ),
         ),
         TextButton(
@@ -2361,9 +1966,10 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
           Text(
             'Securely Processing...',
             style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w900,
-                color: isDark ? Colors.white : Colors.black87),
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
           ),
           const SizedBox(height: 12),
           Padding(
@@ -2391,11 +1997,14 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.greenAccent.withValues(alpha: 	0.1),
+              color: Colors.greenAccent.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Iconsax.tick_circle5,
-                size: 80, color: Colors.greenAccent),
+            child: const Icon(
+              Iconsax.tick_circle5,
+              size: 80,
+              color: Colors.greenAccent,
+            ),
           ),
           const SizedBox(height: 32),
           const Text(
@@ -2407,9 +2016,10 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
             'High five! Your ${widget.title} is now active and ready to go.',
             textAlign: TextAlign.center,
             style: TextStyle(
-                fontSize: 16,
-                color: isDark ? Colors.white54 : Colors.black54,
-                height: 1.5),
+              fontSize: 16,
+              color: isDark ? Colors.white54 : Colors.black54,
+              height: 1.5,
+            ),
           ),
           const SizedBox(height: 40),
           Container(
@@ -2424,7 +2034,7 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFFF4D85).withValues(alpha: 	0.3),
+                  color: const Color(0xFFFF4D85).withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 6),
                 ),
@@ -2436,13 +2046,17 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
                 backgroundColor: Colors.transparent,
                 shadowColor: Colors.transparent,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
-              child: const Text('Done!',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16)),
+              child: const Text(
+                'Done!',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
             ),
           ),
         ],
@@ -2458,11 +2072,14 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.redAccent.withValues(alpha: 	0.1),
+              color: Colors.redAccent.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child:
-                const Icon(Iconsax.danger5, size: 80, color: Colors.redAccent),
+            child: const Icon(
+              Iconsax.danger5,
+              size: 80,
+              color: Colors.redAccent,
+            ),
           ),
           const SizedBox(height: 32),
           const Text(
@@ -2474,9 +2091,10 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
             _errorMsg,
             textAlign: TextAlign.center,
             style: TextStyle(
-                color: Colors.redAccent.withValues(alpha: 	0.8),
-                fontSize: 16,
-                height: 1.5),
+              color: Colors.redAccent.withValues(alpha: 0.8),
+              fontSize: 16,
+              height: 1.5,
+            ),
           ),
           const SizedBox(height: 40),
           SizedBox(
@@ -2485,14 +2103,18 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
             child: ElevatedButton(
               onPressed: () => setState(() => _step = 1),
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    isDark ? Colors.white.withValues(alpha: 	0.05) : Colors.black12,
+                backgroundColor: isDark
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.black12,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
-              child: const Text('Try Again',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              child: const Text(
+                'Try Again',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
             ),
           ),
         ],
@@ -2520,9 +2142,10 @@ class _PulsingLogoState extends State<_PulsingLogo>
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
-    _animation = Tween<double>(begin: 1.0, end: 1.2).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _animation = Tween<double>(
+      begin: 1.0,
+      end: 1.2,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -2556,4 +2179,3 @@ class _PulsingLogoState extends State<_PulsingLogo>
     );
   }
 }
-

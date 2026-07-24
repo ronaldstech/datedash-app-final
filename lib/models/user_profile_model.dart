@@ -113,7 +113,9 @@ class UserProfile {
   bool isPremium;
   String? premiumType; // 'Pro', 'Premium', 'Elite'
   DateTime? premiumExpiry;
-  int credits;
+  int sparks;
+  int get credits => sparks;
+  set credits(int v) => sparks = v;
   List<String> unlockedLikes;
   List<String> unlockedViewers;
 
@@ -200,7 +202,7 @@ class UserProfile {
     this.isPremium = false,
     this.premiumType,
     this.premiumExpiry,
-    this.credits = 0,
+    this.sparks = 0,
     this.unlockedLikes = const [],
     this.unlockedViewers = const [],
     this.dailyUsageDuration = 0.0,
@@ -396,7 +398,7 @@ class UserProfile {
         isPremium: map['isPremium'] == true,
         premiumType: map['premiumType']?.toString(),
         premiumExpiry: _parseDate(map['premiumExpiry']),
-        credits: (map['credits'] as num?)?.toInt() ?? 0,
+        sparks: (map['credits'] as num?)?.toInt() ?? 0,
         unlockedLikes: _parseList(map['unlockedLikes']),
         unlockedViewers: _parseList(map['unlockedViewers']),
         dailyUsageDuration: (map['dailyUsageDuration'] as num?)?.toDouble() ?? 0.0,
@@ -529,7 +531,7 @@ class UserProfile {
       'isPremium': isPremium,
       'premiumType': premiumType,
       'premiumExpiry': premiumExpiry != null ? Timestamp.fromDate(premiumExpiry!) : null,
-      'credits': credits,
+      'credits': sparks,
       'unlockedLikes': unlockedLikes,
       'unlockedViewers': unlockedViewers,
       'dailyUsageDuration': dailyUsageDuration,

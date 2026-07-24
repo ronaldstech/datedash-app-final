@@ -10,7 +10,7 @@ initializeApp();
 const resendApiKey = defineSecret("RESEND_API_KEY");
 const verificationSecret = defineSecret("EMAIL_VERIFICATION_SECRET");
 const emailFrom = defineString("EMAIL_FROM", {
-  default: "DateDash <onboarding@resend.dev>",
+  default: "Snellum <onboarding@resend.dev>",
 });
 
 const db = getFirestore();
@@ -99,11 +99,11 @@ exports.requestEmailVerification = onRequest(
     const emailResult = await resend.emails.send({
       from: emailFrom.value(),
       to: [email],
-      subject: "Verify your DateDash account",
-      text: `Your DateDash verification code is ${code}. It expires in ${codeTtlMinutes} minutes.`,
+      subject: "Verify your Snellum account",
+      text: `Your Snellum verification code is ${code}. It expires in ${codeTtlMinutes} minutes.`,
       html: `
         <div style="font-family:Arial,sans-serif;line-height:1.5;color:#222">
-          <h2>Your DateDash verification code</h2>
+          <h2>Your Snellum verification code</h2>
           <p>Use this code to finish creating your account:</p>
           <p style="font-size:32px;font-weight:700;letter-spacing:6px">${code}</p>
           <p>This code expires in ${codeTtlMinutes} minutes.</p>

@@ -18,7 +18,7 @@ class AppUpdateInfo {
 
 class UpdateService {
   static const String _defaultDownloadUrl =
-      'https://unimarket-mw.com/datedash/datedash.apk';
+      'https://unimarket-mw.com/snellum/snellum.apk';
 
   /// Returns [AppUpdateInfo] if an update is available, otherwise null.
   Future<AppUpdateInfo?> checkForUpdate() async {

@@ -123,7 +123,7 @@ class LiveStreamService {
           senderName: senderName,
           type: 'gift',
           message:
-              'Sent you a $giftType worth $giftValue credits during your live!',
+              'Sent you a $giftType worth $giftValue sparks during your live!',
         );
       }
     }

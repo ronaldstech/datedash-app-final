@@ -62,7 +62,7 @@ class _CallListenerWrapperState extends State<CallListenerWrapper> {
               callerPhoto: callData['callerPhoto'] ?? '',
               chatId: chatId,
               isVideo: callData['isVideo'] ?? false,
-              roomName: callData['roomName'] ?? 'datedash-room',
+              roomName: callData['roomName'] ?? 'snellum-room',
             ),
           ),
         );

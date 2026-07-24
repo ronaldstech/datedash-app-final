@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:datedash/services/notification_service.dart';
+import 'package:snellum/services/notification_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'profile_service.dart';
@@ -40,19 +40,19 @@ class AuthService {
       );
 
       if (cred.user != null) {
-        // Initialize user document in Firestore with name, phone and 50 signup credits
+        // Initialize user document in Firestore with name, phone and 50 signup sparks
         await _profileService.saveUserProfile(
           cred.user!.uid,
-          UserProfile(firstName: name, phoneNumber: phoneNumber, credits: 50),
+          UserProfile(firstName: name, phoneNumber: phoneNumber, sparks: 50),
         );
 
         // Log the signup reward
         await NotificationService().sendNotification(
           recipientId: cred.user!.uid,
           senderId: 'system',
-          senderName: 'Datedash',
+          senderName: 'Snellum',
           type: 'reward',
-          message: '🎁 Welcome bonus: 50 free credits added!',
+          message: '🎁 Welcome bonus: 50 free sparks added!',
         );
       }
 
@@ -80,16 +80,16 @@ class AuthService {
         if (profile == null) {
           await _profileService.saveUserProfile(
             cred.user!.uid,
-            UserProfile(firstName: cred.user?.displayName, credits: 50),
+            UserProfile(firstName: cred.user?.displayName, sparks: 50),
           );
 
           // Log the signup reward
           await NotificationService().sendNotification(
             recipientId: cred.user!.uid,
             senderId: 'system',
-            senderName: 'Datedash',
+            senderName: 'Snellum',
             type: 'reward',
-            message: '🎁 Welcome bonus: 50 free credits added!',
+            message: '🎁 Welcome bonus: 50 free sparks added!',
           );
         }
       }
@@ -155,7 +155,7 @@ class AuthService {
             UserProfile(
               firstName: 'User',
               phoneNumber: cred.user?.phoneNumber,
-              credits: 50,
+              sparks: 50,
             ),
           );
 
@@ -163,9 +163,9 @@ class AuthService {
           await NotificationService().sendNotification(
             recipientId: cred.user!.uid,
             senderId: 'system',
-            senderName: 'Datedash',
+            senderName: 'Snellum',
             type: 'reward',
-            message: '🎁 Welcome bonus: 50 free credits added!',
+            message: '🎁 Welcome bonus: 50 free sparks added!',
           );
         }
       }

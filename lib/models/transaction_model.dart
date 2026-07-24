@@ -9,7 +9,7 @@ class TransactionModel {
   final String status; // 'pending', 'success', 'failed'
   final String type; // 'subscription', 'credits'
   final String? plan; // 'Pro', 'Premium', 'Elite'
-  final int? creditAmount;
+  final int? sparkAmount;
   final String operator;
   final DateTime timestamp;
 
@@ -22,7 +22,7 @@ class TransactionModel {
     required this.status,
     required this.type,
     this.plan,
-    this.creditAmount,
+    this.sparkAmount,
     required this.operator,
     required this.timestamp,
   });
@@ -37,7 +37,7 @@ class TransactionModel {
       status: map['status'] ?? 'pending',
       type: map['type'] ?? '',
       plan: map['plan'],
-      creditAmount: map['creditAmount'] as int?,
+      sparkAmount: map['creditAmount'] as int?,
       operator: map['operator'] ?? '',
       timestamp: (map['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
@@ -52,7 +52,7 @@ class TransactionModel {
       'status': status,
       'type': type,
       'plan': plan,
-      'creditAmount': creditAmount,
+      'sparkAmount': sparkAmount,
       'operator': operator,
       'timestamp': FieldValue.serverTimestamp(),
     };

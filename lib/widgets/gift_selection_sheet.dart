@@ -255,7 +255,7 @@ class GiftSelectionSheet extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 32),
                 child: Text(
-                  'Surprise $targetUserName with this special gift for ${gift.cost} credits.',
+                  'Surprise $targetUserName with this special gift for ${gift.cost} sparks.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 15,

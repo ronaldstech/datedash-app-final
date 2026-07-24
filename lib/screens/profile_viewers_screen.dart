@@ -461,7 +461,7 @@ class ProfileViewersScreen extends StatelessWidget {
 
               const SizedBox(height: 32),
 
-              // --- Credit Indicator ---
+              // --- Spark Indicator ---
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -481,7 +481,7 @@ class ProfileViewersScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Your Balance: ${profileProvider.userProfile?.credits ?? 0} Credits',
+                      'Your Balance: ${profileProvider.userProfile?.credits ?? 0} Sparks',
                       style: const TextStyle(
                         color: Color(0xFFFFB300),
                         fontWeight: FontWeight.w700,
@@ -499,7 +499,7 @@ class ProfileViewersScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   children: [
-                    // Unlock with Credits
+                    // Unlock with Sparks
                     GestureDetector(
                       onTap: () async {
                         if ((profileProvider.userProfile?.credits ?? 0) < 20) {

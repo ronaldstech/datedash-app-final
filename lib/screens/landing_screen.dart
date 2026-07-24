@@ -1,4 +1,4 @@
-import 'package:datedash/screens/auth/sign_in_screen.dart';
+import 'package:snellum/screens/auth/sign_in_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'dart:ui';
@@ -180,7 +180,7 @@ class _LandingScreenState extends State<LandingScreen>
                           selectedCategory,
                           languageProvider,
                         )
-                      : 'DateDash',
+                      : 'Snellum',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: (currentIndex == 1 && selectedCategory != null)

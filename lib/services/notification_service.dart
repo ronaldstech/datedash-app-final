@@ -40,13 +40,13 @@ class NotificationService {
   }
 
   /// Returns a stream of notifications for a user
-  Stream<List<DatedashNotification>> getNotificationsStream(String userId) {
+  Stream<List<SnellumNotification>> getNotificationsStream(String userId) {
     return _notificationsCollection
         .where('recipientId', isEqualTo: userId)
         .snapshots()
         .map((snapshot) {
-      final List<DatedashNotification> notifications = snapshot.docs.map((doc) {
-        return DatedashNotification.fromMap(
+      final List<SnellumNotification> notifications = snapshot.docs.map((doc) {
+        return SnellumNotification.fromMap(
           doc.data() as Map<String, dynamic>,
           doc.id,
         );

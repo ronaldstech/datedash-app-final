@@ -22,7 +22,7 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen> {
   final NotificationService _notificationService = NotificationService();
   final ProfileService _profileService = ProfileService();
-  Stream<List<DatedashNotification>>? _notificationsStream;
+  Stream<List<SnellumNotification>>? _notificationsStream;
 
   @override
   void initState() {
@@ -34,9 +34,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }
   }
 
-  Map<String, List<DatedashNotification>> _groupNotifications(
-      List<DatedashNotification> notifications, LanguageProvider lp) {
-    final Map<String, List<DatedashNotification>> groups = {
+  Map<String, List<SnellumNotification>> _groupNotifications(
+      List<SnellumNotification> notifications, LanguageProvider lp) {
+    final Map<String, List<SnellumNotification>> groups = {
       'Today': [],
       'Yesterday': [],
       'Earlier': [],
@@ -174,7 +174,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }
 
     return Scaffold(
-      body: StreamBuilder<List<DatedashNotification>>(
+      body: StreamBuilder<List<SnellumNotification>>(
         stream: _notificationsStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -253,7 +253,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     );
   }
 
-  Widget _buildNotificationSliver(List<DatedashNotification> items) {
+  Widget _buildNotificationSliver(List<SnellumNotification> items) {
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       sliver: SliverList(
@@ -304,7 +304,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 }
 
 class _NotificationCard extends StatefulWidget {
-  final DatedashNotification notification;
+  final SnellumNotification notification;
   final NotificationService service;
   final ProfileService profileService;
   final VoidCallback onPop;

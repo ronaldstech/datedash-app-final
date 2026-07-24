@@ -63,7 +63,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       // Using ip-api.com as it's often more accessible than ipapi.co
       final response = await http.get(
         Uri.parse('http://ip-api.com/json'),
-        headers: {'User-Agent': 'Datedash/1.0.0'},
+        headers: {'User-Agent': 'Snellum/1.0.0'},
       );
       if (response.statusCode == 200) {
         final data = json.decode(response.body);

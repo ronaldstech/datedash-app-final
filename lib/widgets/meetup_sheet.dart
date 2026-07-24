@@ -123,7 +123,7 @@ class _MeetupSheetState extends State<MeetupSheet> {
         title: const Text('Confirm Meetup Request',
             style: TextStyle(fontWeight: FontWeight.w800)),
         content: const Text(
-            'Sending a meetup request costs 100 credits. Do you want to proceed?'),
+            'Sending a meetup request costs 100 sparks. Do you want to proceed?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -135,7 +135,7 @@ class _MeetupSheetState extends State<MeetupSheet> {
               backgroundColor: const Color(0xFFFF4D85),
               foregroundColor: Colors.white,
             ),
-            child: const Text('Send (100 Credits)'),
+            child: const Text('Send (100 Sparks)'),
           ),
         ],
       ),
@@ -149,8 +149,8 @@ class _MeetupSheetState extends State<MeetupSheet> {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Insufficient Credits'),
-        content: const Text('You need 100 credits to send a meetup request.'),
+        title: const Text('Insufficient Sparks'),
+        content: const Text('You need 100 sparks to send a meetup request.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

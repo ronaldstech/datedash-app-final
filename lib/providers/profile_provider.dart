@@ -280,7 +280,7 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
     }
   }
 
-  /// Deducts credits from the current user
+  /// Deducts sparks from the current user
   Future<void> useCredits(int amount) async {
     final uid = _currentUser?.uid;
     if (uid == null) return;
@@ -288,17 +288,17 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
       await _profileService.deductCredits(uid, amount);
       // Local state will update via stream
     } catch (e) {
-      debugPrint('ProfileProvider: Error using credits: $e');
+      debugPrint('ProfileProvider: Error using sparks: $e');
       rethrow;
     }
   }
 
-  /// Unlocks a specific profile for 20 credits
+  /// Unlocks a specific profile for 20 sparks
   Future<void> unlockProfile(String targetId) async {
     final uid = _currentUser?.uid;
     if (uid == null) return;
     try {
-      // 1. Deduct 20 credits
+      // 1. Deduct 20 sparks
       await useCredits(20);
       
       // 2. Add to unlockedLikes in Firestore
@@ -313,12 +313,12 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
     }
   }
 
-  /// Unlocks a specific viewer for 20 credits
+  /// Unlocks a specific viewer for 20 sparks
   Future<void> unlockViewer(String targetId) async {
     final uid = _currentUser?.uid;
     if (uid == null) return;
     try {
-      // 1. Deduct 20 credits
+      // 1. Deduct 20 sparks
       await useCredits(20);
       
       // 2. Add to unlockedViewers in Firestore
@@ -431,7 +431,7 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
     // _checkActivityReward(uid, profile, today); // Removed automatic awarding - now manual claim in UI
   }
 
-  /// Claims a specific reward and grants credits
+  /// Claims a specific reward and grants sparks
   Future<void> claimReward(String rewardId, int amount) async {
     final uid = _currentUser?.uid;
     final profile = _userProfile;
@@ -467,9 +467,9 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
       await NotificationService().sendNotification(
         recipientId: uid,
         senderId: 'system',
-        senderName: 'Datedash',
+        senderName: 'Snellum',
         type: 'reward',
-        message: '🎁 Challenge completed: $amount free credits added!',
+        message: '🎁 Challenge completed: $amount free sparks added!',
       );
       
       notifyListeners();

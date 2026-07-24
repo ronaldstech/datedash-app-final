@@ -14,7 +14,7 @@ class ChatService {
 
   // Change this to your actual PHP server endpoint
   static const String _uploadEndpoint =
-      'https://unimarket-mw.com/datedash/api/upload2.php';
+      'https://unimarket-mw.com/snellum/api/upload2.php';
 
   /// Deterministic chat ID — sorted UIDs joined by underscore
   String getChatId(String uid1, String uid2) {
@@ -88,7 +88,7 @@ class ChatService {
         }
         
         // We no longer throw an exception here. 
-        // The client-side handles charging credits after the 5 free messages are used up.
+        // The client-side handles charging sparks after the 5 free messages are used up.
         
         await senderRef.update({
           'dailyMessageCount': dailyCount + 1,
@@ -182,7 +182,7 @@ class ChatService {
         }
         
         // We no longer throw an exception here. 
-        // The client-side handles charging credits after the 5 free messages are used up.
+        // The client-side handles charging sparks after the 5 free messages are used up.
         
         await senderRef.update({
           'dailyMessageCount': dailyCount + 1,
@@ -283,7 +283,7 @@ class ChatService {
         }
         
         // We no longer throw an exception here. 
-        // The client-side handles charging credits after the 5 free messages are used up.
+        // The client-side handles charging sparks after the 5 free messages are used up.
         
         await senderRef.update({
           'dailyMessageCount': dailyCount + 1,
@@ -334,7 +334,7 @@ class ChatService {
     }
   }
 
-  /// Sends a Super Request (priority chat) for 20 credits
+  /// Sends a Super Request (priority chat) for 20 sparks
   Future<void> sendSuperRequest({
     required String chatId,
     required String senderId,
@@ -382,7 +382,7 @@ class ChatService {
     }
   }
 
-  /// Sends a gift in chat, deducting credits from sender
+  /// Sends a gift in chat, deducting sparks from sender
   Future<void> sendGift({
     required String chatId,
     required String senderId,
@@ -396,12 +396,12 @@ class ChatService {
     final senderRef = _firestore.collection('users').doc(senderId);
     final receiverRef = _firestore.collection('users').doc(receiverId);
 
-    // 1. Deduct credits from sender
+    // 1. Deduct sparks from sender
     batch.update(senderRef, {
       'credits': FieldValue.increment(-giftValue),
     });
 
-    // 2. Add credits to receiver
+    // 2. Add sparks to receiver
     batch.update(receiverRef, {
       'credits': FieldValue.increment(giftValue),
     });
@@ -508,7 +508,7 @@ class ChatService {
         // Fix for backend script upload2.php omitting the app directory
         if (url.contains('unimarket-mw.com/uploads/')) {
           url = url.replaceFirst('unimarket-mw.com/uploads/',
-              'unimarket-mw.com/datedash/api/uploads/');
+              'unimarket-mw.com/snellum/api/uploads/');
         }
         return url;
       } else {
@@ -667,7 +667,7 @@ class ChatService {
         String url = data['file_url'] as String;
         if (url.contains('unimarket-mw.com/uploads/')) {
           url = url.replaceFirst('unimarket-mw.com/uploads/',
-              'unimarket-mw.com/datedash/api/uploads/');
+              'unimarket-mw.com/snellum/api/uploads/');
         }
         return url;
       } else {
@@ -787,7 +787,24 @@ class ChatService {
   Stream<bool> getUserOnlineStatus(String uid) {
     return _firestore.collection('users').doc(uid).snapshots().map((snap) {
       if (!snap.exists) return false;
-      return (snap.data()?['isOnline'] as bool?) ?? false;
+      final data = snap.data();
+      if (data == null) return false;
+
+      final isOnlineFlag = (data['isOnline'] as bool?) ?? false;
+      if (!isOnlineFlag) return false;
+
+      // Check lastSeen timestamp freshness to prevent stale online status
+      final lastSeenRaw = data['lastSeen'];
+      if (lastSeenRaw is Timestamp) {
+        final lastSeen = lastSeenRaw.toDate();
+        final diffInSeconds = DateTime.now().difference(lastSeen).inSeconds;
+        // If lastSeen was over 2 minutes (120 seconds) ago, treat as offline
+        if (diffInSeconds > 120) {
+          return false;
+        }
+      }
+
+      return true;
     }).handleError((error) {
       debugPrint('Error getting user online status: $error');
       return false;
