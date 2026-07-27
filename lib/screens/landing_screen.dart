@@ -14,6 +14,7 @@ import '../services/notification_service.dart';
 import 'notification_screen.dart';
 import 'swipe_filters_screen.dart';
 import 'premium_screen.dart';
+import 'live_list_screen.dart';
 import '../providers/language_provider.dart';
 import '../widgets/mandatory_phone_sheet.dart';
 import 'package:flutter/scheduler.dart';
@@ -314,6 +315,7 @@ class _LandingScreenState extends State<LandingScreen>
                   const ExploreScreen(),
                   LikesScreen(),
                   const ChatListScreen(),
+                  const LiveListScreen(),
                   PremiumScreen(initialTab: profileProvider.initialPremiumTab),
                 ],
               ),
@@ -387,6 +389,14 @@ class _LandingScreenState extends State<LandingScreen>
                         ),
                         _buildNavItem(
                           4,
+                          Iconsax.video,
+                          Iconsax.video5,
+                          languageProvider.getString('nav_video'),
+                          currentIndex,
+                          profileProvider,
+                        ),
+                        _buildNavItem(
+                          5,
                           Iconsax.crown,
                           Iconsax.crown5,
                           'Premium',

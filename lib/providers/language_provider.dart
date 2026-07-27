@@ -235,6 +235,7 @@ class LanguageProvider with ChangeNotifier {
       'nav_explore': 'Explore',
       'nav_likes': 'Likes',
       'nav_chat': 'Chat',
+      'nav_video': 'Video',
       'profile_needs_attention': 'Profile Needs Attention',
       'profile_completion_sub':
           'Your profile is currently {completion}% complete. You need to complete your profile past 40% before you can start matching, chatting, and exploring!',
@@ -632,6 +633,7 @@ class LanguageProvider with ChangeNotifier {
       'nav_explore': 'Gundua',
       'nav_likes': 'Penda',
       'nav_chat': 'Mazungumzo',
+      'nav_video': 'Video',
       'profile_needs_attention': 'Wasifu Unahitaji Makini',
       'profile_completion_sub':
           'Wasifu wako kwa sasa umekamilika kwa {completion}%. Unahitaji kukamilisha wasifu wako zaidi ya 40% kabla ya kuanza kulinganisha, kuzungumza, na kuvinjari!',
