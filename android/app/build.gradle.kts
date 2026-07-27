@@ -43,3 +43,42 @@ kotlin {
 flutter {
     source = "../.."
 }
+
+// Fix Agora SDK namespace conflict: both iris-rtc and agora-special-full
+// declare package="io.agora.rtc" which AGP 8+ rejects as duplicate.
+// Patch iris-rtc's cached manifest to use a unique namespace before merging.
+tasks.matching {
+    it.name.contains("processDebugMainManifest") ||
+    it.name.contains("processReleaseMainManifest") ||
+    it.name.contains("processProfileMainManifest")
+}.configureEach {
+    doFirst {
+        val transformsDir = File(gradle.gradleUserHomeDir, "caches")
+            .listFiles()
+            ?.filter { it.isDirectory && it.name.matches(Regex("\\d+\\.\\d+(\\.\\d+)?")) }
+            ?.flatMap { versionDir ->
+                val tDir = File(versionDir, "transforms")
+                if (tDir.exists()) listOf(tDir) else emptyList()
+            } ?: emptyList()
+
+        for (tDir in transformsDir) {
+            tDir.walkTopDown()
+                .filter {
+                    it.name == "AndroidManifest.xml" &&
+                    it.absolutePath.contains("iris-rtc") &&
+                    !it.absolutePath.contains("agora-special")
+                }
+                .forEach { manifest ->
+                    val content = manifest.readText()
+                    if (content.contains("package=\"io.agora.rtc\"")) {
+                        manifest.writeText(
+                            content.replace(
+                                "package=\"io.agora.rtc\"",
+                                "package=\"io.agora.rtc.iris\""
+                            )
+                        )
+                    }
+                }
+        }
+    }
+}

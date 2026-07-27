@@ -43,6 +43,13 @@ class _LiveListScreenState extends State<LiveListScreen>
     'Français',
     'Deutsch',
     'Português',
+    'Hindi',
+    'Japanese',
+    'Italian',
+    'Chinese',
+    'Korean',
+    'Arabic',
+    'Russian',
   ];
 
   final List<String> _genders = ['Any', 'Male', 'Female'];
@@ -57,6 +64,16 @@ class _LiveListScreenState extends State<LiveListScreen>
     'France',
     'Germany',
     'Brazil',
+    'Canada',
+    'Australia',
+    'India',
+    'Japan',
+    'Italy',
+    'Mexico',
+    'South Africa',
+    'Nigeria',
+    'South Korea',
+    'China',
   ];
 
   @override
@@ -76,12 +93,19 @@ class _LiveListScreenState extends State<LiveListScreen>
   }
 
   void _startMatchingFlow(ProfileProvider pp) async {
+    final currentUser = pp.userProfile;
+    if (currentUser == null || currentUser.uid == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profile not loaded. Please try again.')),
+      );
+      return;
+    }
+
     setState(() {
       _isMatching = true;
     });
     _radarController.repeat();
 
-    final currentUser = pp.userProfile!;
     final currentUserId = currentUser.uid!;
     final bool isPremium = currentUser.isPremium;
 
@@ -89,80 +113,105 @@ class _LiveListScreenState extends State<LiveListScreen>
     final String effectiveGender = isPremium ? _selectedGender : 'Any';
     final String effectiveCountry = isPremium ? _selectedCountry : 'Any';
 
-    // 1. Try to match immediately
-    final matchResult = await _videoChatService.startMatching(
-      currentUser: currentUser,
-      filterLanguage: _selectedLanguage,
-      filterGender: effectiveGender,
-      filterMinAge: _ageRange.start.round(),
-      filterMaxAge: _ageRange.end.round(),
-      filterCountry: effectiveCountry,
-    );
-
-    if (!mounted) return;
-
-    if (matchResult != null) {
-      // Direct match found!
-      _radarController.stop();
-      setState(() {
-        _isMatching = false;
-      });
-
-      _navigateToCall(
-        channelId: matchResult['channelId'],
-        partnerId: matchResult['matchedWith'],
-        partnerName: matchResult['partnerName'],
-        partnerPhoto: matchResult['partnerPhoto'],
-        isHost: true,
+    try {
+      // 1. Try to match immediately
+      final matchResult = await _videoChatService.startMatching(
+        currentUser: currentUser,
+        filterLanguage: _selectedLanguage,
+        filterGender: effectiveGender,
+        filterMinAge: _ageRange.start.round(),
+        filterMaxAge: _ageRange.end.round(),
+        filterCountry: effectiveCountry,
       );
-    } else {
-      // No immediate match. Start listening to current user's ticket updates
-      _ticketSubscription = _videoChatService
-          .getTicketStream(currentUserId)
-          .listen((snapshot) {
-            if (!snapshot.exists || !mounted) return;
 
-            final data = snapshot.data() as Map<String, dynamic>?;
-            if (data == null) return;
+      if (!mounted) return;
 
-            final status = data['status'] as String?;
-            if (status == 'matched') {
-              _ticketSubscription?.cancel();
-              _radarController.stop();
-              setState(() {
-                _isMatching = false;
-              });
+      if (matchResult != null) {
+        // Direct match found!
+        _radarController.stop();
+        setState(() {
+          _isMatching = false;
+        });
 
-              final String channelId = data['channelId'];
-              final String partnerId = data['matchedWith'];
+        _navigateToCall(
+          channelId: matchResult['channelId'],
+          partnerId: matchResult['matchedWith'],
+          partnerName: matchResult['partnerName'],
+          partnerPhoto: matchResult['partnerPhoto'],
+          isHost: true,
+        );
+      } else {
+        // No immediate match. Start listening to current user's ticket updates
+        _ticketSubscription?.cancel();
+        _ticketSubscription = _videoChatService
+            .getTicketStream(currentUserId)
+            .listen((snapshot) {
+              if (!snapshot.exists || !mounted) return;
 
-              // Fetch partner details from ticket or Firestore
-              FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(partnerId)
-                  .get()
-                  .then((userDoc) {
-                    if (!mounted) return;
-                    String partnerName = 'User';
-                    String partnerPhoto = '';
-                    if (userDoc.exists) {
-                      partnerName = userDoc.data()?['firstName'] ?? 'User';
-                      final photos = List<String>.from(
-                        userDoc.data()?['photos'] ?? [],
+              final data = snapshot.data() as Map<String, dynamic>?;
+              if (data == null) return;
+
+              final status = data['status'] as String?;
+              if (status == 'matched') {
+                _ticketSubscription?.cancel();
+                _radarController.stop();
+                setState(() {
+                  _isMatching = false;
+                });
+
+                final String? channelId = data['channelId'];
+                final String? partnerId = data['matchedWith'];
+
+                if (channelId == null || partnerId == null) return;
+
+                // Fetch partner details from ticket or Firestore
+                FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(partnerId)
+                    .get()
+                    .then((userDoc) {
+                      if (!mounted) return;
+                      String partnerName = 'User';
+                      String partnerPhoto = '';
+                      if (userDoc.exists) {
+                        partnerName = userDoc.data()?['firstName'] ?? 'User';
+                        final photos = List<String>.from(
+                          userDoc.data()?['photos'] ?? [],
+                        );
+                        if (photos.isNotEmpty) partnerPhoto = photos.first;
+                      }
+
+                      _navigateToCall(
+                        channelId: channelId,
+                        partnerId: partnerId,
+                        partnerName: partnerName,
+                        partnerPhoto: partnerPhoto,
+                        isHost: false,
                       );
-                      if (photos.isNotEmpty) partnerPhoto = photos.first;
-                    }
-
-                    _navigateToCall(
-                      channelId: channelId,
-                      partnerId: partnerId,
-                      partnerName: partnerName,
-                      partnerPhoto: partnerPhoto,
-                      isHost: false,
-                    );
-                  });
-            }
-          });
+                    }).catchError((_) {
+                      if (!mounted) return;
+                      _navigateToCall(
+                        channelId: channelId,
+                        partnerId: partnerId,
+                        partnerName: 'User',
+                        partnerPhoto: '',
+                        isHost: false,
+                      );
+                    });
+              }
+            });
+      }
+    } catch (e) {
+      debugPrint('Error starting matching flow: $e');
+      if (mounted) {
+        _radarController.stop();
+        setState(() {
+          _isMatching = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Matchmaking error: $e')),
+        );
+      }
     }
   }
 
@@ -223,6 +272,26 @@ class _LiveListScreenState extends State<LiveListScreen>
       'de': 'Germany',
       'brazil': 'Brazil',
       'br': 'Brazil',
+      'canada': 'Canada',
+      'ca': 'Canada',
+      'australia': 'Australia',
+      'au': 'Australia',
+      'india': 'India',
+      'in': 'India',
+      'japan': 'Japan',
+      'jp': 'Japan',
+      'italy': 'Italy',
+      'it': 'Italy',
+      'mexico': 'Mexico',
+      'mx': 'Mexico',
+      'south africa': 'South Africa',
+      'za': 'South Africa',
+      'nigeria': 'Nigeria',
+      'ng': 'Nigeria',
+      'south korea': 'South Korea',
+      'kr': 'South Korea',
+      'china': 'China',
+      'cn': 'China',
     };
 
     final locLower = userLocation.toLowerCase();
@@ -718,6 +787,20 @@ class _LiveListScreenState extends State<LiveListScreen>
         return '🇩🇪';
       case 'Português':
         return '🇵🇹';
+      case 'Hindi':
+        return '🇮🇳';
+      case 'Japanese':
+        return '🇯🇵';
+      case 'Italian':
+        return '🇮🇹';
+      case 'Chinese':
+        return '🇨🇳';
+      case 'Korean':
+        return '🇰🇷';
+      case 'Arabic':
+        return '🇸🇦';
+      case 'Russian':
+        return '🇷🇺';
       default:
         return '🌐';
     }
@@ -897,6 +980,26 @@ class _LiveListScreenState extends State<LiveListScreen>
         return '🇩🇪';
       case 'Brazil':
         return '🇧🇷';
+      case 'Canada':
+        return '🇨🇦';
+      case 'Australia':
+        return '🇦🇺';
+      case 'India':
+        return '🇮🇳';
+      case 'Japan':
+        return '🇯🇵';
+      case 'Italy':
+        return '🇮🇹';
+      case 'Mexico':
+        return '🇲🇽';
+      case 'South Africa':
+        return '🇿🇦';
+      case 'Nigeria':
+        return '🇳🇬';
+      case 'South Korea':
+        return '🇰🇷';
+      case 'China':
+        return '🇨🇳';
       default:
         return '🌐';
     }

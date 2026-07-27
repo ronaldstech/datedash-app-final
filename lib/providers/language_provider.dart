@@ -69,6 +69,7 @@ class LanguageProvider with ChangeNotifier {
       'my_meetups': 'My Meet Ups',
       'preferences': 'Preferences',
       'discovery': 'Discovery',
+      'video_chat': 'Video chat',
       'support': 'Support',
       'edit_profile': 'Edit Profile',
       'edit_profile_sub': 'Change your profile details',
@@ -177,7 +178,7 @@ class LanguageProvider with ChangeNotifier {
       'booking_details_hint':
           'These details will be shown to users who want to book a date with you.',
       'booking_location_label': 'Preferred Location',
-      'booking_rate_label': 'Your Rate / Requirements',
+      'booking_rate_label': 'Requirements',
       'booking_notes_label': 'Rules & Notes',
       'my_bookings': 'My Meetups',
       'reset_swipes_title': 'Reset Swipes',

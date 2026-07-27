@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' show ImageFilter;
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../providers/profile_provider.dart';
 import '../services/video_chat_service.dart';
 import '../services/profile_service.dart';
@@ -38,22 +41,200 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   
   static const _securityChannel = MethodChannel('com.example.datedash/security');
 
+  // Agora configurations
+  static const String agoraAppId = '45fbe0e2e7b844bfab588523c914bfb2';
+  RtcEngine? _engine;
+  int? _remoteUid;
+  bool _localUserJoined = false;
+
   int _callDuration = 0;
   Timer? _durationTimer;
+  StreamSubscription<DocumentSnapshot>? _callSessionSubscription;
   StreamSubscription<DocumentSnapshot>? _ticketSubscription;
   StreamSubscription<DocumentSnapshot>? _partnerTicketSubscription;
+  bool _callLifecycleReady = false; // grace period flag
 
   bool _isMuted = false;
   bool _isCameraOff = false;
   bool _isPartnerMuted = false;
   bool _isPartnerCameraOff = false;
 
+  // DEBUG — remove after fixing
+  String _agoraStatus = 'initialising...';
+
   @override
   void initState() {
     super.initState();
     _startTimer();
-    _listenToCallLifecycle();
     _secureScreen();
+    // Give a 2-second grace period before the lifecycle listener can exit the call.
+    // This prevents false 'call ended' triggers during initial Firestore propagation.
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        _callLifecycleReady = true;
+        _listenToCallLifecycle();
+      }
+    });
+    // Auto-connect to Agora live video & audio call when matchmaking is connected
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (mounted) {
+        _initAgora();
+      }
+    });
+  }
+
+  Future<void> _initAgora() async {
+    // 1. Request Camera and Microphone permissions
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.camera,
+      Permission.microphone,
+    ].request();
+
+    if (statuses[Permission.camera] != PermissionStatus.granted ||
+        statuses[Permission.microphone] != PermissionStatus.granted) {
+      debugPrint('Camera or Microphone permission not granted');
+      return;
+    }
+
+    if (_engine != null) return;
+
+    try {
+      // 2. Create the engine
+      _engine = createAgoraRtcEngine();
+      await _engine!.initialize(const RtcEngineContext(
+        appId: agoraAppId,
+        channelProfile: ChannelProfileType.channelProfileCommunication,
+      ));
+
+      _engine!.registerEventHandler(
+        RtcEngineEventHandler(
+          onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
+            debugPrint("[Agora] Local user ${connection.localUid} joined channel: ${connection.channelId}");
+            if (mounted) {
+              setState(() {
+                _localUserJoined = true;
+                _agoraStatus = 'joined as uid=${connection.localUid}';
+              });
+            }
+          },
+          onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
+            debugPrint("[Agora] Remote user $remoteUid joined channel: ${connection.channelId}");
+            if (mounted) {
+              setState(() {
+                _remoteUid = remoteUid;
+                _agoraStatus = 'remote=$remoteUid connected ✓';
+              });
+            }
+          },
+          onUserOffline: (RtcConnection connection, int remoteUid, UserOfflineReasonType reason) {
+            debugPrint("[Agora] Remote user $remoteUid left channel. Reason: $reason");
+            if (mounted) {
+              setState(() {
+                _remoteUid = null;
+                _agoraStatus = 'remote left ($reason)';
+              });
+            }
+          },
+          onError: (ErrorCodeType err, String msg) {
+            debugPrint('[Agora] ERROR: code=$err msg=$msg');
+            if (mounted) setState(() => _agoraStatus = 'ERROR: $err - $msg');
+          },
+          onConnectionStateChanged: (RtcConnection connection, ConnectionStateType state, ConnectionChangedReasonType reason) {
+            debugPrint('[Agora] Connection state: $state reason: $reason channel: ${connection.channelId}');
+            if (mounted) setState(() => _agoraStatus = '${state.name} (${reason.name})');
+          },
+        ),
+      );
+
+      await _engine!.enableAudio();
+      await _engine!.enableVideo();
+      await _engine!.startPreview();
+
+      // Ensure proper mute / camera off values are set on joining
+      await _engine!.muteLocalAudioStream(_isMuted);
+      await _engine!.muteLocalVideoStream(_isCameraOff);
+
+      // 3. Fetch a valid token from our Cloud Function (App Certificate is enabled)
+      debugPrint('[Agora] Joining channel: "${widget.channelId}" (length=${widget.channelId.length})');
+      final String agoraToken = await _fetchAgoraToken(widget.channelId);
+
+      await _engine!.joinChannel(
+        token: agoraToken,
+        channelId: widget.channelId,
+        uid: 0,
+        options: const ChannelMediaOptions(
+          clientRoleType: ClientRoleType.clientRoleBroadcaster,
+          channelProfile: ChannelProfileType.channelProfileCommunication,
+          publishCameraTrack: true,
+          publishMicrophoneTrack: true,
+          autoSubscribeAudio: true,
+          autoSubscribeVideo: true,
+        ),
+      );
+    } catch (e) {
+      debugPrint('Error initializing Agora: $e');
+    }
+  }
+
+  /// Calls the Cloud Function to generate a short-lived Agora RTC token.
+  Future<String> _fetchAgoraToken(String channelId) async {
+    try {
+      final uri = Uri.parse(
+        'https://us-central1-datedash-35789.cloudfunctions.net/generateAgoraToken'
+        '?channelName=${Uri.encodeComponent(channelId)}&uid=0',
+      );
+      final response = await HttpClient()
+          .getUrl(uri)
+          .then((req) => req.close());
+      final body = await response.transform(const Utf8Decoder()).join();
+      final json = jsonDecode(body) as Map<String, dynamic>;
+      final token = json['token'] as String?;
+      if (token != null && token.isNotEmpty) {
+        debugPrint('[Agora] Token fetched successfully');
+        return token;
+      }
+      debugPrint('[Agora] Token fetch returned empty: $body');
+    } catch (e) {
+      debugPrint('[Agora] Token fetch failed: $e');
+    }
+    return ''; // fallback — will fail if cert is enabled but better than crashing
+  }
+
+  Future<void> _disposeAgora() async {
+    if (_engine != null) {
+      try {
+        await _engine!.leaveChannel();
+        await _engine!.release();
+      } catch (e) {
+        debugPrint('Error disposing Agora: $e');
+      }
+      _engine = null;
+    }
+  }
+
+  Future<void> _updateMyDeviceState() async {
+    final pp = context.read<ProfileProvider>();
+    final currentUserId = pp.userProfile?.uid;
+
+    // Apply locally/engine-wise
+    if (_engine != null) {
+      await _engine!.muteLocalAudioStream(_isMuted);
+      await _engine!.muteLocalVideoStream(_isCameraOff);
+    }
+
+    if (currentUserId != null) {
+      try {
+        await FirebaseFirestore.instance
+            .collection('video_chat_waiting')
+            .doc(currentUserId)
+            .update({
+          'isMuted': _isMuted,
+          'isCameraOff': _isCameraOff,
+        });
+      } catch (e) {
+        debugPrint('Error updating device state in Firestore: $e');
+      }
+    }
   }
 
   Future<void> _secureScreen() async {
@@ -115,14 +296,17 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         'timestamp': FieldValue.serverTimestamp(),
         'reason': 'Blocked during video call',
       });
-      _endCall();
+      await _videoChatService.endCall(currentUserId, widget.channelId);
+      _exitCallScreen();
     }
   }
 
   @override
   void dispose() {
+    _disposeAgora();
     _clearSecureScreen();
     _durationTimer?.cancel();
+    _callSessionSubscription?.cancel();
     _ticketSubscription?.cancel();
     _partnerTicketSubscription?.cancel();
     _messageController.dispose();
@@ -144,18 +328,50 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     final pp = context.read<ProfileProvider>();
     final currentUserId = pp.userProfile?.uid;
 
-    if (currentUserId != null) {
-      // Listen to our own ticket. If it is deleted, the partner has left the call.
-      _ticketSubscription = _videoChatService.getTicketStream(currentUserId).listen((snapshot) {
-        if (!snapshot.exists && mounted) {
-          _exitCallScreen(showMessage: 'Call ended by partner');
-        }
-      });
+    // Listen to the dedicated call session document.
+    // It is set to 'active' when the match is made and 'ended' when either side ends.
+    _callSessionSubscription = _videoChatService
+        .getCallSessionStream(widget.channelId)
+        .listen((snapshot) {
+      if (!mounted || !_callLifecycleReady) return;
 
-      // Listen to partner's ticket. If it is deleted, partner has left.
+      if (!snapshot.exists) {
+        // Session doc deleted — treat as ended
+        _exitCallScreen(showMessage: 'Call ended by partner');
+        if (currentUserId != null) {
+          _videoChatService.cleanupOwnTicket(currentUserId);
+        }
+        return;
+      }
+
+      final data = snapshot.data() as Map<String, dynamic>?;
+      if (data == null) return;
+
+      final status = data['status'] as String?;
+      final endedBy = data['endedBy'] as String?;
+
+      if (status == 'ended' && endedBy != currentUserId) {
+        // Partner ended the call
+        _exitCallScreen(showMessage: 'Call ended by partner');
+        if (currentUserId != null) {
+          _videoChatService.cleanupOwnTicket(currentUserId);
+        }
+      }
+
+      // Also sync partner device state from the partner's ticket if needed
+      // (mute/camera state is tracked separately via Firestore ticket fields)
+    });
+
+    // Still watch partner's ticket for mute/camera state sync
+    if (currentUserId != null) {
       _partnerTicketSubscription = _videoChatService.getTicketStream(widget.partnerId).listen((snapshot) {
-        if (!snapshot.exists && mounted) {
-          _exitCallScreen(showMessage: 'Call ended by partner');
+        if (!snapshot.exists || !mounted) return;
+        final data = snapshot.data() as Map<String, dynamic>?;
+        if (data != null && mounted) {
+          setState(() {
+            _isPartnerMuted = data['isMuted'] ?? false;
+            _isPartnerCameraOff = data['isCameraOff'] ?? false;
+          });
         }
       });
     }
@@ -200,7 +416,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     final pp = context.read<ProfileProvider>();
     final currentUserId = pp.userProfile?.uid;
     if (currentUserId != null) {
-      await _videoChatService.endCall(currentUserId, widget.partnerId);
+      await _videoChatService.endCall(currentUserId, widget.channelId);
     }
     _exitCallScreen();
   }
@@ -209,7 +425,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     final pp = context.read<ProfileProvider>();
     final currentUserId = pp.userProfile?.uid;
     if (currentUserId != null) {
-      await _videoChatService.endCall(currentUserId, widget.partnerId);
+      await _videoChatService.endCall(currentUserId, widget.channelId);
     }
     if (mounted) {
       Navigator.pop(context); // Return to matchmaking screen
@@ -274,6 +490,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                         name: widget.partnerName,
                         isCameraOff: _isPartnerCameraOff,
                         isMuted: _isPartnerMuted,
+                        isLocal: false,
                       ),
                       Positioned(
                         left: 16,
@@ -324,6 +541,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                         name: 'You',
                         isCameraOff: _isCameraOff,
                         isMuted: _isMuted,
+                        isLocal: true,
                       ),
                       Positioned(
                         left: 16,
@@ -569,6 +787,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                               setState(() {
                                 _isMuted = !_isMuted;
                               });
+                              _updateMyDeviceState();
                             },
                           ),
                           const SizedBox(width: 8),
@@ -581,6 +800,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                               setState(() {
                                 _isCameraOff = !_isCameraOff;
                               });
+                              _updateMyDeviceState();
                             },
                           ),
                           const SizedBox(width: 8),
@@ -606,6 +826,53 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                 ),
               ),
             ),
+
+            // Floating Join Call Button to manually reconnect Agora room
+            if (!_localUserJoined)
+              Positioned(
+                right: 16,
+                top: 110,
+                child: ElevatedButton.icon(
+                  onPressed: _initAgora,
+                  icon: const Icon(Iconsax.video5, size: 16),
+                  label: const Text(
+                    'Join Call',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF4D85),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 4,
+                  ),
+                ),
+              ),
+          // DEBUG OVERLAY — remove after fixing
+          Positioned(
+            bottom: 120,
+            left: 8,
+            right: 8,
+            child: IgnorePointer(
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.75),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('CH: ${widget.channelId}', style: const TextStyle(color: Colors.yellow, fontSize: 9, fontFamily: 'monospace')),
+                    Text('Status: $_agoraStatus', style: const TextStyle(color: Colors.greenAccent, fontSize: 9)),
+                    Text('localJoined=$_localUserJoined  remoteUid=$_remoteUid', style: const TextStyle(color: Colors.cyanAccent, fontSize: 9)),
+                  ],
+                ),
+              ),
+            ),
+          ),
           ],
         ),
       ),
@@ -617,15 +884,36 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     required String name,
     required bool isCameraOff,
     required bool isMuted,
+    required bool isLocal,
   }) {
+    // Local preview is available as soon as the engine+preview started (no need to wait for join).
+    // Remote video requires remoteUid to be set after the partner joins.
+    final bool showLocalVideo = isLocal && _engine != null && !isCameraOff;
+    final bool showRemoteVideo = !isLocal && _engine != null && _remoteUid != null && !isCameraOff;
+
     return Container(
       color: const Color(0xFF111115),
       child: Stack(
         fit: StackFit.expand,
         alignment: Alignment.center,
         children: [
-          // Background photo (normal or dark overlay depending on camera state)
-          if (photo.isNotEmpty)
+          // 1. Agora video stream OR background profile photo fallback
+          if (showLocalVideo)
+            AgoraVideoView(
+              controller: VideoViewController(
+                rtcEngine: _engine!,
+                canvas: const VideoCanvas(uid: 0),
+              ),
+            )
+          else if (showRemoteVideo)
+            AgoraVideoView(
+              controller: VideoViewController.remote(
+                rtcEngine: _engine!,
+                canvas: VideoCanvas(uid: _remoteUid),
+                connection: RtcConnection(channelId: widget.channelId),
+              ),
+            )
+          else if (photo.isNotEmpty)
             Image.network(
               photo,
               fit: BoxFit.cover,

@@ -399,11 +399,6 @@ class ProfileDrawer extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
 
-                  // Finance Section - Subscription & Credits
-                  _buildSectionHeader(
-                    context,
-                    languageProvider.getString('finance_section'),
-                  ),
                   _buildItem(
                     context,
                     Iconsax.cup,
