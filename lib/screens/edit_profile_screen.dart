@@ -77,12 +77,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     try {
       await _profileService.saveUserProfile(user.uid, _profile);
       if (mounted) {
-        _showPremiumSnack(languageProvider.getString('profile_saved_snack'), isSuccess: true);
+        _showPremiumSnack(
+          languageProvider.getString('profile_saved_snack'),
+          isSuccess: true,
+        );
         Navigator.pop(context); // Return to summary screen after save
       }
     } catch (e) {
       if (mounted) {
-        _showPremiumSnack('${languageProvider.getString('failed_save_profile_snack')}: $e', isError: true);
+        _showPremiumSnack(
+          '${languageProvider.getString('failed_save_profile_snack')}: $e',
+          isError: true,
+        );
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -96,18 +102,58 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final languageProvider = context.watch<LanguageProvider>();
-    
+
     final List<Map<String, dynamic>> categories = [
-      {'title': languageProvider.getString('category_basic'), 'icon': Iconsax.user, 'key': 'Basic'},
-      {'title': languageProvider.getString('category_personal'), 'icon': Iconsax.heart, 'key': 'Personal'},
-      {'title': languageProvider.getString('category_goals'), 'icon': Iconsax.cup, 'key': 'Goals'},
-      {'title': languageProvider.getString('category_work'), 'icon': Iconsax.briefcase, 'key': 'Work'},
-      {'title': languageProvider.getString('category_lifestyle'), 'icon': Iconsax.activity, 'key': 'Lifestyle'},
-      {'title': languageProvider.getString('category_interests'), 'icon': Iconsax.music, 'key': 'Interests'},
-      {'title': languageProvider.getString('category_personality'), 'icon': Iconsax.lamp, 'key': 'Personality'},
-      {'title': languageProvider.getString('category_media'), 'icon': Iconsax.camera, 'key': 'Media'},
-      {'title': languageProvider.getString('category_location'), 'icon': Iconsax.location, 'key': 'Location'},
-      {'title': languageProvider.getString('category_prompts'), 'icon': Iconsax.messages_2, 'key': 'Prompts'},
+      {
+        'title': languageProvider.getString('category_basic'),
+        'icon': Iconsax.user,
+        'key': 'Basic',
+      },
+      {
+        'title': languageProvider.getString('category_personal'),
+        'icon': Iconsax.heart,
+        'key': 'Personal',
+      },
+      {
+        'title': languageProvider.getString('category_goals'),
+        'icon': Iconsax.cup,
+        'key': 'Goals',
+      },
+      {
+        'title': languageProvider.getString('category_work'),
+        'icon': Iconsax.briefcase,
+        'key': 'Work',
+      },
+      {
+        'title': languageProvider.getString('category_lifestyle'),
+        'icon': Iconsax.activity,
+        'key': 'Lifestyle',
+      },
+      {
+        'title': languageProvider.getString('category_interests'),
+        'icon': Iconsax.music,
+        'key': 'Interests',
+      },
+      {
+        'title': languageProvider.getString('category_personality'),
+        'icon': Iconsax.lamp,
+        'key': 'Personality',
+      },
+      {
+        'title': languageProvider.getString('category_media'),
+        'icon': Iconsax.camera,
+        'key': 'Media',
+      },
+      {
+        'title': languageProvider.getString('category_location'),
+        'icon': Iconsax.location,
+        'key': 'Location',
+      },
+      {
+        'title': languageProvider.getString('category_prompts'),
+        'icon': Iconsax.messages_2,
+        'key': 'Prompts',
+      },
     ];
 
     if (_isLoading) {
@@ -133,22 +179,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: Padding(
               padding: const EdgeInsets.only(right: 20.0),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: _primaryColor.withValues(alpha: 	0.1),
+                  color: _primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   '${_profile.completionPercentage}%',
                   style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                      color: _primaryColor,
-                      fontSize: 13),
+                    fontWeight: FontWeight.w800,
+                    color: _primaryColor,
+                    fontSize: 13,
+                  ),
                 ),
               ),
             ),
-          )
+          ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(64),
@@ -172,13 +221,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 width: 24,
                 height: 24,
                 child: CircularProgressIndicator(
-                    color: Colors.white, strokeWidth: 2),
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
               )
             : const Icon(Iconsax.save_2, color: Colors.white),
         label: Text(
-          _isSaving ? languageProvider.getString('saving_label') : languageProvider.getString('save_profile_button'),
-          style:
-              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          _isSaving
+              ? languageProvider.getString('saving_label')
+              : languageProvider.getString('save_profile_button'),
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -210,8 +265,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   margin: const EdgeInsets.only(right: 12),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? _primaryColor
@@ -226,10 +283,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     boxShadow: isSelected
                         ? [
                             BoxShadow(
-                              color: _primaryColor.withValues(alpha: 	0.3),
+                              color: _primaryColor.withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
-                            )
+                            ),
                           ]
                         : [],
                   ),
@@ -240,10 +297,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         size: 15,
                         color: isSelected
                             ? Colors.white
-                            : Theme.of(context)
-                                .iconTheme
-                                .color
-                                ?.withValues(alpha: 	0.7),
+                            : Theme.of(
+                                context,
+                              ).iconTheme.color?.withValues(alpha: 0.7),
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -251,13 +307,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         style: TextStyle(
                           color: isSelected
                               ? Colors.white
-                              : Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.color
-                                  ?.withValues(alpha: 	0.8),
-                          fontWeight:
-                              isSelected ? FontWeight.w800 : FontWeight.w600,
+                              : Theme.of(context).textTheme.bodyMedium?.color
+                                    ?.withValues(alpha: 0.8),
+                          fontWeight: isSelected
+                              ? FontWeight.w800
+                              : FontWeight.w600,
                           fontSize: 14,
                         ),
                       ),
@@ -275,8 +329,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         color: Colors.orange,
                         shape: BoxShape.circle,
                         border: Border.all(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            width: 2),
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          width: 2,
+                        ),
                       ),
                     ),
                   ),
@@ -338,7 +393,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             'Average',
             'Curvy',
             'A few extra pounds',
-            'Prefer not to say'
+            'Prefer not to say',
           ],
           onChanged: (val) => _profile.bodyType = val,
         ),
@@ -350,7 +405,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             'Married',
             'Divorced',
             'Widowed',
-            'Separated'
+            'Separated',
           ],
           onChanged: (val) => _profile.relationshipStatus = val,
         ),
@@ -373,19 +428,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _buildPageContent([
         _buildChoiceChips(
           label: languageProvider.getString('looking_for_label'),
-          value:
-              _profile.lookingFor.isNotEmpty ? _profile.lookingFor.first : null,
+          value: _profile.lookingFor.isNotEmpty
+              ? _profile.lookingFor.first
+              : null,
           items: const [
             'Marriage',
             'Long Term Relationship',
             'Short Term Relationship',
-            'Hookups',
+            'Casual',
             'Short Term Fun',
             'New Friends',
             'Coffee Date',
-            'Movie Night',
-            'Sponsor',
-            'Figuring Out'
+            'Learn Cultures',
+            'Travel the World',
+            'Figuring Out',
           ],
           onChanged: (val) => _profile.lookingFor = [val],
         ),
@@ -403,7 +459,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _buildChoiceChips(
           label: 'Family Plans',
           value: _profile.familyPlans,
-          items: const ['Want some day', 'Don\'t want', 'Have and want more', 'Have and don\'t want more', 'Not sure yet'],
+          items: const [
+            'Want some day',
+            'Don\'t want',
+            'Have and want more',
+            'Have and don\'t want more',
+            'Not sure yet',
+          ],
           onChanged: (val) => _profile.familyPlans = val,
         ),
       ]),
@@ -428,7 +490,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             'In College',
             'Undergraduate',
             'Postgraduate',
-            'Other'
+            'Other',
           ],
           onChanged: (val) => _profile.educationLevel = val,
         ),
@@ -467,7 +529,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             'Vegan',
             'Halal',
             'Kosher',
-            'Other'
+            'Other',
           ],
           onChanged: (val) => _profile.diet = val,
         ),
@@ -498,7 +560,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             'Sagittarius',
             'Capricorn',
             'Aquarius',
-            'Pisces'
+            'Pisces',
           ],
           onChanged: (val) => _profile.zodiac = val,
         ),
@@ -534,7 +596,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             'Cycling',
             'Fishing',
             'Camping',
-            'Board Games'
+            'Board Games',
           ],
           onChanged: (val) => _profile.hobbies = val,
         ),
@@ -583,7 +645,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             'Acts of Service',
             'Receiving Gifts',
             'Quality Time',
-            'Physical Touch'
+            'Physical Touch',
           ],
           onChanged: (val) => _profile.loveLanguage = val,
         ),
@@ -606,13 +668,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _buildChoiceChips(
           label: 'Communication Style',
           value: _profile.communicationStyle,
-          items: const ['Big text in person', 'Phone caller', 'Video chatter', 'Bad texter', 'Better in person'],
+          items: const [
+            'Big text in person',
+            'Phone caller',
+            'Video chatter',
+            'Bad texter',
+            'Better in person',
+          ],
           onChanged: (val) => _profile.communicationStyle = val,
         ),
         _buildChoiceChips(
           label: 'Love Style',
           value: _profile.loveStyle,
-          items: const ['Thoughtful gestures', 'Presents', 'Touch', 'Deep talks', 'Time together'],
+          items: const [
+            'Thoughtful gestures',
+            'Presents',
+            'Touch',
+            'Deep talks',
+            'Time together',
+          ],
           onChanged: (val) => _profile.loveStyle = val,
         ),
       ]),
@@ -625,13 +699,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             children: [
               Text(
                 languageProvider.getString('add_photos_title'),
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
                 languageProvider.getString('upload_photos_sub'),
-                style:
-                    const TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  color: Colors.grey,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ],
           ),
@@ -668,7 +747,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   borderRadius: BorderRadius.circular(10),
                   child: LinearProgressIndicator(
                     value: _uploadProgress,
-                    backgroundColor: _primaryColor.withValues(alpha: 	0.1),
+                    backgroundColor: _primaryColor.withValues(alpha: 0.1),
                     valueColor: AlwaysStoppedAnimation<Color>(_primaryColor),
                     minHeight: 6,
                   ),
@@ -725,7 +804,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             const SizedBox(height: 8),
             Text(
               languageProvider.getString('location_sub'),
-              style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -743,13 +825,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: hasLocation
-                ? Colors.green.withValues(alpha: 	0.3)
+                ? Colors.green.withValues(alpha: 0.3)
                 : Theme.of(context).dividerColor,
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 	0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -760,8 +842,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: (hasLocation ? Colors.green : _primaryColor)
-                    .withValues(alpha: 	0.1),
+                color: (hasLocation ? Colors.green : _primaryColor).withValues(
+                  alpha: 0.1,
+                ),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -772,11 +855,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             const SizedBox(height: 20),
             Text(
-              hasLocation ? languageProvider.getString('location_synced') : languageProvider.getString('location_not_set'),
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-              ),
+              hasLocation
+                  ? languageProvider.getString('location_synced')
+                  : languageProvider.getString('location_not_set'),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 8),
             if (hasLocation)
@@ -792,10 +874,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               Text(
                 languageProvider.getString('location_sub'),
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 13,
-                ),
+                style: const TextStyle(color: Colors.grey, fontSize: 13),
               ),
             const SizedBox(height: 32),
             ElevatedButton(
@@ -803,8 +882,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: hasLocation ? Colors.green : _primaryColor,
                 foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -816,7 +897,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   const Icon(Iconsax.radar, size: 20),
                   const SizedBox(width: 10),
                   Text(
-                    hasLocation ? languageProvider.getString('update_location_button') : languageProvider.getString('sync_location_now_button'),
+                    hasLocation
+                        ? languageProvider.getString('update_location_button')
+                        : languageProvider.getString(
+                            'sync_location_now_button',
+                          ),
                     style: const TextStyle(fontWeight: FontWeight.w800),
                   ),
                 ],
@@ -835,8 +920,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      _showPremiumSnack(languageProvider.getString('location_services_disabled'),
-          isError: true);
+      _showPremiumSnack(
+        languageProvider.getString('location_services_disabled'),
+        isError: true,
+      );
       return;
     }
 
@@ -844,14 +931,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        _showPremiumSnack(languageProvider.getString('location_permission_denied'), isError: true);
+        _showPremiumSnack(
+          languageProvider.getString('location_permission_denied'),
+          isError: true,
+        );
         return;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      _showPremiumSnack(languageProvider.getString('location_permission_denied_forever'),
-          isError: true);
+      _showPremiumSnack(
+        languageProvider.getString('location_permission_denied_forever'),
+        isError: true,
+      );
       return;
     }
 
@@ -859,7 +951,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     try {
       Position position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
 
       setState(() {
@@ -872,9 +966,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         await _profileService.saveUserProfile(user.uid, _profile);
       }
 
-      _showPremiumSnack(languageProvider.getString('location_updated_snack'), isSuccess: true);
+      _showPremiumSnack(
+        languageProvider.getString('location_updated_snack'),
+        isSuccess: true,
+      );
     } catch (e) {
-      _showPremiumSnack('${languageProvider.getString('error_fetching_location')}: $e', isError: true);
+      _showPremiumSnack(
+        '${languageProvider.getString('error_fetching_location')}: $e',
+        isError: true,
+      );
     }
   }
 
@@ -902,10 +1002,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: hasPhoto
-                    ? _primaryColor.withValues(alpha: 	0.5)
+                    ? _primaryColor.withValues(alpha: 0.5)
                     : isRequired
-                        ? Colors.orange.withValues(alpha: 	0.5)
-                        : Theme.of(context).dividerColor,
+                    ? Colors.orange.withValues(alpha: 0.5)
+                    : Theme.of(context).dividerColor,
                 width: 2,
                 style: hasPhoto ? BorderStyle.solid : BorderStyle.none,
               ),
@@ -951,17 +1051,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         Icon(
                           Iconsax.add_square,
                           color: isRequired
-                              ? Colors.orange.withValues(alpha: 	0.5)
-                              : Colors.grey.withValues(alpha: 	0.3),
+                              ? Colors.orange.withValues(alpha: 0.5)
+                              : Colors.grey.withValues(alpha: 0.3),
                           size: 32,
                         ),
                         if (isRequired)
                           const Text(
                             'Required',
                             style: TextStyle(
-                                fontSize: 10,
-                                color: Colors.orange,
-                                fontWeight: FontWeight.bold),
+                              fontSize: 10,
+                              color: Colors.orange,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                       ],
                     ),
@@ -979,7 +1080,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         final user = FirebaseAuth.instance.currentUser;
                         if (user != null) {
                           await _profileService.saveUserProfile(
-                              user.uid, _profile);
+                            user.uid,
+                            _profile,
+                          );
                         }
                       },
                       child: Container(
@@ -988,8 +1091,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           color: Colors.white,
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(Iconsax.close_circle,
-                            color: _primaryColor, size: 16),
+                        child: Icon(
+                          Iconsax.close_circle,
+                          color: _primaryColor,
+                          size: 16,
+                        ),
                       ),
                     ),
                   ),
@@ -997,18 +1103,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   bottom: 8,
                   left: 8,
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 	0.5),
+                      color: Colors.black.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       '${index + 1}',
                       style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold),
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -1048,8 +1157,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     for (var image in toUpload) {
       try {
         var request = http.MultipartRequest('POST', Uri.parse(_uploadUrl));
-        request.files
-            .add(await http.MultipartFile.fromPath('image', image.path));
+        request.files.add(
+          await http.MultipartFile.fromPath('image', image.path),
+        );
 
         var response = await request.send();
         if (response.statusCode == 200) {
@@ -1066,12 +1176,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             successCount++;
           } else {
             _showPremiumSnack(
-                'Server Error: ${jsonResponse['message'] ?? 'Unknown error'}',
-                isError: true);
+              'Server Error: ${jsonResponse['message'] ?? 'Unknown error'}',
+              isError: true,
+            );
           }
         } else {
-          _showPremiumSnack('HTTP Error: ${response.statusCode}',
-              isError: true);
+          _showPremiumSnack(
+            'HTTP Error: ${response.statusCode}',
+            isError: true,
+          );
         }
       } catch (e) {
         debugPrint('Upload error: $e');
@@ -1103,17 +1216,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _showPremiumSnack('All photos uploaded and saved!', isSuccess: true);
       } else {
         _showPremiumSnack(
-            'Uploaded $successCount of ${toUpload.length} photos and saved profile.',
-            isSuccess: true);
+          'Uploaded $successCount of ${toUpload.length} photos and saved profile.',
+          isSuccess: true,
+        );
       }
     } else if (toUpload.isNotEmpty) {
-      _showPremiumSnack('Upload failed. Check your server logs.',
-          isError: true);
+      _showPremiumSnack(
+        'Upload failed. Check your server logs.',
+        isError: true,
+      );
     }
   }
 
-  void _showPremiumSnack(String message,
-      {bool isError = false, bool isSuccess = false}) {
+  void _showPremiumSnack(
+    String message, {
+    bool isError = false,
+    bool isSuccess = false,
+  }) {
     if (!mounted) return;
 
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -1146,9 +1265,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             : (isSuccess ? Colors.green.shade400 : _primaryColor),
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         duration: const Duration(seconds: 3),
         elevation: 10,
       ),
@@ -1159,10 +1276,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.only(
-          left: 28,
-          right: 28,
-          top: 20,
-          bottom: 100), // Increased horizontal padding
+        left: 28,
+        right: 28,
+        top: 20,
+        bottom: 100,
+      ), // Increased horizontal padding
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: children,
@@ -1198,10 +1316,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             decoration: InputDecoration(
               hintText: hint ?? 'Tap to enter...',
               hintStyle: TextStyle(
-                  color: Colors.grey.shade400, fontWeight: FontWeight.normal),
+                color: Colors.grey.shade400,
+                fontWeight: FontWeight.normal,
+              ),
               alignLabelWithHint: true,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 14,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide.none,
@@ -1210,14 +1332,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               fillColor: Theme.of(context).cardColor,
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide:
-                    BorderSide(color: _primaryColor.withValues(alpha: 	0.6), width: 2),
+                borderSide: BorderSide(
+                  color: _primaryColor.withValues(alpha: 0.6),
+                  width: 2,
+                ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide(
-                    color: Theme.of(context).dividerColor.withValues(alpha: 	0.5),
-                    width: 1.5),
+                  color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
+                  width: 1.5,
+                ),
               ),
             ),
             onChanged: (val) {
@@ -1263,16 +1388,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 labelStyle: TextStyle(
                   color: isSelected
                       ? Colors.white
-                      : Theme.of(context)
-                          .textTheme
-                          .bodyMedium
-                          ?.color
-                          ?.withValues(alpha: 	0.7),
+                      : Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                   fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                   fontSize: 14,
                 ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                   side: BorderSide(
@@ -1331,16 +1456,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 labelStyle: TextStyle(
                   color: isSelected
                       ? Colors.white
-                      : Theme.of(context)
-                          .textTheme
-                          .bodyMedium
-                          ?.color
-                          ?.withValues(alpha: 	0.7),
+                      : Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                   fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                   fontSize: 14,
                 ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                   side: BorderSide(
@@ -1385,14 +1510,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         child: SwitchListTile(
           title: Text(
             label,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-            ),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
           ),
           value: value,
           activeThumbColor: _primaryColor,
-          activeTrackColor: _primaryColor.withValues(alpha: 	0.3),
+          activeTrackColor: _primaryColor.withValues(alpha: 0.3),
           inactiveThumbColor: Theme.of(context).disabledColor,
           inactiveTrackColor: Theme.of(context).dividerColor,
           contentPadding: EdgeInsets.zero,
@@ -1435,12 +1557,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 builder: (context, child) {
                   return Theme(
                     data: Theme.of(context).copyWith(
-                      colorScheme: Theme.of(context).colorScheme.brightness ==
+                      colorScheme:
+                          Theme.of(context).colorScheme.brightness ==
                               Brightness.light
                           ? ColorScheme.light(primary: _primaryColor)
                           : ColorScheme.dark(
                               primary: _primaryColor,
-                              surface: const Color(0xFF1F1F3D)),
+                              surface: const Color(0xFF1F1F3D),
+                            ),
                     ),
                     child: child!,
                   );
@@ -1458,7 +1582,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                    color: Theme.of(context).dividerColor, width: 1.5),
+                  color: Theme.of(context).dividerColor,
+                  width: 1.5,
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1475,10 +1601,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       fontSize: 14,
                     ),
                   ),
-                  Icon(Iconsax.calendar_1,
-                      color:
-                          Theme.of(context).iconTheme.color?.withValues(alpha: 	0.5),
-                      size: 20),
+                  Icon(
+                    Iconsax.calendar_1,
+                    color: Theme.of(
+                      context,
+                    ).iconTheme.color?.withValues(alpha: 0.5),
+                    size: 20,
+                  ),
                 ],
               ),
             ),
@@ -1488,4 +1617,3 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 }
-

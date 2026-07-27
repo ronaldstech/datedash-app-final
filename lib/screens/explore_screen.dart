@@ -124,7 +124,7 @@ class ExploreScreen extends StatelessWidget {
       {
         'title': languageProvider.getString('cat_coffee_date'),
         'subtitle': languageProvider.getString('cat_coffee_date_sub'),
-        'key': 'Coffee Date',
+        'key': 'Coffee',
         'icon': Iconsax.cup,
         'photo':
             'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&q=80',
@@ -133,8 +133,8 @@ class ExploreScreen extends StatelessWidget {
       {
         'title': languageProvider.getString('cat_movie_night'),
         'subtitle': languageProvider.getString('cat_movie_night_sub'),
-        'key': 'Movie Night',
-        'icon': Iconsax.video_play4,
+        'key': 'Learn Cultures',
+        'icon': Iconsax.global,
         'photo':
             'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&q=80',
         'accent': const Color(0xFFEB5757),

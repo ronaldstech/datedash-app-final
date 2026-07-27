@@ -22,7 +22,8 @@ class IncompleteProfileWizard extends StatefulWidget {
   });
 
   @override
-  State<IncompleteProfileWizard> createState() => _IncompleteProfileWizardState();
+  State<IncompleteProfileWizard> createState() =>
+      _IncompleteProfileWizardState();
 }
 
 class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
@@ -35,7 +36,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
   late TextEditingController _locationController;
   late TextEditingController _heightController;
   late TextEditingController _occupationController;
-  
+
   DateTime? _selectedDob;
   String? _selectedGender;
   String? _selectedInterestedIn;
@@ -52,23 +53,33 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
   bool _isUploading = false;
   double _uploadProgress = 0.0;
   final String _uploadUrl = 'https://unimarket-mw.com/snellum/api/upload.php';
-  
+
   final Color _primaryColor = const Color(0xFFFF4D85);
 
   @override
   void initState() {
     super.initState();
-    _firstNameController = TextEditingController(text: widget.profile.firstName ?? '');
+    _firstNameController = TextEditingController(
+      text: widget.profile.firstName ?? '',
+    );
     _bioController = TextEditingController(text: widget.profile.bio ?? '');
-    _locationController = TextEditingController(text: widget.profile.location ?? '');
-    _heightController = TextEditingController(text: widget.profile.height ?? '');
-    _occupationController = TextEditingController(text: widget.profile.occupation ?? '');
-    
+    _locationController = TextEditingController(
+      text: widget.profile.location ?? '',
+    );
+    _heightController = TextEditingController(
+      text: widget.profile.height ?? '',
+    );
+    _occupationController = TextEditingController(
+      text: widget.profile.occupation ?? '',
+    );
+
     _selectedDob = widget.profile.dob;
     _selectedGender = widget.profile.gender;
     _selectedInterestedIn = widget.profile.interestedIn;
     _selectedRelationshipStatus = widget.profile.relationshipStatus;
-    _selectedLookingFor = widget.profile.lookingFor.isNotEmpty ? widget.profile.lookingFor.first : null;
+    _selectedLookingFor = widget.profile.lookingFor.isNotEmpty
+        ? widget.profile.lookingFor.first
+        : null;
     _selectedBodyType = widget.profile.bodyType;
     _selectedSmoking = widget.profile.smoking;
     _selectedDrinking = widget.profile.drinking;
@@ -95,24 +106,28 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
 
     final provider = context.read<ProfileProvider>();
     final profile = widget.profile;
-    
+
     // Update local object
     profile.firstName = _firstNameController.text.trim();
     profile.bio = _bioController.text.trim();
     profile.location = _locationController.text.trim();
     profile.height = _heightController.text.trim();
     profile.occupation = _occupationController.text.trim();
-    
+
     if (_selectedDob != null) profile.dob = _selectedDob;
     if (_selectedGender != null) profile.gender = _selectedGender;
-    if (_selectedInterestedIn != null) profile.interestedIn = _selectedInterestedIn;
-    if (_selectedRelationshipStatus != null) profile.relationshipStatus = _selectedRelationshipStatus;
-    if (_selectedLookingFor != null) profile.lookingFor = [_selectedLookingFor!];
+    if (_selectedInterestedIn != null)
+      profile.interestedIn = _selectedInterestedIn;
+    if (_selectedRelationshipStatus != null)
+      profile.relationshipStatus = _selectedRelationshipStatus;
+    if (_selectedLookingFor != null)
+      profile.lookingFor = [_selectedLookingFor!];
     if (_selectedBodyType != null) profile.bodyType = _selectedBodyType;
     if (_selectedSmoking != null) profile.smoking = _selectedSmoking;
     if (_selectedDrinking != null) profile.drinking = _selectedDrinking;
     if (_selectedWantKids != null) profile.wantKids = _selectedWantKids;
-    if (_selectedEducationLevel != null) profile.educationLevel = _selectedEducationLevel;
+    if (_selectedEducationLevel != null)
+      profile.educationLevel = _selectedEducationLevel;
     if (_selectedZodiac != null) profile.zodiac = _selectedZodiac;
 
     final user = FirebaseAuth.instance.currentUser;
@@ -136,7 +151,9 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
       if (newCompletion < 40) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Your profile is currently $newCompletion% complete. Upload more details or photos to reach 40%!'),
+            content: Text(
+              'Your profile is currently $newCompletion% complete. Upload more details or photos to reach 40%!',
+            ),
             backgroundColor: _primaryColor,
           ),
         );
@@ -178,7 +195,9 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
     for (var image in toUpload) {
       try {
         var request = http.MultipartRequest('POST', Uri.parse(_uploadUrl));
-        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+        request.files.add(
+          await http.MultipartFile.fromPath('image', image.path),
+        );
 
         var response = await request.send();
         if (response.statusCode == 200) {
@@ -195,7 +214,9 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Server Error: ${jsonResponse['message'] ?? 'Unknown error'}'),
+                  content: Text(
+                    'Server Error: ${jsonResponse['message'] ?? 'Unknown error'}',
+                  ),
                   backgroundColor: Colors.red,
                 ),
               );
@@ -255,7 +276,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 	0.8),
+            color: Colors.white.withValues(alpha: 0.8),
             fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
@@ -267,19 +288,29 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
           style: const TextStyle(color: Colors.white, fontSize: 16),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 	0.35)),
+            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.35)),
             filled: true,
-            fillColor: Colors.white.withValues(alpha: 	0.03),
-            prefixIcon: Icon(icon, color: Colors.white.withValues(alpha: 	0.4), size: 20),
+            fillColor: Colors.white.withValues(alpha: 0.03),
+            prefixIcon: Icon(
+              icon,
+              color: Colors.white.withValues(alpha: 0.4),
+              size: 20,
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: Colors.white.withValues(alpha: 	0.08), width: 1.5),
+              borderSide: BorderSide(
+                color: Colors.white.withValues(alpha: 0.08),
+                width: 1.5,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(color: _primaryColor, width: 1.5),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
           ),
         ),
       ],
@@ -300,7 +331,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 	0.8),
+            color: Colors.white.withValues(alpha: 0.8),
             fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
@@ -318,16 +349,20 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                     duration: const Duration(milliseconds: 200),
                     height: 56,
                     decoration: BoxDecoration(
-                      color: isSelected ? _primaryColor.withValues(alpha: 	0.12) : Colors.white.withValues(alpha: 	0.02),
+                      color: isSelected
+                          ? _primaryColor.withValues(alpha: 0.12)
+                          : Colors.white.withValues(alpha: 0.02),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: isSelected ? _primaryColor : Colors.white.withValues(alpha: 	0.08),
+                        color: isSelected
+                            ? _primaryColor
+                            : Colors.white.withValues(alpha: 0.08),
                         width: 1.5,
                       ),
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: _primaryColor.withValues(alpha: 	0.2),
+                                color: _primaryColor.withValues(alpha: 0.2),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -340,12 +375,16 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: isSelected ? _primaryColor.withValues(alpha: 	0.2) : Colors.white.withValues(alpha: 	0.05),
+                            color: isSelected
+                                ? _primaryColor.withValues(alpha: 0.2)
+                                : Colors.white.withValues(alpha: 0.05),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             item.icon,
-                            color: isSelected ? _primaryColor : Colors.white.withValues(alpha: 	0.6),
+                            color: isSelected
+                                ? _primaryColor
+                                : Colors.white.withValues(alpha: 0.6),
                             size: 16,
                           ),
                         ),
@@ -354,8 +393,12 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                           child: Text(
                             item.label,
                             style: TextStyle(
-                              color: isSelected ? Colors.white : Colors.white.withValues(alpha: 	0.7),
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                              color: isSelected
+                                  ? Colors.white
+                                  : Colors.white.withValues(alpha: 0.7),
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.w500,
                               fontSize: 14,
                             ),
                           ),
@@ -387,22 +430,26 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
             itemBuilder: (context, index) {
               final item = items[index];
               final isSelected = value == item.label;
-              
+
               return GestureDetector(
                 onTap: () => onChanged(item.label),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   decoration: BoxDecoration(
-                    color: isSelected ? _primaryColor.withValues(alpha: 	0.12) : Colors.white.withValues(alpha: 	0.02),
+                    color: isSelected
+                        ? _primaryColor.withValues(alpha: 0.12)
+                        : Colors.white.withValues(alpha: 0.02),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: isSelected ? _primaryColor : Colors.white.withValues(alpha: 	0.08),
+                      color: isSelected
+                          ? _primaryColor
+                          : Colors.white.withValues(alpha: 0.08),
                       width: 1.5,
                     ),
                     boxShadow: isSelected
                         ? [
                             BoxShadow(
-                              color: _primaryColor.withValues(alpha: 	0.2),
+                              color: _primaryColor.withValues(alpha: 0.2),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -415,12 +462,16 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                       Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: isSelected ? _primaryColor.withValues(alpha: 	0.2) : Colors.white.withValues(alpha: 	0.05),
+                          color: isSelected
+                              ? _primaryColor.withValues(alpha: 0.2)
+                              : Colors.white.withValues(alpha: 0.05),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           item.icon,
-                          color: isSelected ? _primaryColor : Colors.white.withValues(alpha: 	0.6),
+                          color: isSelected
+                              ? _primaryColor
+                              : Colors.white.withValues(alpha: 0.6),
                           size: 14,
                         ),
                       ),
@@ -429,8 +480,12 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                         child: Text(
                           item.label,
                           style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.white.withValues(alpha: 	0.7),
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                            color: isSelected
+                                ? Colors.white
+                                : Colors.white.withValues(alpha: 0.7),
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.w500,
                             fontSize: 12,
                           ),
                           maxLines: 2,
@@ -465,7 +520,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 	0.8),
+            color: Colors.white.withValues(alpha: 0.8),
             fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
@@ -503,10 +558,10 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 	0.03),
+              color: Colors.white.withValues(alpha: 0.03),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 	0.08),
+                color: Colors.white.withValues(alpha: 0.08),
                 width: 1.5,
               ),
             ),
@@ -517,7 +572,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                   children: [
                     Icon(
                       Iconsax.calendar,
-                      color: Colors.white.withValues(alpha: 	0.4),
+                      color: Colors.white.withValues(alpha: 0.4),
                       size: 20,
                     ),
                     const SizedBox(width: 12),
@@ -526,7 +581,9 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                           ? '${value.year}-${value.month.toString().padLeft(2, '0')}-${value.day.toString().padLeft(2, '0')}'
                           : languageProvider.getString('select_date'),
                       style: TextStyle(
-                        color: value != null ? Colors.white : Colors.white.withValues(alpha: 	0.35),
+                        color: value != null
+                            ? Colors.white
+                            : Colors.white.withValues(alpha: 0.35),
                         fontSize: 16,
                       ),
                     ),
@@ -534,7 +591,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                 ),
                 Icon(
                   Iconsax.arrow_down_1,
-                  color: Colors.white.withValues(alpha: 	0.4),
+                  color: Colors.white.withValues(alpha: 0.4),
                   size: 16,
                 ),
               ],
@@ -547,7 +604,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
 
   Widget _buildPhotoUploadGrid() {
     final photos = widget.profile.photos;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -563,7 +620,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
         Text(
           'Upload up to 6 high-quality photos. Adding photos significantly boosts your completion score.',
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 	0.5),
+            color: Colors.white.withValues(alpha: 0.5),
             fontSize: 13,
           ),
         ),
@@ -574,12 +631,15 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
               LinearProgressIndicator(
                 value: _uploadProgress,
                 color: _primaryColor,
-                backgroundColor: Colors.white.withValues(alpha: 	0.1),
+                backgroundColor: Colors.white.withValues(alpha: 0.1),
               ),
               const SizedBox(height: 8),
               Text(
                 'Uploading selected photos...',
-                style: TextStyle(color: Colors.white.withValues(alpha: 	0.5), fontSize: 12),
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.5),
+                  fontSize: 12,
+                ),
               ),
               const SizedBox(height: 16),
             ],
@@ -596,7 +656,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
           itemCount: 6,
           itemBuilder: (context, index) {
             final hasPhoto = index < photos.length;
-            
+
             if (hasPhoto) {
               final photoUrl = photos[index];
               return Stack(
@@ -608,8 +668,11 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                         photoUrl,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
-                          color: Colors.white.withValues(alpha: 	0.05),
-                          child: const Icon(Iconsax.image, color: Colors.white24),
+                          color: Colors.white.withValues(alpha: 0.05),
+                          child: const Icon(
+                            Iconsax.image,
+                            color: Colors.white24,
+                          ),
                         ),
                       ),
                     ),
@@ -619,7 +682,9 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                     right: 6,
                     child: GestureDetector(
                       onTap: () async {
-                        final updatedPhotos = List<String>.from(widget.profile.photos);
+                        final updatedPhotos = List<String>.from(
+                          widget.profile.photos,
+                        );
                         updatedPhotos.removeAt(index);
                         setState(() {
                           widget.profile.photos = updatedPhotos;
@@ -627,7 +692,10 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                         final provider = context.read<ProfileProvider>();
                         final user = FirebaseAuth.instance.currentUser;
                         if (user != null) {
-                          await provider.saveUserProfile(user.uid, widget.profile);
+                          await provider.saveUserProfile(
+                            user.uid,
+                            widget.profile,
+                          );
                         }
                       },
                       child: Container(
@@ -651,17 +719,17 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                 onTap: _isUploading ? null : _pickAndUploadImages,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 	0.02),
+                    color: Colors.white.withValues(alpha: 0.02),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 	0.12),
+                      color: Colors.white.withValues(alpha: 0.12),
                       width: 1.5,
                     ),
                   ),
                   child: Center(
                     child: Icon(
                       Iconsax.add,
-                      color: _primaryColor.withValues(alpha: 	0.8),
+                      color: _primaryColor.withValues(alpha: 0.8),
                       size: 28,
                     ),
                   ),
@@ -676,7 +744,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
 
   Widget _buildProgressHeader(LanguageProvider lp) {
     final double progress = (_currentPage + 1) / 7.0;
-    
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 10),
       child: Column(
@@ -701,7 +769,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                   Text(
                     'Step ${_currentPage + 1} of 7',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 	0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
                     ),
@@ -709,16 +777,26 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: _primaryColor.withValues(alpha: 	0.15),
+                  color: _primaryColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: _primaryColor.withValues(alpha: 	0.3), width: 1),
+                  border: Border.all(
+                    color: _primaryColor.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Iconsax.star5, color: Color(0xFFFF9F43), size: 14),
+                    const Icon(
+                      Iconsax.star5,
+                      color: Color(0xFFFF9F43),
+                      size: 14,
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       'Score: ${widget.completion}%',
@@ -740,7 +818,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
               Container(
                 height: 6,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 	0.06),
+                  color: Colors.white.withValues(alpha: 0.06),
                   borderRadius: BorderRadius.circular(3),
                 ),
               ),
@@ -751,14 +829,11 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(3),
                   gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFFFF4D85),
-                      Color(0xFFFF9F43),
-                    ],
+                    colors: [Color(0xFFFF4D85), Color(0xFFFF9F43)],
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFFF4D85).withValues(alpha: 	0.4),
+                      color: const Color(0xFFFF4D85).withValues(alpha: 0.4),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
@@ -790,9 +865,11 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 	0.03),
+                  color: Colors.white.withValues(alpha: 0.03),
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withValues(alpha: 	0.08)),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.08),
+                  ),
                 ),
                 child: const Icon(
                   Iconsax.arrow_left_2,
@@ -814,7 +891,9 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                 height: 6,
                 width: isActive ? 16 : 6,
                 decoration: BoxDecoration(
-                  color: isActive ? _primaryColor : Colors.white.withValues(alpha: 	0.2),
+                  color: isActive
+                      ? _primaryColor
+                      : Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(3),
                 ),
               );
@@ -828,15 +907,12 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    _primaryColor,
-                    const Color(0xFFFF9F43),
-                  ],
+                  colors: [_primaryColor, const Color(0xFFFF9F43)],
                 ),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: _primaryColor.withValues(alpha: 	0.4),
+                    color: _primaryColor.withValues(alpha: 0.4),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -852,7 +928,9 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                       ),
                     )
                   : Icon(
-                      _currentPage == 6 ? Iconsax.tick_circle : Iconsax.arrow_right_3,
+                      _currentPage == 6
+                          ? Iconsax.tick_circle
+                          : Iconsax.arrow_right_3,
                       color: Colors.white,
                       size: 20,
                     ),
@@ -887,7 +965,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
           Text(
             subtitle,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 	0.5),
+              color: Colors.white.withValues(alpha: 0.5),
               fontSize: 14,
             ),
           ),
@@ -913,10 +991,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFF0F0F12),
-                    Color(0xFF1C0A15),
-                  ],
+                  colors: [Color(0xFF0F0F12), Color(0xFF1C0A15)],
                 ),
               ),
             ),
@@ -930,7 +1005,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
               height: 280,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: _primaryColor.withValues(alpha: 	0.1),
+                color: _primaryColor.withValues(alpha: 0.1),
               ),
             ),
           ),
@@ -942,28 +1017,31 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
               height: 320,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFFB388FF).withValues(alpha: 	0.06),
+                color: const Color(0xFFB388FF).withValues(alpha: 0.06),
               ),
             ),
           ),
-          
+
           SafeArea(
             child: Column(
               children: [
                 _buildProgressHeader(languageProvider),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(30),
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 	0.03),
+                            color: Colors.white.withValues(alpha: 0.03),
                             borderRadius: BorderRadius.circular(30),
                             border: Border.all(
-                              color: Colors.white.withValues(alpha: 	0.08),
+                              color: Colors.white.withValues(alpha: 0.08),
                               width: 1.5,
                             ),
                           ),
@@ -982,14 +1060,18 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                                 subtitle: 'Introduce yourself to the community',
                                 children: [
                                   _buildTextInput(
-                                    label: languageProvider.getString('username_label'),
+                                    label: languageProvider.getString(
+                                      'username_label',
+                                    ),
                                     controller: _firstNameController,
                                     hint: 'Enter your first name',
                                     icon: Iconsax.user,
                                   ),
                                   const SizedBox(height: 24),
                                   _buildDatePicker(
-                                    label: languageProvider.getString('dob_label'),
+                                    label: languageProvider.getString(
+                                      'dob_label',
+                                    ),
                                     value: _selectedDob,
                                     onChanged: (date) {
                                       setState(() {
@@ -1002,16 +1084,31 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                               // PAGE 2: Identity & Vibe
                               _buildWizardPage(
                                 title: 'Identity',
-                                subtitle: 'Who are you and who matches your vibe?',
+                                subtitle:
+                                    'Who are you and who matches your vibe?',
                                 children: [
                                   _buildCustomSelectGrid(
-                                    label: languageProvider.getString('gender_label'),
+                                    label: languageProvider.getString(
+                                      'gender_label',
+                                    ),
                                     value: _selectedGender,
                                     items: const [
-                                      _SelectCardItem(label: 'Male', icon: Iconsax.man),
-                                      _SelectCardItem(label: 'Female', icon: Iconsax.woman),
-                                      _SelectCardItem(label: 'Non-Binary', icon: Iconsax.profile_2user),
-                                      _SelectCardItem(label: 'Other', icon: Iconsax.more),
+                                      _SelectCardItem(
+                                        label: 'Male',
+                                        icon: Iconsax.man,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Female',
+                                        icon: Iconsax.woman,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Non-Binary',
+                                        icon: Iconsax.profile_2user,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Other',
+                                        icon: Iconsax.more,
+                                      ),
                                     ],
                                     onChanged: (val) {
                                       setState(() {
@@ -1021,12 +1118,23 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                                   ),
                                   const SizedBox(height: 24),
                                   _buildCustomSelectGrid(
-                                    label: languageProvider.getString('interested_in_label'),
+                                    label: languageProvider.getString(
+                                      'interested_in_label',
+                                    ),
                                     value: _selectedInterestedIn,
                                     items: const [
-                                      _SelectCardItem(label: 'Men', icon: Iconsax.man),
-                                      _SelectCardItem(label: 'Women', icon: Iconsax.woman),
-                                      _SelectCardItem(label: 'Everyone', icon: Iconsax.people),
+                                      _SelectCardItem(
+                                        label: 'Men',
+                                        icon: Iconsax.man,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Women',
+                                        icon: Iconsax.woman,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Everyone',
+                                        icon: Iconsax.people,
+                                      ),
                                     ],
                                     onChanged: (val) {
                                       setState(() {
@@ -1039,17 +1147,35 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                               // PAGE 3: Status & Goals
                               _buildWizardPage(
                                 title: 'Goals & Status',
-                                subtitle: 'What are you looking for on Snellum?',
+                                subtitle:
+                                    'What are you looking for on Snellum?',
                                 children: [
                                   _buildCustomSelectGrid(
-                                    label: languageProvider.getString('relationship_status_label'),
+                                    label: languageProvider.getString(
+                                      'relationship_status_label',
+                                    ),
                                     value: _selectedRelationshipStatus,
                                     items: const [
-                                      _SelectCardItem(label: 'Single', icon: Iconsax.user),
-                                      _SelectCardItem(label: 'Married', icon: Iconsax.heart5),
-                                      _SelectCardItem(label: 'Divorced', icon: Iconsax.user_remove),
-                                      _SelectCardItem(label: 'Widowed', icon: Iconsax.star),
-                                      _SelectCardItem(label: 'Separated', icon: Iconsax.slash),
+                                      _SelectCardItem(
+                                        label: 'Single',
+                                        icon: Iconsax.user,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Married',
+                                        icon: Iconsax.heart5,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Divorced',
+                                        icon: Iconsax.user_remove,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Widowed',
+                                        icon: Iconsax.star,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Separated',
+                                        icon: Iconsax.slash,
+                                      ),
                                     ],
                                     onChanged: (val) {
                                       setState(() {
@@ -1062,16 +1188,46 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                                     label: 'Looking For',
                                     value: _selectedLookingFor,
                                     items: const [
-                                      _SelectCardItem(label: 'Marriage', icon: Iconsax.heart5),
-                                      _SelectCardItem(label: 'Long Term Relationship', icon: Iconsax.clock),
-                                      _SelectCardItem(label: 'Short Term Relationship', icon: Iconsax.timer),
-                                      _SelectCardItem(label: 'Hookups', icon: Iconsax.flash),
-                                      _SelectCardItem(label: 'Short Term Fun', icon: Iconsax.emoji_happy),
-                                      _SelectCardItem(label: 'New Friends', icon: Iconsax.people),
-                                      _SelectCardItem(label: 'Coffee Date', icon: Iconsax.cup),
-                                      _SelectCardItem(label: 'Movie Night', icon: Iconsax.video),
-                                      _SelectCardItem(label: 'Sponsor', icon: Iconsax.card),
-                                      _SelectCardItem(label: 'Figuring Out', icon: Iconsax.info_circle),
+                                      _SelectCardItem(
+                                        label: 'Marriage',
+                                        icon: Iconsax.heart5,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Long Term Relationship',
+                                        icon: Iconsax.clock,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Short Term Relationship',
+                                        icon: Iconsax.timer,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Casual',
+                                        icon: Iconsax.flash,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Short Term Fun',
+                                        icon: Iconsax.emoji_happy,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'New Friends',
+                                        icon: Iconsax.people,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Coffee Date',
+                                        icon: Iconsax.cup,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Learn Cultures',
+                                        icon: Iconsax.global,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Travel the World',
+                                        icon: Iconsax.card,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Figuring Out',
+                                        icon: Iconsax.info_circle,
+                                      ),
                                     ],
                                     onChanged: (val) {
                                       setState(() {
@@ -1085,15 +1241,27 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                               // PAGE 4: Habits & Lifestyle
                               _buildWizardPage(
                                 title: 'Habits & Lifestyle',
-                                subtitle: 'Help matches understand your daily habits',
+                                subtitle:
+                                    'Help matches understand your daily habits',
                                 children: [
                                   _buildCustomSelectGrid(
-                                    label: languageProvider.getString('smoking_label'),
+                                    label: languageProvider.getString(
+                                      'smoking_label',
+                                    ),
                                     value: _selectedSmoking,
                                     items: const [
-                                      _SelectCardItem(label: 'Yes', icon: Iconsax.activity),
-                                      _SelectCardItem(label: 'No', icon: Iconsax.close_circle),
-                                      _SelectCardItem(label: 'Occasionally', icon: Iconsax.timer),
+                                      _SelectCardItem(
+                                        label: 'Yes',
+                                        icon: Iconsax.activity,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'No',
+                                        icon: Iconsax.close_circle,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Occasionally',
+                                        icon: Iconsax.timer,
+                                      ),
                                     ],
                                     onChanged: (val) {
                                       setState(() {
@@ -1104,12 +1272,23 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                                   ),
                                   const SizedBox(height: 24),
                                   _buildCustomSelectGrid(
-                                    label: languageProvider.getString('drinking_label'),
+                                    label: languageProvider.getString(
+                                      'drinking_label',
+                                    ),
                                     value: _selectedDrinking,
                                     items: const [
-                                      _SelectCardItem(label: 'Yes', icon: Iconsax.cup),
-                                      _SelectCardItem(label: 'No', icon: Iconsax.close_circle),
-                                      _SelectCardItem(label: 'Socially', icon: Iconsax.people),
+                                      _SelectCardItem(
+                                        label: 'Yes',
+                                        icon: Iconsax.cup,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'No',
+                                        icon: Iconsax.close_circle,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Socially',
+                                        icon: Iconsax.people,
+                                      ),
                                     ],
                                     onChanged: (val) {
                                       setState(() {
@@ -1120,13 +1299,27 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                                   ),
                                   const SizedBox(height: 24),
                                   _buildCustomSelectGrid(
-                                    label: languageProvider.getString('want_kids_label'),
+                                    label: languageProvider.getString(
+                                      'want_kids_label',
+                                    ),
                                     value: _selectedWantKids,
                                     items: const [
-                                      _SelectCardItem(label: 'Yes', icon: Iconsax.emoji_happy),
-                                      _SelectCardItem(label: 'No', icon: Iconsax.close_circle),
-                                      _SelectCardItem(label: 'Maybe', icon: Iconsax.info_circle),
-                                      _SelectCardItem(label: 'Already have', icon: Iconsax.star),
+                                      _SelectCardItem(
+                                        label: 'Yes',
+                                        icon: Iconsax.emoji_happy,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'No',
+                                        icon: Iconsax.close_circle,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Maybe',
+                                        icon: Iconsax.info_circle,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Already have',
+                                        icon: Iconsax.star,
+                                      ),
                                     ],
                                     onChanged: (val) {
                                       setState(() {
@@ -1142,15 +1335,35 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                                 subtitle: 'What makes you unique?',
                                 children: [
                                   _buildCustomSelectGrid(
-                                    label: languageProvider.getString('body_type_label'),
+                                    label: languageProvider.getString(
+                                      'body_type_label',
+                                    ),
                                     value: _selectedBodyType,
                                     items: const [
-                                      _SelectCardItem(label: 'Slim', icon: Iconsax.profile),
-                                      _SelectCardItem(label: 'Athletic', icon: Iconsax.activity),
-                                      _SelectCardItem(label: 'Average', icon: Iconsax.user),
-                                      _SelectCardItem(label: 'Curvy', icon: Iconsax.profile_2user),
-                                      _SelectCardItem(label: 'A few extra pounds', icon: Iconsax.profile_add),
-                                      _SelectCardItem(label: 'Prefer not to say', icon: Iconsax.close_circle),
+                                      _SelectCardItem(
+                                        label: 'Slim',
+                                        icon: Iconsax.profile,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Athletic',
+                                        icon: Iconsax.activity,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Average',
+                                        icon: Iconsax.user,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Curvy',
+                                        icon: Iconsax.profile_2user,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'A few extra pounds',
+                                        icon: Iconsax.profile_add,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Prefer not to say',
+                                        icon: Iconsax.close_circle,
+                                      ),
                                     ],
                                     onChanged: (val) {
                                       setState(() {
@@ -1161,14 +1374,31 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                                   ),
                                   const SizedBox(height: 24),
                                   _buildCustomSelectGrid(
-                                    label: languageProvider.getString('education_level_label'),
+                                    label: languageProvider.getString(
+                                      'education_level_label',
+                                    ),
                                     value: _selectedEducationLevel,
                                     items: const [
-                                      _SelectCardItem(label: 'High School', icon: Iconsax.teacher),
-                                      _SelectCardItem(label: 'In College', icon: Iconsax.book),
-                                      _SelectCardItem(label: 'Undergraduate', icon: Iconsax.award),
-                                      _SelectCardItem(label: 'Postgraduate', icon: Iconsax.briefcase),
-                                      _SelectCardItem(label: 'Other', icon: Iconsax.more),
+                                      _SelectCardItem(
+                                        label: 'High School',
+                                        icon: Iconsax.teacher,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'In College',
+                                        icon: Iconsax.book,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Undergraduate',
+                                        icon: Iconsax.award,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Postgraduate',
+                                        icon: Iconsax.briefcase,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Other',
+                                        icon: Iconsax.more,
+                                      ),
                                     ],
                                     onChanged: (val) {
                                       setState(() {
@@ -1179,21 +1409,59 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                                   ),
                                   const SizedBox(height: 24),
                                   _buildCustomSelectGrid(
-                                    label: languageProvider.getString('zodiac_label'),
+                                    label: languageProvider.getString(
+                                      'zodiac_label',
+                                    ),
                                     value: _selectedZodiac,
                                     items: const [
-                                      _SelectCardItem(label: 'Aries', icon: Iconsax.star),
-                                      _SelectCardItem(label: 'Taurus', icon: Iconsax.star),
-                                      _SelectCardItem(label: 'Gemini', icon: Iconsax.star),
-                                      _SelectCardItem(label: 'Cancer', icon: Iconsax.star),
-                                      _SelectCardItem(label: 'Leo', icon: Iconsax.star),
-                                      _SelectCardItem(label: 'Virgo', icon: Iconsax.star),
-                                      _SelectCardItem(label: 'Libra', icon: Iconsax.star),
-                                      _SelectCardItem(label: 'Scorpio', icon: Iconsax.star),
-                                      _SelectCardItem(label: 'Sagittarius', icon: Iconsax.star),
-                                      _SelectCardItem(label: 'Capricorn', icon: Iconsax.star),
-                                      _SelectCardItem(label: 'Aquarius', icon: Iconsax.star),
-                                      _SelectCardItem(label: 'Pisces', icon: Iconsax.star),
+                                      _SelectCardItem(
+                                        label: 'Aries',
+                                        icon: Iconsax.star,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Taurus',
+                                        icon: Iconsax.star,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Gemini',
+                                        icon: Iconsax.star,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Cancer',
+                                        icon: Iconsax.star,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Leo',
+                                        icon: Iconsax.star,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Virgo',
+                                        icon: Iconsax.star,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Libra',
+                                        icon: Iconsax.star,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Scorpio',
+                                        icon: Iconsax.star,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Sagittarius',
+                                        icon: Iconsax.star,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Capricorn',
+                                        icon: Iconsax.star,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Aquarius',
+                                        icon: Iconsax.star,
+                                      ),
+                                      _SelectCardItem(
+                                        label: 'Pisces',
+                                        icon: Iconsax.star,
+                                      ),
                                     ],
                                     onChanged: (val) {
                                       setState(() {
@@ -1207,10 +1475,13 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                               // PAGE 6: Bio & Location
                               _buildWizardPage(
                                 title: 'Tell Us More',
-                                subtitle: 'Where do you live and what is your story?',
+                                subtitle:
+                                    'Where do you live and what is your story?',
                                 children: [
                                   _buildTextInput(
-                                    label: languageProvider.getString('location_title'),
+                                    label: languageProvider.getString(
+                                      'location_title',
+                                    ),
                                     controller: _locationController,
                                     hint: 'e.g. London, UK',
                                     icon: Iconsax.location,
@@ -1224,14 +1495,18 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                                   ),
                                   const SizedBox(height: 24),
                                   _buildTextInput(
-                                    label: languageProvider.getString('occupation_label'),
+                                    label: languageProvider.getString(
+                                      'occupation_label',
+                                    ),
                                     controller: _occupationController,
                                     hint: 'e.g. Software Engineer',
                                     icon: Iconsax.briefcase,
                                   ),
                                   const SizedBox(height: 24),
                                   _buildTextInput(
-                                    label: languageProvider.getString('bio_about_label'),
+                                    label: languageProvider.getString(
+                                      'bio_about_label',
+                                    ),
                                     controller: _bioController,
                                     hint: 'Tell us a bit about who you are...',
                                     maxLines: 4,
@@ -1243,9 +1518,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                               _buildWizardPage(
                                 title: 'Photos',
                                 subtitle: 'Show off your best angles!',
-                                children: [
-                                  _buildPhotoUploadGrid(),
-                                ],
+                                children: [_buildPhotoUploadGrid()],
                               ),
                             ],
                           ),

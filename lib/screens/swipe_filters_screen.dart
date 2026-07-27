@@ -51,7 +51,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
     'Short Term Fun',
     'New Friends',
     'Coffee Date',
-    'Movie Night',
+    'Learn Cultures',
     'Sponsor',
     'Figuring Out'
   ];

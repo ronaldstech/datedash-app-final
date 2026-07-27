@@ -582,7 +582,7 @@ class _LandingScreenState extends State<LandingScreen>
         return lp.getString('cat_new_friends');
       case 'Coffee Date':
         return lp.getString('cat_coffee_date');
-      case 'Movie Night':
+      case 'Learn Cultures':
         return lp.getString('cat_movie_night');
       case 'Sponsor':
         return lp.getString('cat_sponsor');
