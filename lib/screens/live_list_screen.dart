@@ -188,7 +188,8 @@ class _LiveListScreenState extends State<LiveListScreen>
                         partnerPhoto: partnerPhoto,
                         isHost: false,
                       );
-                    }).catchError((_) {
+                    })
+                    .catchError((_) {
                       if (!mounted) return;
                       _navigateToCall(
                         channelId: channelId,
@@ -208,9 +209,9 @@ class _LiveListScreenState extends State<LiveListScreen>
         setState(() {
           _isMatching = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Matchmaking error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Matchmaking error: $e')));
       }
     }
   }
@@ -670,43 +671,6 @@ class _LiveListScreenState extends State<LiveListScreen>
     );
   }
 
-  Widget _buildDropdownFilter({
-    required String value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-    required bool isDark,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.04),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          isExpanded: true,
-          icon: const Icon(Iconsax.arrow_down_1, size: 18),
-          dropdownColor: isDark ? const Color(0xFF14141A) : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          items: items.map((String item) {
-            return DropdownMenuItem<String>(
-              value: item,
-              child: Text(
-                item,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            );
-          }).toList(),
-          onChanged: onChanged,
-        ),
-      ),
-    );
-  }
-
   Widget _buildGenderCard(String gender, bool isSelected, bool isDark) {
     IconData iconData;
     switch (gender) {
@@ -884,10 +848,7 @@ class _LiveListScreenState extends State<LiveListScreen>
                   const SizedBox(height: 16),
                   const Text(
                     'Select Partner Language',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
                   Padding(
