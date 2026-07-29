@@ -8,7 +8,6 @@ class VideoChatService {
   CollectionReference get _waitingCollection =>
       _firestore.collection('video_chat_waiting');
 
-  /// Starts the matchmaking process by creating a ticket and searching for candidates.
   Future<Map<String, dynamic>?> startMatching({
     required UserProfile currentUser,
     required String filterLanguage,
@@ -18,8 +17,12 @@ class VideoChatService {
     required String filterCountry,
   }) async {
     final String currentUserId = currentUser.uid!;
+    final existingTicket = await _waitingCollection.doc(currentUserId).get();
+    final existingData = existingTicket.data() as Map<String, dynamic>?;
+    final skippedUserIds = List<String>.from(
+      existingData?['skippedUserIds'] ?? [],
+    );
 
-    // Create/update ticket for current user
     final Map<String, dynamic> myTicket = {
       'uid': currentUserId,
       'name': currentUser.firstName ?? 'User',
@@ -39,13 +42,22 @@ class VideoChatService {
       'matchedWith': null,
       'channelId': null,
       'isHost': false,
+      'accepted': false,
+      'partnerName': null,
+      'partnerPhoto': null,
+      'partnerGender': null,
+      'partnerAge': null,
+      'partnerCountry': null,
+      'skippedUserIds': skippedUserIds,
       'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
     };
 
     try {
-      await _waitingCollection.doc(currentUserId).set(myTicket);
+      await _waitingCollection
+          .doc(currentUserId)
+          .set(myTicket, SetOptions(merge: true));
 
-      // Search for candidates already waiting (avoid requiring composite index)
       final querySnapshot = await _waitingCollection
           .where('status', isEqualTo: 'waiting')
           .get();
@@ -57,8 +69,13 @@ class VideoChatService {
         final String candidateId = data['uid'] ?? doc.id;
         if (candidateId == currentUserId) continue;
         if (data['status'] != 'waiting') continue;
+        if (skippedUserIds.contains(candidateId)) continue;
 
-        // Check if candidate matches current user's filters
+        final candidateSkipped = List<String>.from(
+          data['skippedUserIds'] ?? [],
+        );
+        if (candidateSkipped.contains(currentUserId)) continue;
+
         final candidateGender = (data['gender'] as String?) ?? 'Other';
         final candidateAge = (data['age'] as num?)?.toInt() ?? 25;
         final candidateCountry = (data['country'] as String?) ?? '';
@@ -89,10 +106,10 @@ class VideoChatService {
                   filterLanguage.toLowerCase().contains(lang.toLowerCase()),
             );
 
-        if (!genderMatch || !ageMatch || !countryMatch || !languageMatch)
+        if (!genderMatch || !ageMatch || !countryMatch || !languageMatch) {
           continue;
+        }
 
-        // Check if current user matches candidate's filters
         final candFilterGender = (data['filterGender'] as String?) ?? 'Any';
         final candFilterMinAge = (data['filterMinAge'] as num?)?.toInt() ?? 18;
         final candFilterMaxAge = (data['filterMaxAge'] as num?)?.toInt() ?? 80;
@@ -126,51 +143,75 @@ class VideoChatService {
                   candFilterLanguage.toLowerCase().contains(lang.toLowerCase()),
             );
 
-        if (candGenderMatch &&
-            candAgeMatch &&
-            candCountryMatch &&
-            candLanguageMatch) {
-          // We found a mutual match! Let's update both tickets.
-          final String channelId = '${candidateId}_$currentUserId';
+        if (!candGenderMatch ||
+            !candAgeMatch ||
+            !candCountryMatch ||
+            !candLanguageMatch) {
+          continue;
+        }
 
-          // Write batch: update tickets + create a dedicated call session doc
-          final batch = _firestore.batch();
+        final String channelId = '${candidateId}_$currentUserId';
+        bool proposed = false;
 
-          batch.update(_waitingCollection.doc(candidateId), {
-            'status': 'matched',
+        await _firestore.runTransaction((transaction) async {
+          final candidateRef = _waitingCollection.doc(candidateId);
+          final currentRef = _waitingCollection.doc(currentUserId);
+          final candidateSnap = await transaction.get(candidateRef);
+          final currentSnap = await transaction.get(currentRef);
+
+          final candidateData =
+              candidateSnap.data() as Map<String, dynamic>?;
+          final currentData = currentSnap.data() as Map<String, dynamic>?;
+
+          if (candidateData?['status'] != 'waiting' ||
+              currentData?['status'] != 'waiting') {
+            return;
+          }
+
+          transaction.update(candidateRef, {
+            'status': 'proposed',
             'matchedWith': currentUserId,
             'channelId': channelId,
             'isHost': false,
+            'accepted': false,
+            'partnerName': currentUser.firstName ?? 'User',
+            'partnerPhoto':
+                currentUser.photos.isNotEmpty ? currentUser.photos.first : '',
+            'partnerGender': currentUser.gender ?? 'Other',
+            'partnerAge': currentUser.age ?? 25,
+            'partnerCountry': currentUser.location ?? 'Unknown',
+            'updatedAt': FieldValue.serverTimestamp(),
           });
 
-          batch.update(_waitingCollection.doc(currentUserId), {
-            'status': 'matched',
+          transaction.update(currentRef, {
+            'status': 'proposed',
             'matchedWith': candidateId,
             'channelId': channelId,
             'isHost': true,
-          });
-
-          // Create call session document — this is the single source of truth
-          // for the call lifecycle (replaces watching the waiting tickets)
-          batch.set(_firestore.collection('video_chat_calls').doc(channelId), {
-            'channelId': channelId,
-            'hostId': currentUserId,
-            'guestId': candidateId,
-            'status': 'active',
-            'startedAt': FieldValue.serverTimestamp(),
-            'endedBy': null,
-          });
-
-          await batch.commit();
-
-          return {
-            'channelId': channelId,
-            'matchedWith': candidateId,
+            'accepted': false,
             'partnerName': data['name'] ?? 'User',
             'partnerPhoto': data['photo'] ?? '',
-            'isHost': true,
-          };
-        }
+            'partnerGender': data['gender'] ?? 'Other',
+            'partnerAge': (data['age'] as num?)?.toInt() ?? 25,
+            'partnerCountry': data['country'] ?? 'Unknown',
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+
+          proposed = true;
+        });
+
+        if (!proposed) continue;
+
+        return {
+          'channelId': channelId,
+          'matchedWith': candidateId,
+          'partnerName': data['name'] ?? 'User',
+          'partnerPhoto': data['photo'] ?? '',
+          'partnerGender': data['gender'] ?? 'Other',
+          'partnerAge': (data['age'] as num?)?.toInt() ?? 25,
+          'partnerCountry': data['country'] ?? 'Unknown',
+          'isHost': true,
+        };
       }
     } catch (e, stack) {
       debugPrint('Error in startMatching: $e\n$stack');
@@ -179,30 +220,110 @@ class VideoChatService {
     return null;
   }
 
-  /// Listens to the current user's ticket changes to detect if a match occurred.
   Stream<DocumentSnapshot> getTicketStream(String userId) {
     return _waitingCollection.doc(userId).snapshots();
   }
 
-  /// Listens to the call session document for lifecycle events (ended, etc.)
-  /// This is the source of truth during a live call — not the waiting tickets.
   Stream<DocumentSnapshot> getCallSessionStream(String channelId) {
     return _firestore.collection('video_chat_calls').doc(channelId).snapshots();
   }
 
-  /// Cancels matchmaking and deletes the ticket.
+  Stream<int> getActiveVideoUsersCountStream() {
+    return _firestore
+        .collection('video_chat_calls')
+        .where('status', isEqualTo: 'active')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.length * 2);
+  }
+
+  Future<Map<String, dynamic>?> acceptMatch(String userId) async {
+    Map<String, dynamic>? callData;
+
+    await _firestore.runTransaction((transaction) async {
+      final myRef = _waitingCollection.doc(userId);
+      final mySnap = await transaction.get(myRef);
+      final myData = mySnap.data() as Map<String, dynamic>?;
+
+      if (myData == null || myData['status'] != 'proposed') return;
+
+      final partnerId = myData['matchedWith'] as String?;
+      final channelId = myData['channelId'] as String?;
+      if (partnerId == null || channelId == null) return;
+
+      final partnerRef = _waitingCollection.doc(partnerId);
+      final partnerSnap = await transaction.get(partnerRef);
+      final partnerData = partnerSnap.data() as Map<String, dynamic>?;
+
+      transaction.update(myRef, {
+        'accepted': true,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      if (partnerData?['status'] == 'proposed' &&
+          partnerData?['matchedWith'] == userId &&
+          partnerData?['accepted'] == true) {
+        transaction.update(myRef, {
+          'status': 'matched',
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+        transaction.update(partnerRef, {
+          'status': 'matched',
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+        transaction.set(
+          _firestore.collection('video_chat_calls').doc(channelId),
+          {
+            'channelId': channelId,
+            'hostId': myData['isHost'] == true ? userId : partnerId,
+            'guestId': myData['isHost'] == true ? partnerId : userId,
+            'status': 'active',
+            'startedAt': FieldValue.serverTimestamp(),
+            'endedBy': null,
+          },
+          SetOptions(merge: true),
+        );
+
+        callData = _callDataFromTicket(myData, partnerId, channelId);
+      }
+    });
+
+    return callData;
+  }
+
+  Future<void> declineMatch(String userId) async {
+    try {
+      final mySnap = await _waitingCollection.doc(userId).get();
+      final myData = mySnap.data() as Map<String, dynamic>?;
+      final partnerId = myData?['matchedWith'] as String?;
+
+      final batch = _firestore.batch();
+      batch.set(
+        _waitingCollection.doc(userId),
+        _waitingResetData(partnerId),
+        SetOptions(merge: true),
+      );
+
+      if (partnerId != null) {
+        batch.set(
+          _waitingCollection.doc(partnerId),
+          _waitingResetData(userId),
+          SetOptions(merge: true),
+        );
+      }
+
+      await batch.commit();
+    } catch (e) {
+      debugPrint('Error declining video match: $e');
+    }
+  }
+
   Future<void> cancelMatching(String userId) async {
     try {
       await _waitingCollection.doc(userId).delete();
     } catch (_) {}
   }
 
-  /// Ends the call:
-  /// - Marks call session doc as 'ended'
-  /// - Deletes ONLY the current user's own waiting ticket
-  /// - Does NOT delete partner's ticket (partner handles their own cleanup)
   Future<void> endCall(String userId, String channelId) async {
-    // Mark call as ended in the session document
     try {
       await _firestore.collection('video_chat_calls').doc(channelId).update({
         'status': 'ended',
@@ -210,16 +331,49 @@ class VideoChatService {
         'endedAt': FieldValue.serverTimestamp(),
       });
     } catch (_) {}
-    // Clean up own ticket only
     try {
       await _waitingCollection.doc(userId).delete();
     } catch (_) {}
   }
 
-  /// Called by the partner when they receive the 'ended' signal — cleans up their own ticket.
   Future<void> cleanupOwnTicket(String userId) async {
     try {
       await _waitingCollection.doc(userId).delete();
     } catch (_) {}
+  }
+
+  Map<String, dynamic> _waitingResetData(String? skippedUserId) {
+    return {
+      'status': 'waiting',
+      'matchedWith': FieldValue.delete(),
+      'channelId': FieldValue.delete(),
+      'isHost': false,
+      'accepted': false,
+      'partnerName': FieldValue.delete(),
+      'partnerPhoto': FieldValue.delete(),
+      'partnerGender': FieldValue.delete(),
+      'partnerAge': FieldValue.delete(),
+      'partnerCountry': FieldValue.delete(),
+      'updatedAt': FieldValue.serverTimestamp(),
+      if (skippedUserId != null)
+        'skippedUserIds': FieldValue.arrayUnion([skippedUserId]),
+    };
+  }
+
+  Map<String, dynamic> _callDataFromTicket(
+    Map<String, dynamic> ticket,
+    String partnerId,
+    String channelId,
+  ) {
+    return {
+      'channelId': channelId,
+      'matchedWith': partnerId,
+      'partnerName': ticket['partnerName'] ?? 'User',
+      'partnerPhoto': ticket['partnerPhoto'] ?? '',
+      'partnerGender': ticket['partnerGender'] ?? 'Other',
+      'partnerAge': (ticket['partnerAge'] as num?)?.toInt() ?? 25,
+      'partnerCountry': ticket['partnerCountry'] ?? 'Unknown',
+      'isHost': ticket['isHost'] == true,
+    };
   }
 }

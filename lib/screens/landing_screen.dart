@@ -351,7 +351,6 @@ class _LandingScreenState extends State<LandingScreen>
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         _buildNavItem(
                           0,
@@ -530,37 +529,40 @@ class _LandingScreenState extends State<LandingScreen>
           : profileProvider.unreadMessageCount;
     }
 
-    return GestureDetector(
-      onTap: () => profileProvider.setTabIndex(index),
-      behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: 60,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Badge(
-              isLabelVisible: hasBadge && badgeCount > 0,
-              backgroundColor: const Color(0xFFFF4D85),
-              label: Text(
-                badgeCount.toString(),
-                style: const TextStyle(fontSize: 10, color: Colors.white),
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => profileProvider.setTabIndex(index),
+        behavior: HitTestBehavior.opaque,
+        child: SizedBox.expand(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Badge(
+                isLabelVisible: hasBadge && badgeCount > 0,
+                backgroundColor: const Color(0xFFFF4D85),
+                label: Text(
+                  badgeCount.toString(),
+                  style: const TextStyle(fontSize: 10, color: Colors.white),
+                ),
+                child: Icon(
+                  isSelected ? activeIcon : icon,
+                  color: color,
+                  size: 24,
+                ),
               ),
-              child: Icon(
-                isSelected ? activeIcon : icon,
-                color: color,
-                size: 24,
+              const SizedBox(height: 4),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontSize: 10,
-                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

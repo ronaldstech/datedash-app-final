@@ -8,7 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import '../providers/profile_provider.dart';
 import '../providers/language_provider.dart';
 import '../services/video_chat_service.dart';
-import 'video_call_screen.dart';
+import 'video_matchmaking_screen.dart';
 import 'premium_screen.dart';
 
 class LiveListScreen extends StatefulWidget {
@@ -101,119 +101,25 @@ class _LiveListScreenState extends State<LiveListScreen>
       return;
     }
 
-    setState(() {
-      _isMatching = true;
-    });
-    _radarController.repeat();
-
-    final currentUserId = currentUser.uid!;
     final bool isPremium = currentUser.isPremium;
 
     // Premium restriction: non-premium users are locked to 'Any'
     final String effectiveGender = isPremium ? _selectedGender : 'Any';
     final String effectiveCountry = isPremium ? _selectedCountry : 'Any';
 
-    try {
-      // 1. Try to match immediately
-      final matchResult = await _videoChatService.startMatching(
-        currentUser: currentUser,
-        filterLanguage: _selectedLanguage,
-        filterGender: effectiveGender,
-        filterMinAge: _ageRange.start.round(),
-        filterMaxAge: _ageRange.end.round(),
-        filterCountry: effectiveCountry,
-      );
-
-      if (!mounted) return;
-
-      if (matchResult != null) {
-        // Direct match found!
-        _radarController.stop();
-        setState(() {
-          _isMatching = false;
-        });
-
-        _navigateToCall(
-          channelId: matchResult['channelId'],
-          partnerId: matchResult['matchedWith'],
-          partnerName: matchResult['partnerName'],
-          partnerPhoto: matchResult['partnerPhoto'],
-          isHost: true,
-        );
-      } else {
-        // No immediate match. Start listening to current user's ticket updates
-        _ticketSubscription?.cancel();
-        _ticketSubscription = _videoChatService
-            .getTicketStream(currentUserId)
-            .listen((snapshot) {
-              if (!snapshot.exists || !mounted) return;
-
-              final data = snapshot.data() as Map<String, dynamic>?;
-              if (data == null) return;
-
-              final status = data['status'] as String?;
-              if (status == 'matched') {
-                _ticketSubscription?.cancel();
-                _radarController.stop();
-                setState(() {
-                  _isMatching = false;
-                });
-
-                final String? channelId = data['channelId'];
-                final String? partnerId = data['matchedWith'];
-
-                if (channelId == null || partnerId == null) return;
-
-                // Fetch partner details from ticket or Firestore
-                FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(partnerId)
-                    .get()
-                    .then((userDoc) {
-                      if (!mounted) return;
-                      String partnerName = 'User';
-                      String partnerPhoto = '';
-                      if (userDoc.exists) {
-                        partnerName = userDoc.data()?['firstName'] ?? 'User';
-                        final photos = List<String>.from(
-                          userDoc.data()?['photos'] ?? [],
-                        );
-                        if (photos.isNotEmpty) partnerPhoto = photos.first;
-                      }
-
-                      _navigateToCall(
-                        channelId: channelId,
-                        partnerId: partnerId,
-                        partnerName: partnerName,
-                        partnerPhoto: partnerPhoto,
-                        isHost: false,
-                      );
-                    })
-                    .catchError((_) {
-                      if (!mounted) return;
-                      _navigateToCall(
-                        channelId: channelId,
-                        partnerId: partnerId,
-                        partnerName: 'User',
-                        partnerPhoto: '',
-                        isHost: false,
-                      );
-                    });
-              }
-            });
-      }
-    } catch (e) {
-      debugPrint('Error starting matching flow: $e');
-      if (mounted) {
-        _radarController.stop();
-        setState(() {
-          _isMatching = false;
-        });
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Matchmaking error: $e')));
-      }
-    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => VideoMatchmakingScreen(
+          currentUser: currentUser,
+          filterLanguage: _selectedLanguage,
+          filterGender: effectiveGender,
+          filterMinAge: _ageRange.start.round(),
+          filterMaxAge: _ageRange.end.round(),
+          filterCountry: effectiveCountry,
+        ),
+      ),
+    );
   }
 
   void _cancelMatchingFlow(ProfileProvider pp) async {
@@ -228,27 +134,6 @@ class _LiveListScreenState extends State<LiveListScreen>
         _isMatching = false;
       });
     }
-  }
-
-  void _navigateToCall({
-    required String channelId,
-    required String partnerId,
-    required String partnerName,
-    required String partnerPhoto,
-    required bool isHost,
-  }) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => VideoCallScreen(
-          channelId: channelId,
-          partnerId: partnerId,
-          partnerName: partnerName,
-          partnerPhoto: partnerPhoto,
-          isHost: isHost,
-        ),
-      ),
-    );
   }
 
   Future<void> _setDefaultCountryFromGeo(ProfileProvider pp) async {
@@ -491,146 +376,376 @@ class _LiveListScreenState extends State<LiveListScreen>
     ProfileProvider pp,
     LanguageProvider lp,
   ) {
+    final bool isPremium = pp.userProfile?.isPremium == true;
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Card
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFFF4D85), Color(0xFFFF758F)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+          _buildHeroPanel(pp),
+          const SizedBox(height: 18),
+          _buildQuickStats(isDark, isPremium),
+          const SizedBox(height: 22),
+          _buildFilterPanel(
+            isDark: isDark,
+            title: 'Match preferences',
+            subtitle: 'These are used before the full-screen camera search.',
+            children: [
+              _buildFilterLabel('Partner Language', Iconsax.language_square),
+              const SizedBox(height: 10),
+              _buildLanguagePickerButton(context, isDark),
+              const SizedBox(height: 18),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildFilterLabel('Age Range', Iconsax.calendar),
+                  _buildValuePill(
+                    '${_ageRange.start.round()}-${_ageRange.end.round()}',
+                    isDark,
+                  ),
+                ],
               ),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFFF4D85).withValues(alpha: 0.3),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
+              RangeSlider(
+                values: _ageRange,
+                min: 18,
+                max: 80,
+                activeColor: const Color(0xFFFF4D85),
+                inactiveColor: isDark
+                    ? Colors.white10
+                    : Colors.black.withValues(alpha: 0.06),
+                labels: RangeLabels(
+                  _ageRange.start.round().toString(),
+                  _ageRange.end.round().toString(),
                 ),
-              ],
-            ),
-            child: Row(
+                onChanged: (values) => setState(() => _ageRange = values),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          _buildFilterPanel(
+            isDark: isDark,
+            title: 'Premium filters',
+            subtitle: isPremium
+                ? 'Tune gender and country for a more focused match.'
+                : 'Upgrade to control gender and country matching.',
+            children: [
+              _buildFilterLabel('Desired Gender', Iconsax.user),
+              const SizedBox(height: 10),
+              Stack(
+                children: [
+                  Row(
+                    children: _genders.map((gender) {
+                      final isSelected = _selectedGender == gender;
+                      return Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            right: gender == _genders.last ? 0 : 8,
+                          ),
+                          child: _buildGenderCard(gender, isSelected, isDark),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  if (!isPremium) _buildPremiumLockedOverlay(context, 'Gender'),
+                ],
+              ),
+              const SizedBox(height: 18),
+              _buildFilterLabel('Partner Country', Iconsax.global),
+              const SizedBox(height: 10),
+              Stack(
+                children: [
+                  _buildCountryPickerButton(context, isDark),
+                  if (!isPremium)
+                    _buildPremiumLockedOverlay(context, 'Country'),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          _buildStartCard(isDark, pp, isPremium),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeroPanel(ProfileProvider pp) {
+    final photo = pp.photoURL ?? '';
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFF4D85), Color(0xFF7C3AED)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFFF4D85).withValues(alpha: 0.28),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.24),
+                  ),
+                ),
+                child: const Icon(
+                  Iconsax.video_tick5,
+                  size: 28,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 14),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '1-on-1 Video Chat',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Match first, preview profiles, then both accept.',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 24,
+                backgroundColor: Colors.white.withValues(alpha: 0.2),
+                backgroundImage: photo.isNotEmpty ? NetworkImage(photo) : null,
+                child: photo.isEmpty
+                    ? const Icon(Iconsax.user, color: Colors.white)
+                    : null,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _heroChip(Iconsax.language_square, _selectedLanguage),
+                    _heroChip(
+                      Iconsax.calendar,
+                      '${_ageRange.start.round()}-${_ageRange.end.round()}',
+                    ),
+                    _heroChip(Iconsax.global, _selectedCountry),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickStats(bool isDark, bool isPremium) {
+    return Row(
+      children: [
+        Expanded(
+          child: StreamBuilder<int>(
+            stream: _videoChatService.getActiveVideoUsersCountStream(),
+            builder: (context, snapshot) {
+              return _buildStatTile(
+                isDark,
+                Iconsax.people,
+                '${snapshot.data ?? 0}',
+                'chatting now',
+              );
+            },
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _buildStatTile(
+            isDark,
+            isPremium ? Iconsax.crown5 : Iconsax.lock,
+            isPremium ? 'Premium' : 'Basic',
+            isPremium ? 'filters on' : 'filters limited',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatTile(
+    bool isDark,
+    IconData icon,
+    String value,
+    String label,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.06)
+            : Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.black.withValues(alpha: 0.05),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: const Color(0xFFFF4D85), size: 21),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Iconsax.video_tick5, size: 48, color: Colors.white),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        '1-on-1 Video Chat',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Set your preferences and instantly match with someone online.',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.9),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Theme.of(context).hintColor,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
 
-          // Partner Language
-          _buildFilterLabel('Partner Language', Iconsax.language_square),
-          const SizedBox(height: 12),
-          _buildLanguagePickerButton(context, isDark),
-          const SizedBox(height: 24),
-
-          // Desired Gender
-          _buildFilterLabel('Desired Gender', Iconsax.user),
-          const SizedBox(height: 12),
-          Stack(
-            children: [
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                child: Row(
-                  children: _genders.map((gender) {
-                    final isSelected = _selectedGender == gender;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: SizedBox(
-                        width: 80,
-                        child: _buildGenderCard(gender, isSelected, isDark),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-              if (pp.userProfile?.isPremium != true)
-                _buildPremiumLockedOverlay(context, 'Gender'),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          // Age Range
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildFilterLabel('Age Range', Iconsax.calendar),
-              Text(
-                '${_ageRange.start.round()} - ${_ageRange.end.round()}',
-                style: const TextStyle(
-                  color: Color(0xFFFF4D85),
-                  fontWeight: FontWeight.w900,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-          RangeSlider(
-            values: _ageRange,
-            min: 18,
-            max: 80,
-            activeColor: const Color(0xFFFF4D85),
-            inactiveColor: isDark
-                ? Colors.white10
-                : Colors.black.withValues(alpha: 0.05),
-            labels: RangeLabels(
-              _ageRange.start.round().toString(),
-              _ageRange.end.round().toString(),
+  Widget _buildFilterPanel({
+    required bool isDark,
+    required String title,
+    required String subtitle,
+    required List<Widget> children,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF15151B) : Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.black.withValues(alpha: 0.05),
+        ),
+        boxShadow: [
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
             ),
-            onChanged: (values) {
-              setState(() => _ageRange = values);
-            },
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
+            style: TextStyle(
+              color: Theme.of(context).hintColor,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ...children,
+        ],
+      ),
+    );
+  }
 
-          // Partner Country
-          _buildFilterLabel('Partner Country', Iconsax.global),
-          const SizedBox(height: 12),
-          Stack(
+  Widget _buildStartCard(bool isDark, ProfileProvider pp, bool isPremium) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.05)
+            : const Color(0xFFFFF3F7),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: const Color(0xFFFF4D85).withValues(alpha: 0.16),
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
             children: [
-              _buildCountryPickerButton(context, isDark),
-              if (pp.userProfile?.isPremium != true)
-                _buildPremiumLockedOverlay(context, 'Country'),
+              const Icon(Iconsax.shield_tick, color: Color(0xFFFF4D85)),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  isPremium
+                      ? 'Your selected filters will be applied.'
+                      : 'Gender and country are set to Any on Basic.',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 48),
-
-          // Start Match Button
+          const SizedBox(height: 14),
           SizedBox(
             width: double.infinity,
             height: 56,
-            child: ElevatedButton(
+            child: ElevatedButton.icon(
               onPressed: () => _startMatchingFlow(pp),
+              icon: const Icon(Iconsax.video_play),
+              label: const Text(
+                'Start Matching',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF4D85),
                 foregroundColor: Colors.white,
@@ -639,21 +754,52 @@ class _LiveListScreenState extends State<LiveListScreen>
                 ),
                 elevation: 0,
               ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Iconsax.video_play),
-                  SizedBox(width: 8),
-                  Text(
-                    'Start Matching',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
             ),
           ),
-          const SizedBox(height: 32),
         ],
+      ),
+    );
+  }
+
+  Widget _heroChip(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white, size: 14),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 11,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildValuePill(String value, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFF4D85).withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        value,
+        style: const TextStyle(
+          color: Color(0xFFFF4D85),
+          fontWeight: FontWeight.w900,
+          fontSize: 12,
+        ),
       ),
     );
   }
