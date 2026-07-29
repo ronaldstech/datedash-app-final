@@ -1116,8 +1116,8 @@ class _PremiumScreenState extends State<PremiumScreen>
               childAspectRatio: 0.75,
             ),
             delegate: SliverChildListDelegate([
-              _buildCreditGlassBundle(500, isDark),
-              _buildCreditGlassBundle(1000, isDark, isPopular: true),
+              _buildCreditGlassBundle(1000, isDark),
+              _buildCreditGlassBundle(3000, isDark, isPopular: true),
               _buildCreditGlassBundle(5000, isDark),
               _buildCreditGlassBundle(10000, isDark),
               _buildCreditGlassBundle(20000, isDark),
@@ -1349,7 +1349,6 @@ class _PremiumScreenState extends State<PremiumScreen>
       },
     );
   }
-
 }
 
 class _PaymentSheetContent extends StatefulWidget {

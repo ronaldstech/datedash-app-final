@@ -443,9 +443,10 @@ class LanguageProvider with ChangeNotifier {
       'booking_section_title': 'Meetup Settings',
       'verification_status_unverified': 'Verify Identity',
       'verification_status_unverified_sub':
-          'Submit ID for official verification',
+          'Verify with Sumsub ID checks',
       'verification_status_pending': 'Verification Pending',
-      'verification_status_pending_sub': 'Your ID is being reviewed by admins',
+      'verification_status_pending_sub':
+          'Your ID is being reviewed by Sumsub',
       'verification_status_verified': 'Identity Verified',
       'verification_status_verified_sub':
           'Your identity has been fully confirmed',
@@ -454,7 +455,7 @@ class LanguageProvider with ChangeNotifier {
       'id_document_photo': 'ID Document Photo',
       'submit_verification': 'Submit for Verification',
       'verification_submitted_success':
-          'Verification details submitted successfully!',
+          'Verification started successfully!',
       'use_mock_id': 'Use Mock ID Card',
       'simulated_admin_panel': 'Simulated Admin Action',
       'approve_request': 'Approve Request',
@@ -843,10 +844,10 @@ class LanguageProvider with ChangeNotifier {
       'booking_section_title': 'Mipangilio ya Miadi',
       'verification_status_unverified': 'Thibitisha Utambulisho',
       'verification_status_unverified_sub':
-          'Tuma Kitambulisho kwa uthibitisho rasmi',
+          'Thibitisha kwa ukaguzi wa Sumsub',
       'verification_status_pending': 'Uthibitisho Unasubiriwa',
       'verification_status_pending_sub':
-          'Kitambulisho chako kinakaguliwa na wasimamizi',
+          'Kitambulisho chako kinakaguliwa na Sumsub',
       'verification_status_verified': 'Utambulisho Umethibitishwa',
       'verification_status_verified_sub':
           'Utambulisho wako umethibitishwa kikamilifu',
@@ -855,7 +856,7 @@ class LanguageProvider with ChangeNotifier {
       'id_document_photo': 'Picha ya Kitambulisho',
       'submit_verification': 'Tuma kwa Uthibitisho',
       'verification_submitted_success':
-          'Maelezo ya uthibitisho yametunzwa kikamilifu!',
+          'Uthibitisho umeanzishwa kikamilifu!',
       'use_mock_id': 'Tumia Kitambulisho cha Jaribio',
       'simulated_admin_panel': 'Hatua ya Admin (Simulated)',
       'approve_request': 'Kubali Ombi',

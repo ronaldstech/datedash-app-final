@@ -1,14 +1,11 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
-import '../providers/profile_provider.dart';
-import '../providers/language_provider.dart';
-import 'landing_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../providers/language_provider.dart';
+import '../providers/profile_provider.dart';
+import '../services/identity_verification_service.dart';
 
 class VerificationScreen extends StatefulWidget {
   const VerificationScreen({super.key});
@@ -17,20 +14,13 @@ class VerificationScreen extends StatefulWidget {
   State<VerificationScreen> createState() => _VerificationScreenState();
 }
 
-class _VerificationScreenState extends State<VerificationScreen> with TickerProviderStateMixin {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _idNumberController = TextEditingController();
-  
-  XFile? _selectedImage;
-  bool _isUploading = false;
-  double _uploadProgress = 0.0;
-
-  final ImagePicker _picker = ImagePicker();
-  final String _uploadUrl = 'https://unimarket-mw.com/snellum/api/upload.php';
+class _VerificationScreenState extends State<VerificationScreen>
+    with TickerProviderStateMixin {
+  final IdentityVerificationService _verificationService =
+      IdentityVerificationService();
   final Color _primaryColor = const Color(0xFFFF4D85);
 
-  // Animations
+  bool _isStarting = false;
   late AnimationController _pulseController;
   late Animation<double> _pulseScale;
 
@@ -47,122 +37,77 @@ class _VerificationScreenState extends State<VerificationScreen> with TickerProv
     );
   }
 
-
   @override
   void dispose() {
-    _nameController.dispose();
-    _idNumberController.dispose();
     _pulseController.dispose();
     super.dispose();
   }
 
-  Future<void> _pickImage(ImageSource source) async {
+  Future<void> _startVerification(
+    ProfileProvider profileProvider,
+    LanguageProvider lp,
+  ) async {
+    if (_isStarting) return;
+
+    setState(() => _isStarting = true);
+
     try {
-      // Prevent app lock when picking images
-      try {
-        LandingScreen.ignoreNextLock = true;
-      } catch (_) {}
-      final XFile? image = await _picker.pickImage(source: source);
-      if (image != null) {
-        setState(() {
-          _selectedImage = image;
-        });
+      final url = await _verificationService.createVerificationLink();
+      final uri = Uri.parse(url);
+
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        throw IdentityVerificationException(
+          'Could not open the verification provider.',
+        );
       }
-    } catch (e) {
-      _showSnack('Error selecting image: $e', isError: true);
-    }
-  }
 
-
-
-  Future<void> _submitVerification(ProfileProvider profileProvider, LanguageProvider lp) async {
-    if (_nameController.text.trim().isEmpty || _idNumberController.text.trim().isEmpty) {
-      _showSnack('Please fill in your name and ID number.', isError: true);
-      return;
-    }
-
-    if (_selectedImage == null) {
-      _showSnack('Please capture or select your ID document photo.', isError: true);
-      return;
-    }
-
-    setState(() {
-      _isUploading = true;
-      _uploadProgress = 0.1;
-    });
-
-    String? finalImageUrl;
-
-    // Upload ID document photo
-    try {
-      var request = http.MultipartRequest('POST', Uri.parse(_uploadUrl));
-      request.files.add(await http.MultipartFile.fromPath('image', _selectedImage!.path));
-      
-      setState(() => _uploadProgress = 0.4);
-      var response = await request.send();
-      
-      if (response.statusCode == 200) {
-        var responseData = await response.stream.bytesToString();
-        var jsonResponse = json.decode(responseData);
-        if (jsonResponse['status'] == 'success') {
-          finalImageUrl = jsonResponse['url'];
-        } else {
-          throw Exception(jsonResponse['message'] ?? 'Upload rejected by server.');
-        }
-      } else {
-        throw Exception('Server error code: ${response.statusCode}');
-      }
-    } catch (e) {
-      _showSnack('Failed to upload ID photo. Please try again.', isError: true);
-      if (mounted) setState(() { _isUploading = false; _uploadProgress = 0.0; });
-      return;
-    }
-
-    setState(() => _uploadProgress = 0.8);
-
-    try {
       final user = profileProvider.currentUser;
-      if (user != null && profileProvider.userProfile != null) {
-        final profile = profileProvider.userProfile!;
+      final profile = profileProvider.userProfile;
+      if (user != null && profile != null) {
         profile.verificationStatus = 'pending';
-        profile.nationalId = _idNumberController.text.trim();
-        profile.nationalIdUrl = finalImageUrl;
-        
+        profile.nationalId = 'Sumsub';
+        profile.nationalIdUrl = url;
         await profileProvider.saveUserProfile(user.uid, profile);
-        
-        _showSnack(lp.getString('verification_submitted_success'), isSuccess: true);
       }
+
+      _showSnack(lp.getString('verification_submitted_success'),
+          isSuccess: true);
     } catch (e) {
-      _showSnack('Submission failed: $e', isError: true);
+      _showSnack(e.toString(), isError: true);
     } finally {
-      if (mounted) {
-        setState(() {
-          _isUploading = false;
-          _uploadProgress = 0.0;
-        });
-      }
+      if (mounted) setState(() => _isStarting = false);
     }
   }
 
-
-
-  void _showSnack(String message, {bool isError = false, bool isSuccess = false}) {
+  void _showSnack(
+    String message, {
+    bool isError = false,
+    bool isSuccess = false,
+  }) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
             Icon(
-              isError 
-                  ? Icons.error_outline_rounded 
-                  : (isSuccess ? Icons.check_circle_outline_rounded : Icons.info_outline_rounded),
+              isError
+                  ? Icons.error_outline_rounded
+                  : (isSuccess
+                      ? Icons.check_circle_outline_rounded
+                      : Icons.info_outline_rounded),
               color: Colors.white,
             ),
             const SizedBox(width: 12),
-            Expanded(child: Text(message, style: const TextStyle(fontWeight: FontWeight.w600))),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
           ],
         ),
-        backgroundColor: isError ? Colors.redAccent : (isSuccess ? Colors.green : _primaryColor),
+        backgroundColor:
+            isError ? Colors.redAccent : (isSuccess ? Colors.green : _primaryColor),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         margin: const EdgeInsets.all(16),
@@ -188,12 +133,12 @@ class _VerificationScreenState extends State<VerificationScreen> with TickerProv
         ),
         title: Text(
           lp.getString('verification_title'),
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
         ),
       ),
       body: Stack(
         children: [
-          // Elegant dark-mode gradient background
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -211,18 +156,14 @@ class _VerificationScreenState extends State<VerificationScreen> with TickerProv
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               physics: const BouncingScrollPhysics(),
               child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 550),
-                transitionBuilder: (child, animation) => FadeTransition(
-                  opacity: animation,
-                  child: child,
-                ),
+                duration: const Duration(milliseconds: 350),
                 child: _buildStateContent(status, profileProvider, lp),
               ),
             ),
           ),
-          if (_isUploading)
+          if (_isStarting)
             Container(
-              color: Colors.black.withValues(alpha: 	0.6),
+              color: Colors.black.withValues(alpha: 0.6),
               child: Center(
                 child: Container(
                   padding: const EdgeInsets.all(32),
@@ -233,11 +174,14 @@ class _VerificationScreenState extends State<VerificationScreen> with TickerProv
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      CircularProgressIndicator(color: _primaryColor, value: _uploadProgress > 0 ? _uploadProgress : null),
+                      CircularProgressIndicator(color: _primaryColor),
                       const SizedBox(height: 20),
                       Text(
                         lp.getString('saving_label'),
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                     ],
                   ),
@@ -249,7 +193,11 @@ class _VerificationScreenState extends State<VerificationScreen> with TickerProv
     );
   }
 
-  Widget _buildStateContent(String status, ProfileProvider profileProvider, LanguageProvider lp) {
+  Widget _buildStateContent(
+    String status,
+    ProfileProvider profileProvider,
+    LanguageProvider lp,
+  ) {
     if (status == 'verified') {
       return _buildVerifiedState(lp);
     } else if (status == 'pending') {
@@ -259,22 +207,26 @@ class _VerificationScreenState extends State<VerificationScreen> with TickerProv
     }
   }
 
-  // State: UNVERIFIED
-  Widget _buildUnverifiedState(ProfileProvider profileProvider, LanguageProvider lp) {
+  Widget _buildUnverifiedState(
+    ProfileProvider profileProvider,
+    LanguageProvider lp,
+  ) {
     return Column(
       key: const ValueKey('unverified_view'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Trust Header Card
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [_primaryColor.withValues(alpha: 	0.15), Colors.purple.withValues(alpha: 	0.15)],
+              colors: [
+                _primaryColor.withValues(alpha: 0.15),
+                Colors.purple.withValues(alpha: 0.15),
+              ],
             ),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: _primaryColor.withValues(alpha: 	0.2)),
+            border: Border.all(color: _primaryColor.withValues(alpha: 0.2)),
           ),
           child: Column(
             children: [
@@ -282,226 +234,171 @@ class _VerificationScreenState extends State<VerificationScreen> with TickerProv
               const SizedBox(height: 16),
               Text(
                 lp.getString('verification_title'),
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Colors.white),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
-                lp.getString('verification_sub'),
+                'Verify with Sumsub using a government ID and liveness check.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white.withValues(alpha: 	0.7), fontSize: 13, height: 1.4),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 24),
-
-        // Form Section
-        Text(
-          lp.getString('booking_preferences').toUpperCase(),
-          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _primaryColor, letterSpacing: 1.2),
-        ),
-        const SizedBox(height: 12),
-
-        Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              // Full Name Input
-              TextFormField(
-                controller: _nameController,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-                decoration: InputDecoration(
-                  labelText: lp.getString('full_name_on_id'),
-                  prefixIcon: const Icon(Iconsax.user),
-                  filled: true,
-                  fillColor: Theme.of(context).cardColor,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
-                  floatingLabelStyle: TextStyle(color: _primaryColor),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // ID Number Input
-              TextFormField(
-                controller: _idNumberController,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-                decoration: InputDecoration(
-                  labelText: lp.getString('national_id_number'),
-                  prefixIcon: const Icon(Iconsax.personalcard),
-                  filled: true,
-                  fillColor: Theme.of(context).cardColor,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
-                  floatingLabelStyle: TextStyle(color: _primaryColor),
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.7),
+                  fontSize: 13,
+                  height: 1.4,
                 ),
               ),
             ],
           ),
         ),
         const SizedBox(height: 24),
-
-        // Document Image Selector
-        Text(
-          lp.getString('id_document_photo').toUpperCase(),
-          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _primaryColor, letterSpacing: 1.2),
+        _buildProviderCard(),
+        const SizedBox(height: 24),
+        _buildTrustPoint(
+          Iconsax.personalcard,
+          'Government ID verification',
+          'National ID cards, passports, and driving licenses are handled by the verification provider.',
         ),
         const SizedBox(height: 12),
-
-        Container(
-          width: double.infinity,
-          height: 180,
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Theme.of(context).dividerColor, style: BorderStyle.solid),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: _selectedImage != null
-                ? Stack(
-                    children: [
-                      Image.file(
-                        File(_selectedImage!.path),
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                        errorBuilder: (context, error, stackTrace) => const Icon(Icons.image, size: 50),
-                      ),
-                      _imageOverlays(),
-                    ],
-                  )
-                : InkWell(
-                    onTap: () => _showImageSourcePicker(),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Iconsax.camera5, size: 44, color: _primaryColor.withValues(alpha: 	0.7)),
-                        const SizedBox(height: 12),
-                        Text(
-                          lp.getString('id_document_photo'),
-                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Tap to upload front side of ID card',
-                          style: TextStyle(color: Theme.of(context).hintColor, fontSize: 11),
-                        ),
-                      ],
-                    ),
-                  ),
-          ),
+        _buildTrustPoint(
+          Iconsax.scan_barcode,
+          'Automated document checks',
+          'The provider checks document authenticity, tampering signals, and readable identity data.',
+        ),
+        const SizedBox(height: 12),
+        _buildTrustPoint(
+          Iconsax.profile_tick,
+          'Result updates automatically',
+          'Your profile becomes verified after the provider returns an approved review.',
         ),
         const SizedBox(height: 32),
-
-        // Action Buttons
         SizedBox(
           width: double.infinity,
           height: 56,
-          child: ElevatedButton(
-            onPressed: () => _submitVerification(profileProvider, lp),
+          child: ElevatedButton.icon(
+            onPressed: () => _startVerification(profileProvider, lp),
+            icon: const Icon(Iconsax.verify),
+            label: Text(
+              lp.getString('start_verification_button'),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: _primaryColor,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               elevation: 0,
-            ),
-            child: Text(
-              lp.getString('submit_verification'),
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
             ),
           ),
         ),
-
       ],
     );
   }
 
-  Widget _imageOverlays() {
-    return Positioned(
-      top: 10,
-      right: 10,
-      child: Material(
-        color: Colors.black.withValues(alpha: 	0.5),
-        borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          onTap: () => _showImageSourcePicker(),
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            child: const Row(
+  Widget _buildProviderCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.indigo.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: const Icon(Iconsax.security_safe, color: Colors.indigo),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Iconsax.edit, color: Colors.white, size: 14),
-                SizedBox(width: 4),
-                Text('Change', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                const Text(
+                  'Sumsub',
+                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Third-party identity verification for global ID documents.',
+                  style: TextStyle(
+                    color: Theme.of(context).hintColor,
+                    fontSize: 12,
+                    height: 1.35,
+                  ),
+                ),
               ],
             ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  void _showImageSourcePicker() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Select ID Photo Source',
-              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
+  Widget _buildTrustPoint(IconData icon, String title, String subtitle) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: _primaryColor, size: 22),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    color: Theme.of(context).hintColor,
+                    fontSize: 12,
+                    height: 1.4,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: _primaryColor.withValues(alpha: 	0.1), shape: BoxShape.circle),
-                child: Icon(Iconsax.camera, color: _primaryColor),
-              ),
-              title: const Text('Camera', style: TextStyle(fontWeight: FontWeight.w600)),
-              onTap: () {
-                Navigator.pop(context);
-                _pickImage(ImageSource.camera);
-              },
-            ),
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: Colors.purple.withValues(alpha: 	0.1), shape: BoxShape.circle),
-                child: const Icon(Iconsax.gallery, color: Colors.purple),
-              ),
-              title: const Text('Gallery', style: TextStyle(fontWeight: FontWeight.w600)),
-              onTap: () {
-                Navigator.pop(context);
-                _pickImage(ImageSource.gallery);
-              },
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  // State: PENDING
   Widget _buildPendingState(ProfileProvider profileProvider, LanguageProvider lp) {
-    final profile = profileProvider.userProfile;
-
     return Column(
       key: const ValueKey('pending_view'),
       children: [
         const SizedBox(height: 40),
-        // Pulsating Pending Shield
         ScaleTransition(
           scale: _pulseScale,
           child: Container(
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
-              color: Colors.orange.withValues(alpha: 	0.1),
+              color: Colors.orange.withValues(alpha: 0.1),
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.orange.withValues(alpha: 	0.2), width: 2),
+              border: Border.all(
+                color: Colors.orange.withValues(alpha: 0.2),
+                width: 2,
+              ),
             ),
             child: const Icon(
               Iconsax.shield_search,
@@ -511,67 +408,36 @@ class _VerificationScreenState extends State<VerificationScreen> with TickerProv
           ),
         ),
         const SizedBox(height: 32),
-
         Text(
           lp.getString('verification_status_pending'),
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.white),
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+          ),
         ),
         const SizedBox(height: 12),
-
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Text(
-            lp.getString('verification_status_pending_sub'),
+            'Finish any remaining Sumsub steps. Your profile updates after the provider sends the final review.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white.withValues(alpha: 	0.6), fontSize: 14, height: 1.5, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.6),
+              fontSize: 14,
+              height: 1.5,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
         const SizedBox(height: 32),
-
-        // Submitted Info Summary Card
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
+            color: Colors.orange.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(24),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Submitted Details',
-                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
-              ),
-              const Divider(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Name', style: TextStyle(color: Theme.of(context).hintColor, fontSize: 13)),
-                  Text(profile?.firstName ?? 'N/A', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('ID Number', style: TextStyle(color: Theme.of(context).hintColor, fontSize: 13)),
-                  Text(profile?.nationalId ?? 'N/A', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                ],
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 32),
-
-        // Informational waiting card
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.orange.withValues(alpha: 	0.08),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.orange.withValues(alpha: 	0.2)),
+            border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -579,23 +445,17 @@ class _VerificationScreenState extends State<VerificationScreen> with TickerProv
               const Icon(Iconsax.info_circle, color: Colors.orange, size: 22),
               const SizedBox(width: 14),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Under Review',
-                      style: TextStyle(fontWeight: FontWeight.w800, color: Colors.orange, fontSize: 14),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Our safety team typically reviews submissions within 24 hours. You will receive a notification once your identity has been verified.',
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 	0.75),
-                        fontSize: 13,
-                        height: 1.5,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  'Verification results are handled by Sumsub. You can reopen this screen later to check your profile status.',
+                  style: TextStyle(
+                    color: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.color
+                        ?.withValues(alpha: 0.75),
+                    fontSize: 13,
+                    height: 1.5,
+                  ),
                 ),
               ),
             ],
@@ -605,21 +465,19 @@ class _VerificationScreenState extends State<VerificationScreen> with TickerProv
     );
   }
 
-  // State: VERIFIED
   Widget _buildVerifiedState(LanguageProvider lp) {
     return Column(
       key: const ValueKey('verified_view'),
       children: [
         const SizedBox(height: 50),
-        // Confetti burst animation structure (large green badge with verification mark)
         Container(
           padding: const EdgeInsets.all(28),
           decoration: BoxDecoration(
-            color: Colors.green.withValues(alpha: 	0.1),
+            color: Colors.green.withValues(alpha: 0.1),
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Colors.green.withValues(alpha: 	0.2),
+                color: Colors.green.withValues(alpha: 0.2),
                 blurRadius: 30,
                 spreadRadius: 5,
               ),
@@ -632,51 +490,26 @@ class _VerificationScreenState extends State<VerificationScreen> with TickerProv
           ),
         ),
         const SizedBox(height: 36),
-
         Text(
           lp.getString('verification_status_verified'),
-          style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: -0.5),
+          style: const TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+          ),
         ),
         const SizedBox(height: 12),
-
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Text(
             lp.getString('verification_status_verified_sub'),
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white.withValues(alpha: 	0.65), fontSize: 14, height: 1.5, fontWeight: FontWeight.w500),
-          ),
-        ),
-        const SizedBox(height: 48),
-
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.green.withValues(alpha: 	0.15)),
-          ),
-          child: const Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Iconsax.verify, color: Colors.green, size: 20),
-                  SizedBox(width: 8),
-                  Text(
-                    'All Set!',
-                    style: TextStyle(fontWeight: FontWeight.w900, color: Colors.green, fontSize: 15),
-                  ),
-                ],
-              ),
-              SizedBox(height: 12),
-              Text(
-                'Your verified checkmark is now visible on your profile card to matched users. Enjoy increased matching frequency and elevated trustworthiness!',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, height: 1.5),
-              ),
-            ],
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.65),
+              fontSize: 14,
+              height: 1.5,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ],
