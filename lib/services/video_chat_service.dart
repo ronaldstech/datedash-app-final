@@ -19,6 +19,20 @@ class VideoChatService {
     final String currentUserId = currentUser.uid!;
     final existingTicket = await _waitingCollection.doc(currentUserId).get();
     final existingData = existingTicket.data() as Map<String, dynamic>?;
+    final existingStatus = existingData?['status'] as String?;
+    final existingPartnerId = existingData?['matchedWith'] as String?;
+    final existingChannelId = existingData?['channelId'] as String?;
+
+    if ((existingStatus == 'proposed' || existingStatus == 'matched') &&
+        existingPartnerId != null &&
+        existingChannelId != null) {
+      return _callDataFromTicket(
+        existingData!,
+        existingPartnerId,
+        existingChannelId,
+      );
+    }
+
     final skippedUserIds = List<String>.from(
       existingData?['skippedUserIds'] ?? [],
     );
@@ -83,7 +97,7 @@ class VideoChatService {
 
         final bool genderMatch =
             filterGender == 'Any' ||
-            candidateGender.toLowerCase() == filterGender.toLowerCase();
+            _normalizeGender(candidateGender) == _normalizeGender(filterGender);
 
         final bool ageMatch =
             candidateAge >= filterMinAge && candidateAge <= filterMaxAge;
@@ -102,8 +116,7 @@ class VideoChatService {
             candidateLanguages.isEmpty ||
             candidateLanguages.any(
               (lang) =>
-                  lang.toLowerCase() == filterLanguage.toLowerCase() ||
-                  filterLanguage.toLowerCase().contains(lang.toLowerCase()),
+                  _textMatches(lang, filterLanguage),
             );
 
         if (!genderMatch || !ageMatch || !countryMatch || !languageMatch) {
@@ -125,7 +138,7 @@ class VideoChatService {
 
         final bool candGenderMatch =
             candFilterGender == 'Any' ||
-            myGender.toLowerCase() == candFilterGender.toLowerCase();
+            _normalizeGender(myGender) == _normalizeGender(candFilterGender);
 
         final bool candAgeMatch =
             myAge >= candFilterMinAge && myAge <= candFilterMaxAge;
@@ -139,8 +152,7 @@ class VideoChatService {
             candFilterLanguage == 'Any' ||
             myLanguages.any(
               (lang) =>
-                  lang.toLowerCase() == candFilterLanguage.toLowerCase() ||
-                  candFilterLanguage.toLowerCase().contains(lang.toLowerCase()),
+                  _textMatches(lang, candFilterLanguage),
             );
 
         if (!candGenderMatch ||
@@ -375,5 +387,18 @@ class VideoChatService {
       'partnerCountry': ticket['partnerCountry'] ?? 'Unknown',
       'isHost': ticket['isHost'] == true,
     };
+  }
+
+  String _normalizeGender(String value) {
+    final normalized = value.trim().toLowerCase();
+    if (normalized == 'men' || normalized == 'man') return 'male';
+    if (normalized == 'women' || normalized == 'woman') return 'female';
+    return normalized;
+  }
+
+  bool _textMatches(String left, String right) {
+    final a = left.trim().toLowerCase();
+    final b = right.trim().toLowerCase();
+    return a == b || a.contains(b) || b.contains(a);
   }
 }

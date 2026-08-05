@@ -1,10 +1,8 @@
 import 'dart:async';
 
-import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import '../models/user_profile_model.dart';
@@ -36,17 +34,12 @@ class VideoMatchmakingScreen extends StatefulWidget {
 
 class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
     with SingleTickerProviderStateMixin {
-  static const String _agoraAppId = '45fbe0e2e7b844bfab588523c914bfb2';
-
   final VideoChatService _videoChatService = VideoChatService();
-  RtcEngine? _engine;
   StreamSubscription<DocumentSnapshot>? _ticketSubscription;
+  Timer? _searchRetryTimer;
   late AnimationController _pulseController;
 
-  bool _previewReady = false;
   bool _isSearching = false;
-  bool _isMuted = false;
-  bool _isCameraOff = false;
   bool _isAccepting = false;
   bool _navigatingToCall = false;
   Map<String, dynamic>? _proposal;
@@ -60,65 +53,20 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1400),
     )..repeat(reverse: true);
-    _initCameraPreview();
     _listenToTicket();
     _search();
+    _startSearchRetry();
   }
 
   @override
   void dispose() {
     _ticketSubscription?.cancel();
+    _searchRetryTimer?.cancel();
     _pulseController.dispose();
-    _disposePreview();
     if (!_navigatingToCall) {
       _videoChatService.cancelMatching(_userId);
     }
     super.dispose();
-  }
-
-  Future<void> _initCameraPreview() async {
-    final statuses = await [Permission.camera, Permission.microphone].request();
-    if (statuses[Permission.camera] != PermissionStatus.granted ||
-        statuses[Permission.microphone] != PermissionStatus.granted) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Camera and microphone are required.')),
-        );
-        Navigator.pop(context);
-      }
-      return;
-    }
-
-    final engine = createAgoraRtcEngine();
-    await engine.initialize(
-      const RtcEngineContext(
-        appId: _agoraAppId,
-        channelProfile: ChannelProfileType.channelProfileCommunication,
-      ),
-    );
-    await engine.enableAudio();
-    await engine.enableVideo();
-    await engine.startPreview();
-
-    if (!mounted) {
-      await engine.release();
-      return;
-    }
-
-    setState(() {
-      _engine = engine;
-      _previewReady = true;
-    });
-  }
-
-  Future<void> _disposePreview() async {
-    final engine = _engine;
-    _engine = null;
-    if (engine == null) return;
-    try {
-      await engine.stopPreview();
-      await engine.release();
-    } catch (_) {}
   }
 
   void _listenToTicket() {
@@ -153,6 +101,16 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
         });
         _search();
       }
+    }, onError: (error) {
+      debugPrint('Video matchmaking ticket listener failed: $error');
+    });
+  }
+
+  void _startSearchRetry() {
+    _searchRetryTimer?.cancel();
+    _searchRetryTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (!mounted || _proposal != null || _navigatingToCall) return;
+      _search();
     });
   }
 
@@ -160,14 +118,19 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
     if (_isSearching || _proposal != null || _navigatingToCall) return;
 
     setState(() => _isSearching = true);
-    final result = await _videoChatService.startMatching(
-      currentUser: widget.currentUser,
-      filterLanguage: widget.filterLanguage,
-      filterGender: widget.filterGender,
-      filterMinAge: widget.filterMinAge,
-      filterMaxAge: widget.filterMaxAge,
-      filterCountry: widget.filterCountry,
-    );
+    Map<String, dynamic>? result;
+    try {
+      result = await _videoChatService.startMatching(
+        currentUser: widget.currentUser,
+        filterLanguage: widget.filterLanguage,
+        filterGender: widget.filterGender,
+        filterMinAge: widget.filterMinAge,
+        filterMaxAge: widget.filterMaxAge,
+        filterCountry: widget.filterCountry,
+      );
+    } catch (error) {
+      debugPrint('Video matchmaking search failed: $error');
+    }
 
     if (!mounted || _navigatingToCall) return;
     if (result != null) {
@@ -175,6 +138,8 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
         _isSearching = false;
         _proposal = result;
       });
+    } else {
+      setState(() => _isSearching = false);
     }
   }
 
@@ -201,20 +166,6 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
     }
   }
 
-  Future<void> _toggleMute() async {
-    setState(() => _isMuted = !_isMuted);
-    await _engine?.muteLocalAudioStream(_isMuted);
-  }
-
-  Future<void> _toggleCamera() async {
-    setState(() => _isCameraOff = !_isCameraOff);
-    await _engine?.muteLocalVideoStream(_isCameraOff);
-  }
-
-  Future<void> _switchCamera() async {
-    await _engine?.switchCamera();
-  }
-
   void _openCallFromTicket(Map<String, dynamic> data) {
     final partnerId = data['matchedWith'] as String?;
     final channelId = data['channelId'] as String?;
@@ -233,7 +184,6 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
     if (_navigatingToCall) return;
     _navigatingToCall = true;
     await _ticketSubscription?.cancel();
-    await _disposePreview();
     if (!mounted) return;
 
     Navigator.pushReplacement(
@@ -258,7 +208,7 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          Positioned.fill(child: _buildCameraPreview()),
+          Positioned.fill(child: _buildWaitingBackdrop(currentPhoto)),
           Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
@@ -284,7 +234,7 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
                   if (_proposal == null) _buildSearchingPanel(currentPhoto),
                   if (_proposal != null) _buildProposalCard(_proposal!),
                   const SizedBox(height: 18),
-                  _buildControls(),
+                  _buildCancelButton(),
                 ],
               ),
             ),
@@ -294,29 +244,30 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
     );
   }
 
-  Widget _buildCameraPreview() {
-    if (_isCameraOff) {
-      return Container(
-        color: const Color(0xFF111116),
-        child: const Center(
-          child: Icon(Iconsax.video_slash, color: Colors.white38, size: 72),
+  Widget _buildWaitingBackdrop(String currentPhoto) {
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF111116),
+            Color(0xFF26131C),
+            Color(0xFF111116),
+          ],
         ),
-      );
-    }
-
-    if (!_previewReady || _engine == null) {
-      return Container(
-        color: const Color(0xFF111116),
-        child: const Center(
-          child: CircularProgressIndicator(color: Color(0xFFFF4D85)),
+      ),
+      child: Center(
+        child: CircleAvatar(
+          radius: 84,
+          backgroundColor: const Color(0xFFFF4D85).withValues(alpha: 0.18),
+          backgroundImage: currentPhoto.isNotEmpty
+              ? NetworkImage(currentPhoto)
+              : null,
+          child: currentPhoto.isEmpty
+              ? const Icon(Iconsax.user, color: Colors.white54, size: 72)
+              : null,
         ),
-      );
-    }
-
-    return AgoraVideoView(
-      controller: VideoViewController(
-        rtcEngine: _engine!,
-        canvas: const VideoCanvas(uid: 0),
       ),
     );
   }
@@ -328,7 +279,7 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Iconsax.arrow_left_2, color: Colors.white),
           style: IconButton.styleFrom(
-            backgroundColor: Colors.black.withValues(alpha: 0.28),
+            backgroundColor: Colors.black.withValues(alpha: 0.4),
           ),
         ),
         const SizedBox(width: 10),
@@ -337,24 +288,38 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Video Chat',
+                'Speed Video Match',
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w900,
-                  fontSize: 18,
+                  fontSize: 19,
+                  letterSpacing: -0.3,
                 ),
               ),
               StreamBuilder<int>(
                 stream: _videoChatService.getActiveVideoUsersCountStream(),
                 builder: (context, snapshot) {
                   final count = snapshot.data ?? 0;
-                  return Text(
-                    '$count users chatting now',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.72),
-                      fontWeight: FontWeight.w700,
-                      fontSize: 12,
-                    ),
+                  return Row(
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF00E676),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '$count active users chatting',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   );
                 },
               ),
@@ -362,29 +327,49 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
           ),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: const Color(0xFFFF4D85).withValues(alpha: 0.9),
-            borderRadius: BorderRadius.circular(18),
+            gradient: LinearGradient(
+              colors: _proposal == null
+                  ? [const Color(0xFFFF4D85), const Color(0xFFFF8C00)]
+                  : [const Color(0xFF00E676), const Color(0xFF00B0FF)],
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: (_proposal == null
+                        ? const Color(0xFFFF4D85)
+                        : const Color(0xFF00E676))
+                    .withValues(alpha: 0.4),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               FadeTransition(
-                opacity: Tween<double>(begin: 0.45, end: 1).animate(
+                opacity: Tween<double>(begin: 0.4, end: 1).animate(
                   CurvedAnimation(
                     parent: _pulseController,
                     curve: Curves.easeInOut,
                   ),
                 ),
-                child: const Icon(Icons.circle, color: Colors.white, size: 8),
+                child: Icon(
+                  _proposal == null ? Iconsax.radar_1 : Iconsax.tick_circle,
+                  color: Colors.white,
+                  size: 14,
+                ),
               ),
-              const SizedBox(width: 7),
+              const SizedBox(width: 6),
               Text(
-                _proposal == null ? 'Searching' : 'Found',
+                _proposal == null ? 'Searching' : 'Matched!',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 12,
                   fontWeight: FontWeight.w900,
+                  letterSpacing: 0.3,
                 ),
               ),
             ],
@@ -397,57 +382,111 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
   Widget _buildSearchingPanel(String currentPhoto) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.34),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        color: Colors.black.withValues(alpha: 0.45),
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.15),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFFF4D85).withValues(alpha: 0.15),
+            blurRadius: 30,
+            spreadRadius: 2,
+          ),
+        ],
       ),
       child: Column(
         children: [
           Stack(
             alignment: Alignment.center,
             children: [
+              // Outer radar ring
               ScaleTransition(
-                scale: Tween<double>(begin: 0.9, end: 1.08).animate(
+                scale: Tween<double>(begin: 1.0, end: 1.35).animate(
                   CurvedAnimation(
                     parent: _pulseController,
                     curve: Curves.easeInOut,
                   ),
                 ),
                 child: Container(
-                  width: 92,
-                  height: 92,
+                  width: 120,
+                  height: 120,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: const Color(0xFFFF4D85).withValues(alpha: 0.45),
+                      color: const Color(0xFFFF4D85).withValues(alpha: 0.25),
+                      width: 1.5,
+                    ),
+                  ),
+                ),
+              ),
+              // Inner radar ring
+              ScaleTransition(
+                scale: Tween<double>(begin: 0.95, end: 1.15).animate(
+                  CurvedAnimation(
+                    parent: _pulseController,
+                    curve: Curves.easeInOut,
+                  ),
+                ),
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFFFF8C00).withValues(alpha: 0.45),
                       width: 2,
                     ),
                   ),
                 ),
               ),
-              CircleAvatar(
-                radius: 36,
-                backgroundColor: const Color(0xFFFF4D85),
-                backgroundImage:
-                    currentPhoto.isNotEmpty ? NetworkImage(currentPhoto) : null,
-                child: currentPhoto.isEmpty
-                    ? const Icon(Iconsax.user, color: Colors.white, size: 30)
-                    : null,
+              // Avatar
+              Container(
+                padding: const EdgeInsets.all(3),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFFFF4D85), Color(0xFFFF8C00)],
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: CircleAvatar(
+                  radius: 40,
+                  backgroundColor: Colors.black,
+                  backgroundImage: currentPhoto.isNotEmpty
+                      ? NetworkImage(currentPhoto)
+                      : null,
+                  child: currentPhoto.isEmpty
+                      ? const Icon(Iconsax.user, color: Colors.white, size: 36)
+                      : null,
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Text(
-            _isSearching ? 'Finding someone for you...' : 'Waiting for users',
+            _isSearching
+                ? 'Looking for video match...'
+                : 'Waiting in queue...',
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 20,
+              fontSize: 21,
               fontWeight: FontWeight.w900,
+              letterSpacing: -0.3,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
+          Text(
+            'Scanning users matching your criteria',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.65),
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 18),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -457,7 +496,7 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
               _criteriaChip(Iconsax.user, widget.filterGender),
               _criteriaChip(
                 Iconsax.calendar,
-                '${widget.filterMinAge}-${widget.filterMaxAge}',
+                '${widget.filterMinAge}-${widget.filterMaxAge} yrs',
               ),
               _criteriaChip(Iconsax.global, widget.filterCountry),
             ],
@@ -476,54 +515,152 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.58),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+        color: Colors.black.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(
+          color: const Color(0xFFFF4D85).withValues(alpha: 0.5),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFF4D85).withValues(alpha: 0.28),
-            blurRadius: 28,
-            offset: const Offset(0, 12),
+            color: const Color(0xFFFF4D85).withValues(alpha: 0.35),
+            blurRadius: 36,
+            spreadRadius: 2,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
       child: Column(
         children: [
-          CircleAvatar(
-            radius: 44,
-            backgroundColor: const Color(0xFFFF4D85),
-            backgroundImage: photo.isNotEmpty ? NetworkImage(photo) : null,
-            child: photo.isEmpty
-                ? const Icon(Iconsax.user, color: Colors.white, size: 36)
-                : null,
+          // Match Found Badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xFFFF4D85).withValues(alpha: 0.2),
+                  const Color(0xFFFF8C00).withValues(alpha: 0.2),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: const Color(0xFFFF4D85).withValues(alpha: 0.5),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Icon(Iconsax.magic_star, color: Color(0xFFFFD700), size: 16),
+                SizedBox(width: 6),
+                Text(
+                  'MATCH FOUND!',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 13,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
+
+          // Partner Photo Avatar with Glowing Halo
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: const LinearGradient(
+                colors: [Color(0xFFFF4D85), Color(0xFFFF8C00), Color(0xFFFFD700)],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFFF4D85).withValues(alpha: 0.4),
+                  blurRadius: 16,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: CircleAvatar(
+              radius: 48,
+              backgroundColor: Colors.black,
+              backgroundImage: photo.isNotEmpty ? NetworkImage(photo) : null,
+              child: photo.isEmpty
+                  ? const Icon(Iconsax.user, color: Colors.white, size: 44)
+                  : null,
+            ),
           ),
           const SizedBox(height: 14),
           Text(
             age.isEmpty ? name : '$name, $age',
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 22,
+              fontSize: 24,
               fontWeight: FontWeight.w900,
+              letterSpacing: -0.4,
             ),
           ),
           const SizedBox(height: 6),
-          Text(
-            '$gender  |  $country',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.72),
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 18),
-          if (_isAccepting)
-            Text(
-              'Waiting for $name to accept...',
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Iconsax.user,
+                  color: Colors.white.withValues(alpha: 0.7), size: 14),
+              const SizedBox(width: 4),
+              Text(
+                gender,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.75),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                ),
               ),
+              Text(
+                '  •  ',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.4),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Icon(Iconsax.global,
+                  color: Colors.white.withValues(alpha: 0.7), size: 14),
+              const SizedBox(width: 4),
+              Text(
+                country,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.75),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 22),
+
+          if (_isAccepting)
+            Column(
+              children: [
+                const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: Color(0xFFFF4D85),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Connecting video call with $name...',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
             )
           else
             Row(
@@ -531,28 +668,62 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: _nextProposal,
-                    icon: const Icon(Iconsax.arrow_right_3),
-                    label: const Text('Next'),
+                    icon: const Icon(Iconsax.arrow_right_3, size: 18),
+                    label: const Text(
+                      'Next',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                      ),
+                    ),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.white,
                       side: BorderSide(
-                        color: Colors.white.withValues(alpha: 0.32),
+                        color: Colors.white.withValues(alpha: 0.35),
+                        width: 1.2,
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 14),
                 Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _acceptProposal,
-                    icon: const Icon(Iconsax.video_tick),
-                    label: const Text('Accept'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF4D85),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      elevation: 0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFFF4D85), Color(0xFFFF8C00)],
+                      ),
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFFF4D85).withValues(alpha: 0.4),
+                          blurRadius: 14,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ElevatedButton.icon(
+                      onPressed: _acceptProposal,
+                      icon: const Icon(Iconsax.video_tick, size: 20),
+                      label: const Text(
+                        'Accept',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 15,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        foregroundColor: Colors.white,
+                        shadowColor: Colors.transparent,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -563,49 +734,24 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
     );
   }
 
-  Widget _buildControls() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _controlButton(
-          icon: _isMuted ? Iconsax.microphone_slash5 : Iconsax.microphone_2,
-          onPressed: _toggleMute,
-        ),
-        _controlButton(icon: Iconsax.rotate_left, onPressed: _switchCamera),
-        _controlButton(
-          icon: _isCameraOff ? Iconsax.video_slash : Iconsax.video,
-          onPressed: _toggleCamera,
-        ),
-        _controlButton(
-          icon: Iconsax.close_circle,
-          color: Colors.redAccent,
-          onPressed: () => Navigator.pop(context),
-        ),
-      ],
-    );
-  }
-
-  Widget _controlButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-    Color color = Colors.white,
-  }) {
+  Widget _buildCancelButton() {
     return IconButton(
-      onPressed: onPressed,
-      icon: Icon(icon, color: color),
+      onPressed: () => Navigator.pop(context),
+      icon: const Icon(Iconsax.close_circle, color: Colors.redAccent, size: 30),
       style: IconButton.styleFrom(
-        backgroundColor: Colors.black.withValues(alpha: 0.42),
-        fixedSize: const Size(52, 52),
+        backgroundColor: Colors.black.withValues(alpha: 0.5),
+        fixedSize: const Size(58, 58),
       ),
     );
   }
 
   Widget _criteriaChip(IconData icon, String label) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

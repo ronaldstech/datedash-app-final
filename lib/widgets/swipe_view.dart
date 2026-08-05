@@ -775,80 +775,36 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
                     ),
                   ),
 
-                // Top Right Buttons (Gift & Info)
+                // Top Right Button (Info)
                 if (!isBackCard)
                   Positioned(
                     top: 32,
                     right: 14,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Gift Button
-                        GestureDetector(
-                          onTap: () {
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              builder: (context) => GiftSelectionSheet(
-                                targetUserId: profile.uid!,
-                                targetUserName: profile.firstName ?? 'Someone',
-                              ),
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.55),
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.amber.withValues(alpha: 0.6),
-                                width: 1.2,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.amber.withValues(alpha: 0.25),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Iconsax.gift,
-                              color: Colors.amber,
-                              size: 20,
-                            ),
+                    child: GestureDetector(
+                      onTap: () => _showProfileDetails(profile),
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.55),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.4),
+                            width: 1.2,
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        // Info/Details Button
-                        GestureDetector(
-                          onTap: () => _showProfileDetails(profile),
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.55),
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.4),
-                                width: 1.2,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.25),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.25),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
                             ),
-                            child: const Icon(
-                              Iconsax.user,
-                              color: Colors.white,
-                              size: 18,
-                            ),
-                          ),
+                          ],
                         ),
-                      ],
+                        child: const Icon(
+                          Iconsax.user,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
                     ),
                   ),
               ],
@@ -1434,6 +1390,8 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
     final occupation = profile.occupation;
     final school = profile.school;
     final hobbies = profile.hobbies;
+    final bio = profile.bio;
+    final relationshipStatus = profile.relationshipStatus;
 
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20, bottom: 2),
@@ -1441,7 +1399,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // ── Name & Age ──────────────────────────────────────────────
+          // ── Name, Age & Prominent Gift Button ────────────────────────
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -1471,19 +1429,104 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
                 ),
               ],
               if (profile.isVerified) ...[
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 const Icon(Icons.verified_rounded,
-                    color: Color(0xFF4FC3F7), size: 24)
+                    color: Color(0xFF4FC3F7), size: 22),
               ],
+              const SizedBox(width: 10),
+
+              // 🎁 Prominent Gift Button below/next to the user's name
+              GestureDetector(
+                onTap: () {
+                  if (profile.uid != null) {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => GiftSelectionSheet(
+                        targetUserId: profile.uid!,
+                        targetUserName: profile.firstName ?? 'Someone',
+                      ),
+                    );
+                  }
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFFD700), Color(0xFFFF8C00)],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.amber.withValues(alpha: 0.5),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Iconsax.gift, color: Colors.black, size: 16),
+                      const SizedBox(width: 4),
+                      Text(
+                        languageProvider.getString('send_gift').isNotEmpty
+                            ? languageProvider.getString('send_gift')
+                            : 'Gift',
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
 
-          //Professional Info & Distance (Wrapped Chips)
+          // ── Bio Status Box ─────────────────────────────────────────
+          if (bio != null && bio.trim().isNotEmpty) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.45),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.15),
+                ),
+              ),
+              child: Text(
+                bio.trim(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  height: 1.3,
+                  fontWeight: FontWeight.w400,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(height: 6),
+          ],
+
+          // Professional Info & Distance & Relationship Status (Wrapped Chips)
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
+              // Relationship Status chip
+              if (relationshipStatus != null && relationshipStatus.isNotEmpty)
+                _buildInfoChip(
+                  icon: Iconsax.heart,
+                  label: relationshipStatus,
+                ),
               // Occupation / Work
               if (occupation != null && occupation.isNotEmpty)
                 _buildInfoChip(
@@ -1500,7 +1543,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
 
               // Distance
               Consumer<ProfileProvider>(
-                builder: (_, profileProvider, __) => _buildInfoChip(
+                builder: (_, profileProvider, _) => _buildInfoChip(
                   icon: Iconsax.location,
                   label:
                       profile.getDistanceDisplay(profileProvider.userProfile),
@@ -1518,7 +1561,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: hobbies.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 6),
+                separatorBuilder: (_, _) => const SizedBox(width: 6),
                 itemBuilder: (context, index) => Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

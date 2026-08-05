@@ -19,6 +19,7 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
+  static const String _askMeOption = 'Ask me';
   late UserProfile _profile;
   final Color _primaryColor = const Color(0xFFFF4D85);
   bool _isSaving = false;
@@ -97,6 +98,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   void _onFieldUpdated() {
     setState(() {}); // Unconditionally trigger rebuild to update percentage
+  }
+
+  List<String> _withAskMe(List<String> items) {
+    if (items.contains(_askMeOption)) return items;
+    return [...items, _askMeOption];
   }
 
   @override
@@ -378,10 +384,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ]),
       // 2. Personal Details
       _buildPageContent([
-        _buildTextField(
+        _buildSelectableTextField(
           label: languageProvider.getString('height_label'),
           hint: languageProvider.getString('height_hint'),
-          initialValue: _profile.height,
+          value: _profile.height,
+          options: const [
+            '150 cm',
+            '155 cm',
+            '160 cm',
+            '165 cm',
+            '170 cm',
+            '175 cm',
+            '180 cm',
+            '185 cm',
+          ],
           onChanged: (val) => _profile.height = val,
         ),
         _buildChoiceChips(
@@ -409,19 +425,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ],
           onChanged: (val) => _profile.relationshipStatus = val,
         ),
-        _buildTextField(
+        _buildSelectableTextField(
           label: languageProvider.getString('religion_label'),
-          initialValue: _profile.religion,
+          value: _profile.religion,
+          options: const [
+            'Christian',
+            'Muslim',
+            'Hindu',
+            'Spiritual',
+            'Agnostic',
+            'Atheist',
+            'Prefer not to say',
+          ],
           onChanged: (val) => _profile.religion = val,
         ),
-        _buildTextField(
+        _buildSuggestionMultiChips(
           label: languageProvider.getString('languages_spoken_label'),
-          initialValue: _profile.languages.join(', '),
-          onChanged: (val) => _profile.languages = val
-              .split(',')
-              .map((e) => e.trim())
-              .where((e) => e.isNotEmpty)
-              .toList(),
+          values: _profile.languages,
+          suggestions: const [
+            'English',
+            'Chichewa',
+            'Swahili',
+            'French',
+            'Portuguese',
+            'Arabic',
+          ],
+          onChanged: (val) => _profile.languages = val,
         ),
       ]),
       // 3. Relationship Goals
@@ -472,31 +501,61 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       // 4. Work & Education
       _buildPageContent([
-        _buildTextField(
+        _buildSelectableTextField(
           label: languageProvider.getString('occupation_label'),
-          initialValue: _profile.occupation,
+          value: _profile.occupation,
+          options: const [
+            'Student',
+            'Entrepreneur',
+            'Teacher',
+            'Nurse',
+            'Engineer',
+            'Designer',
+            'Developer',
+            'Manager',
+          ],
           onChanged: (val) => _profile.occupation = val,
         ),
-        _buildTextField(
+        _buildSelectableTextField(
           label: languageProvider.getString('industry_label'),
-          initialValue: _profile.industry,
+          value: _profile.industry,
+          options: const [
+            'Healthcare',
+            'Education',
+            'Technology',
+            'Finance',
+            'Hospitality',
+            'Creative',
+            'Government',
+            'Business',
+          ],
           onChanged: (val) => _profile.industry = val,
         ),
         _buildChoiceChips(
           label: languageProvider.getString('education_level_label'),
           value: _profile.educationLevel,
           items: const [
-            'High School',
-            'In College',
-            'Undergraduate',
-            'Postgraduate',
+            'College student',
+            'Degree',
+            'Masters degree',
+            'Diploma',
+            'No degree',
             'Other',
+            _askMeOption,
           ],
           onChanged: (val) => _profile.educationLevel = val,
         ),
-        _buildTextField(
+        _buildSelectableTextField(
           label: languageProvider.getString('school_label'),
-          initialValue: _profile.school,
+          value: _profile.school,
+          options: const [
+            'University of Malawi',
+            'MUBAS',
+            'LUANAR',
+            'Mzuzu University',
+            'Catholic University',
+            'Malawi College',
+          ],
           onChanged: (val) => _profile.school = val,
         ),
       ]),
@@ -600,33 +659,54 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ],
           onChanged: (val) => _profile.hobbies = val,
         ),
-        _buildTextField(
+        _buildSuggestionMultiChips(
           label: languageProvider.getString('music_genres_label'),
-          initialValue: _profile.musicGenres.join(', '),
+          values: _profile.musicGenres,
+          suggestions: const [
+            'Afrobeats',
+            'Amapiano',
+            'Gospel',
+            'Hip Hop',
+            'R&B',
+            'Pop',
+            'Reggae',
+            'Jazz',
+            'Rock',
+            'Country',
+          ],
           hint: 'Pop, Rock, R&B...',
-          onChanged: (val) => _profile.musicGenres = val
-              .split(',')
-              .map((e) => e.trim())
-              .where((e) => e.isNotEmpty)
-              .toList(),
+          onChanged: (val) => _profile.musicGenres = val,
         ),
-        _buildTextField(
+        _buildSuggestionMultiChips(
           label: languageProvider.getString('movies_shows_label'),
-          initialValue: _profile.moviesShows.join(', '),
-          onChanged: (val) => _profile.moviesShows = val
-              .split(',')
-              .map((e) => e.trim())
-              .where((e) => e.isNotEmpty)
-              .toList(),
+          values: _profile.moviesShows,
+          suggestions: const [
+            'Comedy',
+            'Drama',
+            'Action',
+            'Romance',
+            'Documentaries',
+            'Reality TV',
+            'Anime',
+            'K-Drama',
+          ],
+          onChanged: (val) => _profile.moviesShows = val,
         ),
-        _buildTextField(
+        _buildSuggestionMultiChips(
           label: languageProvider.getString('weekend_activities_label'),
-          initialValue: _profile.weekendActivities.join(', '),
-          onChanged: (val) => _profile.weekendActivities = val
-              .split(',')
-              .map((e) => e.trim())
-              .where((e) => e.isNotEmpty)
-              .toList(),
+          values: _profile.weekendActivities,
+          suggestions: const [
+            'Coffee',
+            'Brunch',
+            'Church',
+            'Gym',
+            'Movies',
+            'Road trips',
+            'Markets',
+            'Live music',
+            'Staying in',
+          ],
+          onChanged: (val) => _profile.weekendActivities = val,
         ),
       ]),
       // 7. Personality & Values
@@ -649,19 +729,53 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ],
           onChanged: (val) => _profile.loveLanguage = val,
         ),
-        _buildTextField(
+        _buildChoiceChips(
           label: languageProvider.getString('personality_type_label'),
-          initialValue: _profile.mbti,
+          value: _profile.mbti,
+          items: const [
+            'INTJ',
+            'INTP',
+            'ENTJ',
+            'ENTP',
+            'INFJ',
+            'INFP',
+            'ENFJ',
+            'ENFP',
+            'ISTJ',
+            'ISFJ',
+            'ESTJ',
+            'ESFJ',
+            'ISTP',
+            'ISFP',
+            'ESTP',
+            'ESFP',
+          ],
           onChanged: (val) => _profile.mbti = val,
         ),
-        _buildTextField(
+        _buildSelectableTextField(
           label: languageProvider.getString('political_views_label'),
-          initialValue: _profile.politicalViews,
+          value: _profile.politicalViews,
+          options: const [
+            'Apolitical',
+            'Moderate',
+            'Progressive',
+            'Conservative',
+            'Prefer not to say',
+          ],
           onChanged: (val) => _profile.politicalViews = val,
         ),
-        _buildTextField(
+        _buildSelectableTextField(
           label: languageProvider.getString('core_values_label'),
-          initialValue: _profile.coreValues,
+          value: _profile.coreValues,
+          options: const [
+            'Family',
+            'Faith',
+            'Ambition',
+            'Honesty',
+            'Kindness',
+            'Adventure',
+            'Stability',
+          ],
           hint: 'Family, Ambition, Honesty...',
           onChanged: (val) => _profile.coreValues = val,
         ),
@@ -821,7 +935,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
+          color: Theme.of(context).scaffoldBackgroundColor,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: hasLocation
@@ -998,7 +1112,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           child: Container(
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: hasPhoto
@@ -1007,7 +1121,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ? Colors.orange.withValues(alpha: 0.5)
                     : Theme.of(context).dividerColor,
                 width: 2,
-                style: hasPhoto ? BorderStyle.solid : BorderStyle.none,
+                style: BorderStyle.solid,
               ),
             ),
             child: Stack(
@@ -1273,17 +1387,103 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Widget _buildPageContent(List<Widget> children) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.only(
-        left: 28,
-        right: 28,
-        top: 20,
-        bottom: 100,
-      ), // Increased horizontal padding
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: children,
+        left: 24,
+        right: 24,
+        top: 18,
+        bottom: 104,
+      ),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 8),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.08)
+                : Colors.black.withValues(alpha: 0.05),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.18 : 0.06),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildCompletionStrip(),
+            const SizedBox(height: 18),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompletionStrip() {
+    final languageProvider = context.read<LanguageProvider>();
+    final progress = (_profile.completionPercentage / 100)
+        .clamp(0.0, 1.0)
+        .toDouble();
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: _primaryColor.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _primaryColor.withValues(alpha: 0.14)),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 42,
+            height: 42,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                CircularProgressIndicator(
+                  value: progress,
+                  strokeWidth: 4,
+                  backgroundColor: _primaryColor.withValues(alpha: 0.14),
+                  valueColor: AlwaysStoppedAnimation<Color>(_primaryColor),
+                ),
+                Text(
+                  '${_profile.completionPercentage}%',
+                  style: TextStyle(
+                    color: _primaryColor,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  languageProvider.getString('complete_your_profile'),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  languageProvider.getString('matches_3x_likely'),
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1305,18 +1505,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              letterSpacing: 0.2,
             ),
           ),
           const SizedBox(height: 8),
           TextFormField(
             initialValue: initialValue,
             maxLines: maxLines,
+            cursorColor: _primaryColor,
             style: const TextStyle(fontWeight: FontWeight.w600),
             decoration: InputDecoration(
               hintText: hint ?? 'Tap to enter...',
               hintStyle: TextStyle(
-                color: Colors.grey.shade400,
+                color: Theme.of(context).hintColor.withValues(alpha: 0.7),
                 fontWeight: FontWeight.normal,
               ),
               alignLabelWithHint: true,
@@ -1329,18 +1529,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 borderSide: BorderSide.none,
               ),
               filled: true,
-              fillColor: Theme.of(context).cardColor,
+              fillColor: Theme.of(context).scaffoldBackgroundColor,
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide(
-                  color: _primaryColor.withValues(alpha: 0.6),
+                  color: _primaryColor.withValues(alpha: 0.75),
                   width: 2,
                 ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide(
-                  color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
+                  color: Theme.of(context).dividerColor.withValues(alpha: 0.7),
                   width: 1.5,
                 ),
               ),
@@ -1355,12 +1555,170 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
+  Widget _buildSelectableTextField({
+    required String label,
+    required String? value,
+    required List<String> options,
+    required Function(String) onChanged,
+    String? hint,
+  }) {
+    final optionItems = _withAskMe(options);
+    final normalizedValue = value?.trim();
+    final hasCustomValue = normalizedValue != null &&
+        normalizedValue.isNotEmpty &&
+        !optionItems.contains(normalizedValue);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildChoiceChips(
+            label: label,
+            value: optionItems.contains(normalizedValue)
+                ? normalizedValue
+                : null,
+            items: optionItems,
+            onChanged: onChanged,
+          ),
+          TextFormField(
+            initialValue: hasCustomValue ? normalizedValue : null,
+            cursorColor: _primaryColor,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+            decoration: InputDecoration(
+              hintText: hint ?? 'Or type your own',
+              hintStyle: TextStyle(
+                color: Theme.of(context).hintColor.withValues(alpha: 0.7),
+              ),
+              prefixIcon: Icon(
+                Iconsax.edit_2,
+                color: _primaryColor.withValues(alpha: 0.65),
+                size: 18,
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 14,
+              ),
+              filled: true,
+              fillColor: Theme.of(context).scaffoldBackgroundColor,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(
+                  color: Theme.of(context).dividerColor.withValues(alpha: 0.7),
+                  width: 1.5,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(
+                  color: _primaryColor.withValues(alpha: 0.75),
+                  width: 2,
+                ),
+              ),
+            ),
+            onChanged: (val) {
+              onChanged(val);
+              _onFieldUpdated();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSuggestionMultiChips({
+    required String label,
+    required List<String> values,
+    required List<String> suggestions,
+    required Function(List<String>) onChanged,
+    String? hint,
+  }) {
+    final suggestionItems = _withAskMe(suggestions);
+    final suggestionSet = suggestionItems.toSet();
+    final customValues = values.where((item) => !suggestionSet.contains(item));
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildMultiChoiceChips(
+            label: label,
+            values: values,
+            items: suggestionItems,
+            onChanged: onChanged,
+          ),
+          TextFormField(
+            initialValue: customValues.join(', '),
+            cursorColor: _primaryColor,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+            decoration: InputDecoration(
+              hintText: hint ?? 'Add custom options separated by commas',
+              hintStyle: TextStyle(
+                color: Theme.of(context).hintColor.withValues(alpha: 0.7),
+              ),
+              prefixIcon: Icon(
+                Iconsax.add_circle,
+                color: _primaryColor.withValues(alpha: 0.65),
+                size: 18,
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 14,
+              ),
+              filled: true,
+              fillColor: Theme.of(context).scaffoldBackgroundColor,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(
+                  color: Theme.of(context).dividerColor.withValues(alpha: 0.7),
+                  width: 1.5,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(
+                  color: _primaryColor.withValues(alpha: 0.75),
+                  width: 2,
+                ),
+              ),
+            ),
+            onChanged: (val) {
+              final selectedSuggestions = values
+                  .where(
+                    (item) =>
+                        suggestionSet.contains(item) && item != _askMeOption,
+                  )
+                  .toList();
+              final custom = val
+                  .split(',')
+                  .map((e) => e.trim())
+                  .where((e) => e.isNotEmpty)
+                  .toList();
+              onChanged([...selectedSuggestions, ...custom]);
+              _onFieldUpdated();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildChoiceChips({
     required String label,
     required String? value,
     required List<String> items,
     required Function(String) onChanged,
   }) {
+    final chipItems = _withAskMe(items);
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Column(
@@ -1371,26 +1729,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              letterSpacing: 0.2,
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 8),
           Wrap(
-            spacing: 4,
-            runSpacing: 4,
-            children: items.map((item) {
+            spacing: 8,
+            runSpacing: 8,
+            children: chipItems.map((item) {
               final isSelected = value == item;
               return ChoiceChip(
                 label: Text(item),
                 selected: isSelected,
                 selectedColor: _primaryColor,
-                backgroundColor: Theme.of(context).cardColor,
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 labelStyle: TextStyle(
                   color: isSelected
                       ? Colors.white
                       : Theme.of(
                           context,
-                        ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                        ).textTheme.bodyMedium?.color?.withValues(alpha: 0.75),
                   fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                   fontSize: 14,
                 ),
@@ -1428,6 +1785,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     required List<String> items,
     required Function(List<String>) onChanged,
   }) {
+    final chipItems = _withAskMe(items);
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Column(
@@ -1438,27 +1796,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              letterSpacing: 0.2,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Wrap(
-            spacing: 4,
-            runSpacing: 4,
-            children: items.map((item) {
+            spacing: 8,
+            runSpacing: 8,
+            children: chipItems.map((item) {
               final isSelected = values.contains(item);
               return FilterChip(
                 label: Text(item),
                 selected: isSelected,
                 selectedColor: _primaryColor,
-                backgroundColor: Theme.of(context).cardColor,
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 checkmarkColor: Colors.white,
                 labelStyle: TextStyle(
                   color: isSelected
                       ? Colors.white
                       : Theme.of(
                           context,
-                        ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                        ).textTheme.bodyMedium?.color?.withValues(alpha: 0.75),
                   fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                   fontSize: 14,
                 ),
@@ -1477,7 +1834,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 onSelected: (selected) {
                   final newValues = List<String>.from(values);
-                  if (selected) {
+                  if (item == _askMeOption && selected) {
+                    newValues
+                      ..clear()
+                      ..add(_askMeOption);
+                  } else if (selected) {
+                    newValues.remove(_askMeOption);
                     newValues.add(item);
                   } else {
                     newValues.remove(item);
@@ -1503,7 +1865,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
+          color: Theme.of(context).scaffoldBackgroundColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: Theme.of(context).dividerColor, width: 1.5),
         ),
@@ -1543,7 +1905,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              letterSpacing: 0.2,
             ),
           ),
           const SizedBox(height: 8),
@@ -1579,7 +1940,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
+                color: Theme.of(context).scaffoldBackgroundColor,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: Theme.of(context).dividerColor,

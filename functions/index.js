@@ -9,7 +9,6 @@ const {
 const { onRequest } = require("firebase-functions/v2/https");
 const { defineSecret, defineString } = require("firebase-functions/params");
 const { Resend } = require("resend");
-const { RtcTokenBuilder, RtcRole } = require("agora-token");
 
 initializeApp();
 
@@ -21,7 +20,6 @@ const db = getFirestore();
 
 const resendApiKey = defineSecret("RESEND_API_KEY");
 const verificationSecret = defineSecret("EMAIL_VERIFICATION_SECRET");
-const agoraAppCert = defineSecret("AGORA_APP_CERTIFICATE");
 const sumsubAppToken = defineSecret("SUMSUB_APP_TOKEN");
 const sumsubSecretKey = defineSecret("SUMSUB_SECRET_KEY");
 const sumsubWebhookSecret = defineSecret("SUMSUB_WEBHOOK_SECRET");
@@ -37,9 +35,6 @@ const sumsubLevelName = defineString("SUMSUB_LEVEL_NAME", {
 const sumsubBaseUrl = defineString("SUMSUB_BASE_URL", {
   default: "https://api.sumsub.com",
 });
-
-// App ID is public information
-const AGORA_APP_ID = "45fbe0e2e7b844bfab588523c914bfb2";
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -518,67 +513,5 @@ exports.verifyEmailCode = onRequest(
     sendJson(req, res, 200, {
       ok: true,
     });
-  }
-);
-
-// -----------------------------------------------------------------------------
-// Generate Agora Token
-// -----------------------------------------------------------------------------
-
-exports.generateAgoraToken = onRequest(
-  {
-    secrets: [agoraAppCert],
-  },
-  async (req, res) => {
-    setCors(req, res);
-
-    if (req.method === "OPTIONS") {
-      res.status(204).send("");
-      return;
-    }
-
-    const channelName = (
-      req.body?.channelName ||
-      req.query.channelName ||
-      ""
-    ).trim();
-
-    const uid = parseInt(
-      req.body?.uid || req.query.uid || "0",
-      10
-    );
-
-    if (!channelName) {
-      return sendJson(req, res, 400, {
-        error: "channelName is required",
-      });
-    }
-
-    try {
-      const expireSeconds = 3600;
-
-      const privilegeExpiredTs =
-        Math.floor(Date.now() / 1000) + expireSeconds;
-
-      const token = RtcTokenBuilder.buildTokenWithUid(
-        AGORA_APP_ID,
-        agoraAppCert.value(),
-        channelName,
-        uid,
-        RtcRole.PUBLISHER,
-        privilegeExpiredTs,
-        privilegeExpiredTs
-      );
-
-      sendJson(req, res, 200, {
-        token,
-      });
-    } catch (err) {
-      console.error("Agora token generation failed:", err);
-
-      sendJson(req, res, 500, {
-        error: "Token generation failed",
-      });
-    }
   }
 );

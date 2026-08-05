@@ -2,11 +2,11 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/language_provider.dart';
 import '../services/call_service.dart';
+import '../services/jitsi_call_service.dart';
 import '../services/notification_service.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 
@@ -34,6 +34,7 @@ class OutgoingCallScreen extends StatefulWidget {
 
 class _OutgoingCallScreenState extends State<OutgoingCallScreen> {
   final CallService _callService = CallService();
+  final JitsiCallService _jitsiCallService = JitsiCallService();
   final FlutterRingtonePlayer _ringtonePlayer = FlutterRingtonePlayer();
   Timer? _timeoutTimer;
   bool _joined = false;
@@ -79,23 +80,16 @@ class _OutgoingCallScreenState extends State<OutgoingCallScreen> {
     if (mounted) Navigator.pop(context);
   }
 
-  void _launchJitsiInBrowser() async {
+  void _launchJitsiCall() async {
     if (_joined) return;
     _joined = true;
     _timeoutTimer?.cancel();
     _ringtonePlayer.stop();
 
-    const serverBase = "https://meet.ffmuc.net";
-    final roomUrl = "$serverBase/${widget.roomName}";
-    final uri = Uri.parse(roomUrl);
-
-    try {
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      }
-    } catch (e) {
-      debugPrint('Error launching Jitsi in browser: $e');
-    }
+    await _jitsiCallService.launchRoom(
+      roomName: widget.roomName,
+      isVideo: widget.isVideo,
+    );
 
     if (mounted) Navigator.pop(context);
   }
@@ -129,7 +123,7 @@ class _OutgoingCallScreenState extends State<OutgoingCallScreen> {
 
           if (status == 'answered') {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              _launchJitsiInBrowser();
+              _launchJitsiCall();
             });
           }
         }
