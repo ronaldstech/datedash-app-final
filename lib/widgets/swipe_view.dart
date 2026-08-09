@@ -814,7 +814,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
 
         // Bottom info panel (Inside card)
         Positioned(
-          bottom: 96,
+          bottom: MediaQuery.of(context).size.height < 680 ? 76 : 92,
           left: 0,
           right: 0,
           child: _buildProfileInfo(context, profile,
@@ -825,7 +825,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
         // Action buttons (inside card, at the bottom)
         if (!isBackCard)
           Positioned(
-            bottom: 16,
+            bottom: MediaQuery.of(context).size.height < 680 ? 8 : 14,
             left: 0,
             right: 0,
             child: _buildActionRow(languageProvider),
@@ -842,8 +842,20 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
         _profiles.isNotEmpty ? _profiles[_currentIndex] : null;
     final myUid = FirebaseAuth.instance.currentUser?.uid;
 
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final isSmallScreen = screenWidth < 360;
+
+    final primaryBtnSize = isSmallScreen ? 42.0 : 48.0;
+    final secondaryBtnSize = isSmallScreen ? 32.0 : 36.0;
+
     return Padding(
-      padding: const EdgeInsets.only(bottom: 0, top: 4, left: 16, right: 16),
+      padding: EdgeInsets.only(
+        bottom: 0,
+        top: 4,
+        left: isSmallScreen ? 8 : 16,
+        right: isSmallScreen ? 8 : 16,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -854,7 +866,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
                 ? const Color(0xFF2196F3)
                 : Colors.grey.withValues(alpha: 0.5),
             onTap: canRewind ? _handleRewind : () {},
-            size: 36,
+            size: secondaryBtnSize,
             label: languageProvider.getString('rewind'),
           ),
           // 2. Pass
@@ -862,7 +874,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
             svgAsset: 'assets/images/pass.svg',
             color: const Color(0xFFFF5E5E),
             onTap: () => _runSwipeAnimation('left'),
-            size: 48,
+            size: primaryBtnSize,
             label: languageProvider.getString('pass'),
           ),
           // 3. Book (center)
@@ -872,7 +884,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
             ActionButton(
               icon: Iconsax.calendar_add,
               color: const Color(0xFFFFA000),
-              size: 36,
+              size: secondaryBtnSize,
               label: 'Meet',
               disabled: !currentProfile.allowMeetupRequests,
               onTap: () {
@@ -897,7 +909,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
             svgAsset: 'assets/images/like.svg',
             color: const Color(0xFF00C853),
             onTap: () => _runSwipeAnimation('right'),
-            size: 48,
+            size: primaryBtnSize,
             label: languageProvider.getString('like'),
           ),
           // 5. Message (conditional, disabled if user disallows messages)
@@ -906,7 +918,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
               icon: Iconsax.message_text_1,
               color: const Color(0xFFFF4D85),
               onTap: () => _handleDirectMessage(languageProvider),
-              size: 40,
+              size: isSmallScreen ? 34.0 : 40.0,
               label: languageProvider.getString('message'),
               disabled: currentProfile != null && !currentProfile.allowMessages,
             ),
@@ -1393,8 +1405,14 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
     final bio = profile.bio;
     final relationshipStatus = profile.relationshipStatus;
 
+    final isSmallScreen = MediaQuery.of(context).size.width < 360;
+
     return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 2),
+      padding: EdgeInsets.only(
+        left: isSmallScreen ? 14 : 20,
+        right: isSmallScreen ? 14 : 20,
+        bottom: 2,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -1408,9 +1426,9 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
                   profile.showAge
                       ? '${profile.firstName ?? 'Someone'},'
                       : profile.firstName ?? 'Someone',
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: Colors.white,
-                      fontSize: 32,
+                      fontSize: isSmallScreen ? 24 : 30,
                       fontWeight: FontWeight.w900,
                       letterSpacing: -0.5,
                       height: 1.1),
@@ -1418,12 +1436,12 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
                 ),
               ),
               if (profile.showAge) ...[
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 Text(
                   '${profile.age ?? '??'}',
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: Colors.white,
-                      fontSize: 28,
+                      fontSize: isSmallScreen ? 22 : 26,
                       fontWeight: FontWeight.w400,
                       letterSpacing: -0.5),
                 ),

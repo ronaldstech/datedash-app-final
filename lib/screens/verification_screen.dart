@@ -65,7 +65,7 @@ class _VerificationScreenState extends State<VerificationScreen>
       final profile = profileProvider.userProfile;
       if (user != null && profile != null) {
         profile.verificationStatus = 'pending';
-        profile.nationalId = 'Sumsub';
+        profile.nationalId = 'Stripe Identity';
         profile.nationalIdUrl = url;
         await profileProvider.saveUserProfile(user.uid, profile);
       }
@@ -202,6 +202,8 @@ class _VerificationScreenState extends State<VerificationScreen>
       return _buildVerifiedState(lp);
     } else if (status == 'pending') {
       return _buildPendingState(profileProvider, lp);
+    } else if (status == 'failed' || status == 'canceled') {
+      return _buildFailedState(profileProvider, lp);
     } else {
       return _buildUnverifiedState(profileProvider, lp);
     }
@@ -242,7 +244,7 @@ class _VerificationScreenState extends State<VerificationScreen>
               ),
               const SizedBox(height: 8),
               Text(
-                'Verify with Sumsub using a government ID and liveness check.',
+                'Verify with Stripe Identity using a government ID and biometric selfie check.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.7),
@@ -259,19 +261,19 @@ class _VerificationScreenState extends State<VerificationScreen>
         _buildTrustPoint(
           Iconsax.personalcard,
           'Government ID verification',
-          'National ID cards, passports, and driving licenses are handled by the verification provider.',
+          'National ID cards, passports, and driving licenses are processed securely by Stripe Identity.',
         ),
         const SizedBox(height: 12),
         _buildTrustPoint(
           Iconsax.scan_barcode,
-          'Automated document checks',
-          'The provider checks document authenticity, tampering signals, and readable identity data.',
+          'Automated document & selfie checks',
+          'Stripe checks document authenticity, facial matching, and anti-spoofing signals.',
         ),
         const SizedBox(height: 12),
         _buildTrustPoint(
           Iconsax.profile_tick,
           'Result updates automatically',
-          'Your profile becomes verified after the provider returns an approved review.',
+          'Your profile becomes verified after Stripe completes the identity review.',
         ),
         const SizedBox(height: 32),
         SizedBox(
@@ -312,10 +314,10 @@ class _VerificationScreenState extends State<VerificationScreen>
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: Colors.indigo.withValues(alpha: 0.12),
+              color: const Color(0xFF635BFF).withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(Iconsax.security_safe, color: Colors.indigo),
+            child: const Icon(Iconsax.security_safe, color: Color(0xFF635BFF)),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -323,12 +325,12 @@ class _VerificationScreenState extends State<VerificationScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Sumsub',
+                  'Stripe Identity',
                   style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Third-party identity verification for global ID documents.',
+                  'Secure end-to-end identity verification powered by Stripe.',
                   style: TextStyle(
                     color: Theme.of(context).hintColor,
                     fontSize: 12,
@@ -420,7 +422,7 @@ class _VerificationScreenState extends State<VerificationScreen>
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Text(
-            'Finish any remaining Sumsub steps. Your profile updates after the provider sends the final review.',
+            'Complete your ID scan and selfie check in the Stripe browser window. Your status updates automatically once processed.',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.6),
@@ -446,7 +448,7 @@ class _VerificationScreenState extends State<VerificationScreen>
               const SizedBox(width: 14),
               Expanded(
                 child: Text(
-                  'Verification results are handled by Sumsub. You can reopen this screen later to check your profile status.',
+                  'Verification results are processed securely by Stripe. You can reopen this screen anytime to check your profile status.',
                   style: TextStyle(
                     color: Theme.of(context)
                         .textTheme
@@ -459,6 +461,75 @@ class _VerificationScreenState extends State<VerificationScreen>
                 ),
               ),
             ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFailedState(ProfileProvider profileProvider, LanguageProvider lp) {
+    return Column(
+      key: const ValueKey('failed_view'),
+      children: [
+        const SizedBox(height: 40),
+        Container(
+          padding: const EdgeInsets.all(28),
+          decoration: BoxDecoration(
+            color: Colors.redAccent.withValues(alpha: 0.1),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.redAccent.withValues(alpha: 0.2),
+              width: 2,
+            ),
+          ),
+          child: const Icon(
+            Iconsax.shield_cross,
+            color: Colors.redAccent,
+            size: 72,
+          ),
+        ),
+        const SizedBox(height: 32),
+        Text(
+          lp.getString('verification_status_failed'),
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text(
+            lp.getString('verification_status_failed_sub'),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.6),
+              fontSize: 14,
+              height: 1.5,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        const SizedBox(height: 32),
+        SizedBox(
+          width: double.infinity,
+          height: 56,
+          child: ElevatedButton.icon(
+            onPressed: () => _startVerification(profileProvider, lp),
+            icon: const Icon(Iconsax.refresh),
+            label: const Text(
+              'Retry Verification',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _primaryColor,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 0,
+            ),
           ),
         ),
       ],

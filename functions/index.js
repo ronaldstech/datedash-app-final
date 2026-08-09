@@ -23,6 +23,8 @@ const verificationSecret = defineSecret("EMAIL_VERIFICATION_SECRET");
 const sumsubAppToken = defineSecret("SUMSUB_APP_TOKEN");
 const sumsubSecretKey = defineSecret("SUMSUB_SECRET_KEY");
 const sumsubWebhookSecret = defineSecret("SUMSUB_WEBHOOK_SECRET");
+const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
+const stripeWebhookSecret = defineSecret("STRIPE_WEBHOOK_SECRET");
 
 const emailFrom = defineString("EMAIL_FROM", {
   default: "Snellum <onboarding@resend.dev>",
@@ -183,6 +185,196 @@ function verifySumsubWebhook(req) {
 
   return safeTimingEqualHex(digest, calculatedDigest);
 }
+
+// -----------------------------------------------------------------------------
+// Identity Verification with Stripe Identity
+// -----------------------------------------------------------------------------
+
+function verifyStripeWebhook(req) {
+  const signature = req.get("stripe-signature");
+  const webhookSecret = stripeWebhookSecret.value();
+
+  if (!signature || !webhookSecret || !req.rawBody) return false;
+
+  try {
+    const parts = signature.split(",").reduce((acc, part) => {
+      const [key, value] = part.trim().split("=");
+      if (key && value) acc[key] = value;
+      return acc;
+    }, {});
+
+    const t = parts.t;
+    const v1 = parts.v1;
+    if (!t || !v1) return false;
+
+    const payload = `${t}.${req.rawBody.toString("utf8")}`;
+    const expectedSignature = crypto
+      .createHmac("sha256", webhookSecret)
+      .update(payload)
+      .digest("hex");
+
+    return safeTimingEqualHex(v1, expectedSignature);
+  } catch (err) {
+    console.error("Stripe webhook verification error:", err);
+    return false;
+  }
+}
+
+exports.createStripeIdentityVerificationSession = onRequest(
+  {
+    secrets: [stripeSecretKey],
+  },
+  async (req, res) => {
+    setCors(req, res);
+
+    if (req.method === "OPTIONS") {
+      res.status(204).send("");
+      return;
+    }
+
+    if (req.method !== "POST") {
+      return sendJson(req, res, 405, { error: "Method not allowed" });
+    }
+
+    try {
+      const decodedToken = await requireFirebaseUser(req);
+      const uid = decodedToken.uid;
+      const email = normalizeEmail(req.body?.email || decodedToken.email);
+
+      const params = new URLSearchParams();
+      params.append("type", "document");
+      params.append("options[document][require_matching_selfie]", "true");
+      params.append("metadata[userId]", uid);
+      if (isValidEmail(email)) {
+        params.append("options[document][require_id_number]", "true");
+      }
+
+      const response = await fetch(
+        "https://api.stripe.com/v1/identity/verification_sessions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${stripeSecretKey.value()}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: params.toString(),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error?.message || "Failed to create Stripe Verification Session."
+        );
+      }
+
+      const sessionUrl = data.url;
+      const clientSecret = data.client_secret;
+      const sessionId = data.id;
+
+      await db.collection("users").doc(uid).set(
+        {
+          isVerified: false,
+          verificationStatus: "pending",
+          nationalId: "Stripe Identity",
+          nationalIdUrl: sessionUrl || null,
+          identityProvider: "stripe_identity",
+          identitySessionId: sessionId,
+          identityVerificationUpdatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+
+      sendJson(req, res, 200, {
+        url: sessionUrl,
+        client_secret: clientSecret,
+        session_id: sessionId,
+        provider: "stripe_identity",
+      });
+    } catch (err) {
+      console.error("Create Stripe verification session failed:", err);
+      sendJson(req, res, err.status || 500, {
+        error: err.message || "Could not start Stripe identity verification.",
+      });
+    }
+  }
+);
+
+exports.stripeIdentityWebhook = onRequest(
+  {
+    secrets: [stripeWebhookSecret],
+  },
+  async (req, res) => {
+    if (req.method !== "POST") {
+      res.status(405).json({ error: "Method not allowed" });
+      return;
+    }
+
+    if (!verifyStripeWebhook(req)) {
+      res.status(401).json({ error: "Invalid webhook signature" });
+      return;
+    }
+
+    const event = req.body || {};
+    const session = event.data?.object || {};
+    const uid = session.metadata?.userId;
+
+    if (!uid) {
+      res.status(200).json({ received: true, note: "Ignored event missing userId" });
+      return;
+    }
+
+    let verificationStatus = "pending";
+    let isVerified = false;
+
+    switch (event.type) {
+      case "identity.verification_session.verified":
+        verificationStatus = "verified";
+        isVerified = true;
+        break;
+      case "identity.verification_session.requires_input":
+        verificationStatus = "pending";
+        isVerified = false;
+        break;
+      case "identity.verification_session.canceled":
+      case "identity.verification_session.failed":
+        verificationStatus = "failed";
+        isVerified = false;
+        break;
+      default:
+        res.status(200).json({ received: true });
+        return;
+    }
+
+    const update = {
+      isVerified,
+      verificationStatus,
+      nationalId: "Stripe Identity",
+      identityProvider: "stripe_identity",
+      identitySessionId: session.id || null,
+      identityLastEvent: event.type,
+      identityVerificationUpdatedAt: FieldValue.serverTimestamp(),
+    };
+
+    if (session.last_error?.reason) {
+      update.identityVerificationError = session.last_error.reason;
+    }
+
+    await db.collection("users").doc(uid).set(update, { merge: true });
+
+    await db.collection("identityVerificationEvents").add({
+      provider: "stripe_identity",
+      uid,
+      sessionId: session.id || null,
+      eventType: event.type,
+      status: session.status || null,
+      receivedAt: FieldValue.serverTimestamp(),
+    });
+
+    res.status(200).json({ received: true });
+  }
+);
 
 // -----------------------------------------------------------------------------
 // Identity Verification with Sumsub

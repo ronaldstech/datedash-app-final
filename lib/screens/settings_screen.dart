@@ -777,6 +777,8 @@ class SettingsScreen extends StatelessWidget {
       iconColor = Colors.green;
     } else if (status == 'pending') {
       iconColor = Colors.orange;
+    } else if (status == 'failed' || status == 'canceled') {
+      iconColor = Colors.redAccent;
     }
 
     return Container(

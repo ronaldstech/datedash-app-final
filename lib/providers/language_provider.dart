@@ -443,10 +443,13 @@ class LanguageProvider with ChangeNotifier {
       'booking_section_title': 'Meetup Settings',
       'verification_status_unverified': 'Verify Identity',
       'verification_status_unverified_sub':
-          'Verify with Sumsub ID checks',
+          'Verify with Stripe Identity checks',
       'verification_status_pending': 'Verification Pending',
       'verification_status_pending_sub':
-          'Your ID is being reviewed by Sumsub',
+          'Your ID is being reviewed by Stripe',
+      'verification_status_failed': 'Verification Failed',
+      'verification_status_failed_sub':
+          'Verification was canceled or declined. Tap to try again.',
       'verification_status_verified': 'Identity Verified',
       'verification_status_verified_sub':
           'Your identity has been fully confirmed',
@@ -844,10 +847,10 @@ class LanguageProvider with ChangeNotifier {
       'booking_section_title': 'Mipangilio ya Miadi',
       'verification_status_unverified': 'Thibitisha Utambulisho',
       'verification_status_unverified_sub':
-          'Thibitisha kwa ukaguzi wa Sumsub',
+          'Thibitisha kwa ukaguzi wa Stripe Identity',
       'verification_status_pending': 'Uthibitisho Unasubiriwa',
       'verification_status_pending_sub':
-          'Kitambulisho chako kinakaguliwa na Sumsub',
+          'Kitambulisho chako kinakaguliwa na Stripe',
       'verification_status_verified': 'Utambulisho Umethibitishwa',
       'verification_status_verified_sub':
           'Utambulisho wako umethibitishwa kikamilifu',
