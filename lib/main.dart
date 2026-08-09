@@ -74,6 +74,7 @@ class _SnellumAppState extends State<SnellumApp> with WidgetsBindingObserver {
       _setUserOnline(true);
       _startHeartbeat();
     } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
         state == AppLifecycleState.detached) {
       _stopHeartbeat();
       _setUserOnline(false);

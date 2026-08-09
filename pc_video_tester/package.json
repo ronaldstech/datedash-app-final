@@ -1,0 +1,12 @@
+{
+  "name": "pc-video-tester",
+  "version": "1.0.0",
+  "description": "Simple node app to test speed video chats on PC",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

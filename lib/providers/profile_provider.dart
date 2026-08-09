@@ -231,6 +231,7 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
     String filterZodiac = 'Any',
     String filterEducationLevel = 'Any',
     bool filterVerifiedOnly = false,
+    bool filterOnlineOnly = false,
     String filterKids = 'Any',
     String filterPets = 'Any',
     String filterIntrovertExtrovert = 'Any',
@@ -256,6 +257,7 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
     _userProfile!.filterZodiac = filterZodiac;
     _userProfile!.filterEducationLevel = filterEducationLevel;
     _userProfile!.filterVerifiedOnly = filterVerifiedOnly;
+    _userProfile!.filterOnlineOnly = filterOnlineOnly;
     _userProfile!.filterKids = filterKids;
     _userProfile!.filterPets = filterPets;
     _userProfile!.filterIntrovertExtrovert = filterIntrovertExtrovert;

@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DateDash Speed Video Match - PC Partner Tester</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --bg-dark: #0a0a0f;
+      --bg-card: rgba(18, 18, 29, 0.7);
+      --border-card: rgba(255, 255, 255, 0.08);
+      --primary: #ff4d85;
+      --primary-glow: rgba(255, 77, 133, 0.35);
+      --secondary: #ff8c00;
+      --success: #00e676;
+      --info: #00b0ff;
+      --text-white: #ffffff;
+      --text-gray: #a0a0b0;
+      --font-outfit: 'Outfit', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(255, 77, 133, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(255, 140, 0, 0.08) 0%, transparent 45%);
+      color: var(--text-white);
+      font-family: var(--font-outfit);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Card Styling */
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-card);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(255, 77, 133, 0.2);
+    }
+
+    h1, h2, h3 {
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .subtitle {
+      color: var(--text-gray);
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+      line-height: 1.4;
+    }
+
+    /* Form Fields */
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      color: var(--text-gray);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    input, select {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: var(--text-white);
+      font-family: var(--font-outfit);
+      font-size: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      border: none;
+      border-radius: 14px;
+      padding: 14px 20px;
+      color: var(--text-white);
+      font-family: var(--font-outfit);
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px var(--primary-glow);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(255, 77, 133, 0.5);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: none;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: none;
+    }
+
+    .btn-danger {
+      background: #ff3366;
+      box-shadow: 0 4px 15px rgba(255, 51, 102, 0.35);
+    }
+
+    .btn-danger:hover {
+      box-shadow: 0 8px 20px rgba(255, 51, 102, 0.5);
+    }
+
+    /* Status Panel */
+    .status-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      min-height: 350px;
+    }
+
+    /* Radar Pulse Animation */
+    .radar-container {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .radar-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 2px solid var(--primary);
+      border-radius: 50%;
+      animation: pulse 2s infinite ease-out;
+      opacity: 0;
+    }
+
+    .radar-ring:nth-child(2) {
+      animation-delay: 0.6s;
+    }
+
+    .radar-ring:nth-child(3) {
+      animation-delay: 1.2s;
+    }
+
+    .avatar {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      padding: 3px;
+      z-index: 2;
+    }
+
+    .avatar-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: var(--bg-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .avatar-inner i {
+      font-size: 2rem;
+      color: var(--primary);
+    }
+
+    .avatar-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.6);
+        opacity: 0;
+      }
+      50% {
+        opacity: 0.5;
+      }
+      100% {
+        transform: scale(1.4);
+        opacity: 0;
+      }
+    }
+
+    .status-badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      background: rgba(255, 77, 133, 0.15);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .status-badge.searching {
+      animation: blink 1.5s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .status-text {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .status-subtext {
+      color: var(--text-gray);
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+      max-width: 250px;
+    }
+
+    /* Proposal Card */
+    .proposal-card {
+      width: 100%;
+      border: 2px solid var(--primary);
+      box-shadow: 0 0 25px rgba(255, 77, 133, 0.25);
+      animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes scaleIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .match-tag {
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 900;
+      padding: 4px 12px;
+      border-radius: 12px;
+      letter-spacing: 1px;
+      display: inline-block;
+      margin-bottom: 14px;
+    }
+
+    .partner-info {
+      margin: 16px 0;
+    }
+
+    .partner-name {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .partner-meta {
+      color: var(--text-gray);
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      margin-top: 24px;
+    }
+
+    /* active call card */
+    .call-active-card {
+      border-color: var(--success);
+      box-shadow: 0 0 25px rgba(0, 230, 118, 0.2);
+    }
+
+    .pulse-green {
+      border-color: var(--success);
+      animation: pulse-g 2s infinite ease-out;
+    }
+
+    @keyframes pulse-g {
+      0% { transform: scale(0.6); opacity: 0; }
+      50% { opacity: 0.5; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+
+    /* Logs console */
+    .console-logs {
+      grid-column: 1 / span 2;
+      background: #06060a;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 16px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: #70ffb0;
+      max-height: 180px;
+      overflow-y: auto;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+    }
+
+    .console-entry {
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+
+    .console-time {
+      color: #888;
+      margin-right: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .console-logs {
+        grid-column: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Left panel: mock config -->
+    <div class="card" id="configCard">
+      <h1><i data-lucide="video"></i> PC Partner</h1>
+      <p class="subtitle">Mock a user profile and matchmaking filters to test speed video chat calls on PC.</p>
+      
+      <div id="configForm">
+        <h3>1. Your Mock Profile</h3>
+        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 12px 0 16px 0;">
+
+        <div class="form-group">
+          <label for="profileUid">Mock UID</label>
+          <input type="text" id="profileUid" value="pc_tester_user_99">
+        </div>
+
+        <div class="form-group">
+          <label for="profileName">Display Name</label>
+          <input type="text" id="profileName" value="PC Tester">
+        </div>
+
+        <div class="row-2">
+          <div class="form-group">
+          <label for="profileGender">Gender</label>
+          <select id="profileGender">
+            <option value="Male" selected>Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="profileAge">Age</label>
+          <input type="number" id="profileAge" value="26" min="18" max="100">
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="form-group">
+            <label for="profileCountry">Country</label>
+            <input type="text" id="profileCountry" value="United States">
+          </div>
+          <div class="form-group">
+            <label for="profileLanguage">Language Spoken</label>
+            <input type="text" id="profileLanguage" value="English">
+          </div>
+        </div>
+
+        <h3 style="margin-top: 24px;">2. Your Matching Filters</h3>
+        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 12px 0 16px 0;">
+
+        <div class="form-group">
+          <label for="filterGender">Looking For (Gender)</label>
+          <select id="filterGender">
+            <option value="Any" selected>Any</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="row-2">
+          <div class="form-group">
+            <label for="filterMinAge">Min Age</label>
+            <input type="number" id="filterMinAge" value="13" min="1" max="100">
+          </div>
+          <div class="form-group">
+            <label for="filterMaxAge">Max Age</label>
+            <input type="number" id="filterMaxAge" value="99" min="1" max="100">
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="form-group">
+            <label for="filterCountry">Preferred Country</label>
+            <input type="text" id="filterCountry" value="Any">
+          </div>
+          <div class="form-group">
+            <label for="filterLanguage">Preferred Language</label>
+            <input type="text" id="filterLanguage" value="Any">
+          </div>
+        </div>
+        <p style="font-size:0.78rem; color: var(--text-gray); margin-top:-10px;">💡 Keep filters as <strong style='color:white'>Any</strong> to match with anyone during testing.</p>
+
+        <button class="btn" id="startBtn" style="margin-top: 12px;">
+          <i data-lucide="play"></i> Start Matchmaking
+        </button>
+      </div>
+    </div>
+
+    <!-- Right panel: Status & Interaction -->
+    <div class="card status-panel" id="statusCard">
+      
+      <!-- Idle State -->
+      <div id="stateIdle" style="display: block;">
+        <div class="radar-container" style="filter: grayscale(1);">
+          <div class="avatar">
+            <div class="avatar-inner">
+              <i data-lucide="video-off"></i>
+            </div>
+          </div>
+        </div>
+        <div class="status-badge" style="background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: var(--text-gray);">Offline</div>
+        <div class="status-text">Ready to Connect</div>
+        <div class="status-subtext">Fill out your details and click Start Matchmaking to join the live video pool.</div>
+      </div>
+
+      <!-- Searching State -->
+      <div id="stateSearching" style="display: none;">
+        <div class="radar-container">
+          <div class="radar-ring"></div>
+          <div class="radar-ring"></div>
+          <div class="radar-ring"></div>
+          <div class="avatar">
+            <div class="avatar-inner">
+              <i data-lucide="search"></i>
+            </div>
+          </div>
+        </div>
+        <div class="status-badge searching">Searching</div>
+        <div class="status-text">Finding Matches...</div>
+        <div id="activeUserCount" class="status-subtext">Waiting in the video chat pool...</div>
+        <button class="btn btn-secondary btn-danger" id="cancelMatchBtn">
+          <i data-lucide="x"></i> Stop Search
+        </button>
+      </div>
+
+      <!-- Match Proposed / Accept screen -->
+      <div id="stateProposed" style="display: none; width: 100%;">
+        <div class="card proposal-card">
+          <span class="match-tag"><i data-lucide="sparkles" style="display:inline; width:12px; height:12px; vertical-align:middle; margin-right:4px;"></i> MATCH FOUND!</span>
+          
+          <div class="avatar" style="margin: 0 auto 12px auto; width: 100px; height: 100px; padding: 4px;">
+            <div class="avatar-inner" id="partnerAvatarContainer">
+              <i data-lucide="user" style="font-size: 2.5rem;"></i>
+            </div>
+          </div>
+
+          <div class="partner-info">
+            <div class="partner-name" id="partnerNameText">Jane Doe</div>
+            <div class="partner-meta" id="partnerMetaText">Female • 25 yrs • Canada</div>
+          </div>
+
+          <div id="acceptWaitingMsg" style="display: none; font-weight: 600; color: var(--primary); margin: 15px 0;">
+             Waiting for partner to accept...
+          </div>
+
+          <div class="action-row" id="proposalActionButtons">
+            <button class="btn btn-secondary" id="declineBtn" style="flex: 1;">
+              <i data-lucide="x-circle"></i> Decline
+            </button>
+            <button class="btn" id="acceptBtn" style="flex: 1;">
+              <i data-lucide="check-circle"></i> Accept
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Call Active screen -->
+      <div id="stateCallActive" style="display: none; width: 100%;">
+        <div class="card proposal-card call-active-card">
+          <div class="radar-container" style="margin: 0 auto 20px auto; width: 120px; height: 120px;">
+            <div class="radar-ring pulse-green"></div>
+            <div class="radar-ring pulse-green"></div>
+            <div class="avatar" style="border-color: var(--success); background: linear-gradient(45deg, var(--success), var(--info));">
+              <div class="avatar-inner">
+                <i data-lucide="video" style="color: var(--success);"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div class="status-badge" style="background: rgba(0, 230, 118, 0.15); border-color: var(--success); color: var(--success);">Call Active</div>
+          
+          <div class="partner-info">
+            <div class="partner-name" id="callPartnerNameText">Jane Doe</div>
+            <div style="font-size: 0.95rem; color: var(--text-gray); margin-top: 8px;">
+               Jitsi Meeting link is ready!
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px;">
+            <button class="btn" id="openRoomBtn" style="background: linear-gradient(45deg, var(--success), var(--info)); box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3);">
+              <i data-lucide="external-link"></i> Join Jitsi Room
+            </button>
+            <div class="action-row" style="margin-top: 0; width: 100%;">
+              <button class="btn btn-secondary btn-danger" id="endCallBtn" style="flex: 1;">
+                <i data-lucide="phone-off"></i> End Call
+              </button>
+              <button class="btn" id="nextCallBtn" style="flex: 1; background: linear-gradient(45deg, var(--primary), var(--secondary)); box-shadow: 0 4px 15px var(--primary-glow);">
+                <i data-lucide="chevron-right"></i> Next
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom console logger -->
+    <div class="console-logs" id="consoleLogs">
+      <div class="console-entry"><span class="console-time">[System]</span> Initialized PC Video Tester helper page. Ready to start matching.</div>
+    </div>
+
+  </div>
+
+  <!-- Firebase modular SDK loaders -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { 
+      getFirestore, 
+      doc, 
+      setDoc, 
+      getDoc, 
+      getDocs, 
+      updateDoc, 
+      deleteDoc,
+      onSnapshot, 
+      runTransaction, 
+      query, 
+      where, 
+      collection,
+      serverTimestamp,
+      arrayUnion,
+      deleteField
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Firebase config keys mapped from firebase_options.dart
+    const firebaseConfig = {
+      apiKey: 'AIzaSyDdhrfzSwv_oS8vSiGwouglxRMOFg4PHzE',
+      appId: '1:409694106333:web:39cc514cc46b7ffe202134',
+      messagingSenderId: '409694106333',
+      projectId: 'datedash-35789',
+      authDomain: 'datedash-35789.firebaseapp.com',
+      storageBucket: 'datedash-35789.firebasestorage.app',
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Audio chime generator using Web Audio API (so we don't need audio files)
+    function playChime(freq1 = 523.25, freq2 = 659.25, duration = 0.3) {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+
+        osc1.type = 'sine';
+        osc2.type = 'sine';
+        
+        osc1.frequency.setValueAtTime(freq1, audioCtx.currentTime); // C5
+        osc2.frequency.setValueAtTime(freq2, audioCtx.currentTime + 0.1); // E5
+
+        gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+        osc1.connect(gainNode);
+        osc2.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        osc1.start();
+        osc2.start();
+        
+        osc1.stop(audioCtx.currentTime + duration);
+        osc2.stop(audioCtx.currentTime + duration);
+      } catch (e) {
+        console.error("Audio playback error:", e);
+      }
+    }
+
+    // Console Logging helper
+    const consoleLogs = document.getElementById('consoleLogs');
+    function log(message, type = 'Info') {
+      const entry = document.createElement('div');
+      entry.className = 'console-entry';
+      const now = new Date();
+      const timeStr = now.toTimeString().split(' ')[0];
+      entry.innerHTML = `<span class="console-time">[${timeStr}] [${type}]</span> ${message}`;
+      consoleLogs.appendChild(entry);
+      consoleLogs.scrollTop = consoleLogs.scrollHeight;
+    }
+
+    // UI state switcher
+    const stateIdle = document.getElementById('stateIdle');
+    const stateSearching = document.getElementById('stateSearching');
+    const stateProposed = document.getElementById('stateProposed');
+    const stateCallActive = document.getElementById('stateCallActive');
+    const configFormInputs = document.querySelectorAll('#configForm input, #configForm select');
+
+    function setUIState(state) {
+      stateIdle.style.display = 'none';
+      stateSearching.style.display = 'none';
+      stateProposed.style.display = 'none';
+      stateCallActive.style.display = 'none';
+
+      if (state === 'idle') {
+        stateIdle.style.display = 'block';
+        configFormInputs.forEach(el => el.disabled = false);
+        document.getElementById('startBtn').disabled = false;
+      } else if (state === 'searching') {
+        stateSearching.style.display = 'block';
+        configFormInputs.forEach(el => el.disabled = true);
+        document.getElementById('startBtn').disabled = true;
+      } else if (state === 'proposed') {
+        stateProposed.style.display = 'block';
+      } else if (state === 'callActive') {
+        stateCallActive.style.display = 'block';
+      }
+    }
+
+    // Matchmaking State variables
+    let currentTicketUnsubscribe = null;
+    let poolSubscription = null;
+    let searchTimer = null;
+    let activeChannelId = null;
+    let activeProposal = null;
+    let matchLoopRunning = false; // prevent concurrent loops
+
+    // Start matchmaking process
+    async function startMatchmaking() {
+      const uid = document.getElementById('profileUid').value.trim();
+      const name = document.getElementById('profileName').value.trim();
+      const gender = document.getElementById('profileGender').value;
+      const age = parseInt(document.getElementById('profileAge').value);
+      const country = document.getElementById('profileCountry').value.trim();
+      const language = document.getElementById('profileLanguage').value.trim();
+
+      const filterGender = document.getElementById('filterGender').value;
+      const filterMinAge = parseInt(document.getElementById('filterMinAge').value);
+      const filterMaxAge = parseInt(document.getElementById('filterMaxAge').value);
+      const filterCountry = document.getElementById('filterCountry').value.trim();
+      const filterLanguage = document.getElementById('filterLanguage').value.trim();
+
+      if (!uid || !name) {
+        alert("Please enter a UID and Display Name!");
+        return;
+      }
+
+      log(`Connecting as user ${name} (${uid})...`, 'Firebase');
+      setUIState('searching');
+
+      // Create ticket
+      const ticketRef = doc(db, 'video_chat_waiting', uid);
+      const existingSnap = await getDoc(ticketRef);
+      const existingData = existingSnap.exists() ? existingSnap.data() : null;
+
+      // Reset ticket parameters
+      const myTicket = {
+        uid: uid,
+        name: name,
+        photo: '',
+        gender: gender,
+        age: age,
+        country: country,
+        languages: [language],
+        filterLanguage: filterLanguage,
+        filterGender: filterGender,
+        filterMinAge: filterMinAge,
+        filterMaxAge: filterMaxAge,
+        filterCountry: filterCountry,
+        status: 'waiting',
+        matchedWith: null,
+        channelId: null,
+        isHost: false,
+        accepted: false,
+        partnerName: null,
+        partnerPhoto: null,
+        partnerGender: null,
+        partnerAge: null,
+        partnerCountry: null,
+        skippedUserIds: existingData?.skippedUserIds || [],
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+
+      try {
+        await setDoc(ticketRef, myTicket, { merge: true });
+        log("Matchmaking ticket submitted to database.", "Firestore");
+
+        // Listen to active pool count
+        const poolQuery = query(collection(db, 'video_chat_waiting'), where('status', '==', 'waiting'));
+        poolSubscription = onSnapshot(poolQuery, (snap) => {
+          document.getElementById('activeUserCount').innerText = `${snap.docs.length} users in the matching queue`;
+        });
+
+        // Listen to ticket state updates
+        currentTicketUnsubscribe = onSnapshot(ticketRef, (docSnap) => {
+          if (!docSnap.exists()) return;
+          const data = docSnap.data();
+
+          if (data.status === 'proposed' && data.matchedWith) {
+            log(`Proposed match found with ${data.partnerName}!`, 'Matchmaker');
+            playChime(587.33, 783.99, 0.4); // Play match alert
+            activeProposal = data;
+            
+            // Render proposal
+            document.getElementById('partnerNameText').innerText = `${data.partnerName}, ${data.partnerAge || '?'}`;
+            document.getElementById('partnerMetaText').innerText = `${data.partnerGender} • ${data.partnerCountry || 'Unknown'}`;
+            if (data.partnerPhoto) {
+              document.getElementById('partnerAvatarContainer').innerHTML = `<img src="${data.partnerPhoto}" alt="Avatar">`;
+            } else {
+              document.getElementById('partnerAvatarContainer').innerHTML = `<i data-lucide="user" style="font-size: 2.5rem;"></i>`;
+              lucide.createIcons();
+            }
+
+            document.getElementById('acceptWaitingMsg').style.display = data.accepted ? 'block' : 'none';
+            document.getElementById('proposalActionButtons').style.display = data.accepted ? 'none' : 'flex';
+
+            setUIState('proposed');
+          } else if (data.status === 'matched') {
+            log(`Match accepted and confirmed!`, 'Matchmaker');
+            activeChannelId = data.channelId;
+            document.getElementById('callPartnerNameText').innerText = data.partnerName;
+            setUIState('callActive');
+            playChime(523.25, 659.25, 0.6); // success sound
+            
+            // Automatically launch room link in new window/tab
+            joinJitsiRoom(data.channelId);
+          } else if (data.status === 'waiting' && activeProposal) {
+            log(`Match declined or timed out. Re-entering queue...`, 'Matchmaker');
+            activeProposal = null;
+            setUIState('searching');
+          }
+        });
+
+        // Start checking for matches — add small random jitter so PC and phone
+        // don't try to propose to each other at the exact same millisecond,
+        // which causes both Firestore transactions to abort.
+        const jitter = Math.floor(Math.random() * 1500);
+        log(`Starting match finder in ${jitter}ms (jitter to avoid race conditions)...`, 'System');
+        setTimeout(() => {
+          runMatchFinderLoop(uid, myTicket);
+          searchTimer = setInterval(() => {
+            runMatchFinderLoop(uid, myTicket);
+          }, 5000);
+        }, jitter);
+
+      } catch (err) {
+        log(`Error starting matchmaker: ${err.message}`, 'Error');
+        cancelMatchmaking();
+      }
+    }
+
+    // Client-side match finding logic matching video_chat_service.dart
+    async function runMatchFinderLoop(currentUserId, myProfile) {
+      if (matchLoopRunning) return; // prevent concurrent runs
+      matchLoopRunning = true;
+      try {
+        const ticketRef = doc(db, 'video_chat_waiting', currentUserId);
+        const mySnap = await getDoc(ticketRef);
+        if (!mySnap.exists()) return;
+        const myData = mySnap.data();
+
+        if (myData.status !== 'waiting') return;
+
+        // Fetch all waiting candidates
+        const q = query(collection(db, 'video_chat_waiting'), where('status', '==', 'waiting'));
+        const snap = await getDocs(q);
+
+        for (const docObj of snap.docs) {
+          const data = docObj.data();
+          const candidateId = data.uid || docObj.id;
+
+          if (candidateId === currentUserId) continue;
+          if (data.status !== 'waiting') continue;
+          if (myData.skippedUserIds && myData.skippedUserIds.includes(candidateId)) continue;
+          if (data.skippedUserIds && data.skippedUserIds.includes(currentUserId)) continue;
+
+          // Check if candidate matches my filters
+          const genderMatch = myProfile.filterGender === 'Any' || normalizeGender(data.gender) === normalizeGender(myProfile.filterGender);
+          const ageMatch = data.age >= myProfile.filterMinAge && data.age <= myProfile.filterMaxAge;
+          
+          let countryMatch = myProfile.filterCountry === 'Any' || 
+            (data.country || '').toLowerCase().includes(myProfile.filterCountry.toLowerCase()) || 
+            myProfile.filterCountry.toLowerCase().includes((data.country || '').toLowerCase());
+            
+          let languageMatch = myProfile.filterLanguage === 'Any' || 
+            (data.languages || []).some(lang => textMatches(lang, myProfile.filterLanguage));
+
+          log(`Checking candidate ${data.name}: genderMatch=${genderMatch} (${data.gender} vs ${myProfile.filterGender}), ageMatch=${ageMatch} (${data.age} vs ${myProfile.filterMinAge}-${myProfile.filterMaxAge}), countryMatch=${countryMatch}, languageMatch=${languageMatch}`, 'Debug');
+
+          if (!genderMatch || !ageMatch || !countryMatch || !languageMatch) continue;
+
+          // Check if I match candidate's filters
+          const candFilterGender = data.filterGender || 'Any';
+          const candFilterMinAge = data.filterMinAge || 18;
+          const candFilterMaxAge = data.filterMaxAge || 80;
+          const candFilterCountry = data.filterCountry || 'Any';
+          const candFilterLanguage = data.filterLanguage || 'Any';
+
+          const candGenderMatch = candFilterGender === 'Any' || normalizeGender(myProfile.gender) === normalizeGender(candFilterGender);
+          const candAgeMatch = myProfile.age >= candFilterMinAge && myProfile.age <= candFilterMaxAge;
+
+          let candCountryMatch = candFilterCountry === 'Any' || 
+            (myProfile.country || '').toLowerCase().includes(candFilterCountry.toLowerCase()) || 
+            candFilterCountry.toLowerCase().includes((myProfile.country || '').toLowerCase());
+
+          let candLanguageMatch = candFilterLanguage === 'Any' || 
+            (myProfile.languages || []).some(lang => textMatches(lang, candFilterLanguage));
+
+          log(`Candidate ${data.name}'s filters: candGenderMatch=${candGenderMatch} (${myProfile.gender} vs ${candFilterGender}), candAgeMatch=${candAgeMatch} (${myProfile.age} vs ${candFilterMinAge}-${candFilterMaxAge}), candCountryMatch=${candCountryMatch}, candLanguageMatch=${candLanguageMatch}`, 'Debug');
+
+          if (!candGenderMatch || !candAgeMatch || !candCountryMatch || !candLanguageMatch) continue;
+
+          // Match found! Run transaction
+          const channelId = `${candidateId}_${currentUserId}`;
+          let proposed = false;
+
+          log(`Attempting match transaction with ${data.name}...`, 'Matchmaker');
+
+          try {
+            await runTransaction(db, async (transaction) => {
+              const currentSnapTx = await transaction.get(ticketRef);
+              const candidateRef = doc(db, 'video_chat_waiting', candidateId);
+              const candidateSnapTx = await transaction.get(candidateRef);
+
+              if (!currentSnapTx.exists() || !candidateSnapTx.exists()) return;
+              
+              const currentTxData = currentSnapTx.data();
+              const candidateTxData = candidateSnapTx.data();
+
+              if (currentTxData.status !== 'waiting' || candidateTxData.status !== 'waiting') return;
+
+              // Propose match
+              transaction.update(candidateRef, {
+                status: 'proposed',
+                matchedWith: currentUserId,
+                channelId: channelId,
+                isHost: false,
+                accepted: false,
+                partnerName: myProfile.name,
+                partnerPhoto: myProfile.photo,
+                partnerGender: myProfile.gender,
+                partnerAge: myProfile.age,
+                partnerCountry: myProfile.country,
+                updatedAt: serverTimestamp()
+              });
+
+              transaction.update(ticketRef, {
+                status: 'proposed',
+                matchedWith: candidateId,
+                channelId: channelId,
+                isHost: true,
+                accepted: false,
+                partnerName: data.name,
+                partnerPhoto: data.photo || '',
+                partnerGender: data.gender,
+                partnerAge: data.age,
+                partnerCountry: data.country || 'Unknown',
+                updatedAt: serverTimestamp()
+              });
+
+              proposed = true;
+            });
+
+            if (proposed) {
+              log(`Transaction succeeded. Proposed channel: ${channelId}`, 'Matchmaker');
+              break;
+            }
+          } catch (txError) {
+            log(`Transaction failed: ${txError.message || txError}`, 'Error');
+          }
+        }
+      } catch (err) {
+        log(`Error in matchmaking loop: ${err.message || err}`, 'Error');
+      } finally {
+        matchLoopRunning = false;
+      }
+    }
+
+    // Cancel Matchmaking
+    async function cancelMatchmaking() {
+      const uid = document.getElementById('profileUid').value.trim();
+      log("Cancelling matching and resetting state...", "System");
+      
+      if (searchTimer) {
+        clearInterval(searchTimer);
+        searchTimer = null;
+      }
+      if (currentTicketUnsubscribe) {
+        currentTicketUnsubscribe();
+        currentTicketUnsubscribe = null;
+      }
+      if (poolSubscription) {
+        poolSubscription();
+        poolSubscription = null;
+      }
+
+      if (uid) {
+        try {
+          await deleteDoc(doc(db, 'video_chat_waiting', uid));
+        } catch (_) {}
+      }
+
+      activeProposal = null;
+      activeChannelId = null;
+      setUIState('idle');
+    }
+
+    // Accept Match Proposal
+    async function acceptMatch() {
+      const uid = document.getElementById('profileUid').value.trim();
+      if (!activeProposal || !uid) return;
+
+      log("Accepting match proposal...", "Matchmaker");
+      document.getElementById('proposalActionButtons').style.display = 'none';
+      document.getElementById('acceptWaitingMsg').style.display = 'block';
+
+      try {
+        await runTransaction(db, async (transaction) => {
+          const myRef = doc(db, 'video_chat_waiting', uid);
+          const mySnap = await transaction.get(myRef);
+          if (!mySnap.exists()) return;
+          const myData = mySnap.data();
+
+          if (myData.status !== 'proposed') return;
+
+          const partnerId = myData.matchedWith;
+          const channelId = myData.channelId;
+
+          const partnerRef = doc(db, 'video_chat_waiting', partnerId);
+          const partnerSnap = await transaction.get(partnerRef);
+          
+          transaction.update(myRef, {
+            accepted: true,
+            updatedAt: serverTimestamp()
+          });
+
+          // Check if partner has already accepted
+          if (partnerSnap.exists() && 
+              partnerSnap.data().status === 'proposed' && 
+              partnerSnap.data().matchedWith === uid && 
+              partnerSnap.data().accepted === true) {
+            
+            // Both accepted! Transition to matched
+            transaction.update(myRef, {
+              status: 'matched',
+              updatedAt: serverTimestamp()
+            });
+
+            transaction.update(partnerRef, {
+              status: 'matched',
+              updatedAt: serverTimestamp()
+            });
+
+            // Set Call Session
+            transaction.set(doc(db, 'video_chat_calls', channelId), {
+              channelId: channelId,
+              hostId: myData.isHost ? uid : partnerId,
+              guestId: myData.isHost ? partnerId : uid,
+              status: 'active',
+              startedAt: serverTimestamp(),
+              endedBy: null
+            }, { merge: true });
+          }
+        });
+      } catch (err) {
+        log(`Error accepting match: ${err.message}`, 'Error');
+      }
+    }
+
+    // Decline Proposal
+    async function declineMatch() {
+      const uid = document.getElementById('profileUid').value.trim();
+      if (!activeProposal || !uid) return;
+
+      log("Declining match proposal...", "Matchmaker");
+
+      try {
+        const myRef = doc(db, 'video_chat_waiting', uid);
+        const mySnap = await getDoc(myRef);
+        const myData = mySnap.exists() ? mySnap.data() : null;
+        const partnerId = myData?.matchedWith;
+
+        const resetData = (skippedId) => ({
+          status: 'waiting',
+          matchedWith: deleteField(),
+          channelId: deleteField(),
+          isHost: false,
+          accepted: false,
+          partnerName: deleteField(),
+          partnerPhoto: deleteField(),
+          partnerGender: deleteField(),
+          partnerAge: deleteField(),
+          partnerCountry: deleteField(),
+          updatedAt: serverTimestamp(),
+          skippedUserIds: arrayUnion(skippedId)
+        });
+
+        await updateDoc(myRef, resetData(partnerId));
+        if (partnerId) {
+          await updateDoc(doc(db, 'video_chat_waiting', partnerId), resetData(uid));
+        }
+
+        activeProposal = null;
+        setUIState('searching');
+      } catch (err) {
+        log(`Error declining match: ${err.message}`, 'Error');
+      }
+    }
+
+    // End call session
+    async function endCall() {
+      const uid = document.getElementById('profileUid').value.trim();
+      if (!activeChannelId || !uid) return;
+
+      log("Ending call session...", "Call");
+
+      try {
+        await updateDoc(doc(db, 'video_chat_calls', activeChannelId), {
+          status: 'ended',
+          endedBy: uid,
+          endedAt: serverTimestamp()
+        });
+      } catch (_) {}
+
+      try {
+        await deleteDoc(doc(db, 'video_chat_waiting', uid));
+      } catch (_) {}
+
+      activeProposal = null;
+      activeChannelId = null;
+      setUIState('idle');
+    }
+
+    // Next call: ends current call and immediately re-enters matchmaking
+    async function nextCall() {
+      const uid = document.getElementById('profileUid').value.trim();
+      if (!activeChannelId || !uid) return;
+
+      log("Skipping call & going to next...", "Call");
+
+      try {
+        await updateDoc(doc(db, 'video_chat_calls', activeChannelId), {
+          status: 'ended',
+          endedBy: uid,
+          endedAt: serverTimestamp()
+        });
+      } catch (_) {}
+
+      try {
+        await deleteDoc(doc(db, 'video_chat_waiting', uid));
+      } catch (_) {}
+
+      activeProposal = null;
+      activeChannelId = null;
+
+      if (searchTimer) {
+        clearInterval(searchTimer);
+        searchTimer = null;
+      }
+      if (currentTicketUnsubscribe) {
+        currentTicketUnsubscribe();
+        currentTicketUnsubscribe = null;
+      }
+      if (poolSubscription) {
+        poolSubscription();
+        poolSubscription = null;
+      }
+
+      await startMatchmaking();
+    }
+
+    // Opens Jitsi Meet URL
+    function joinJitsiRoom(channelId = activeChannelId) {
+      if (!channelId) return;
+      const sanitizedRoom = encodeURIComponent(channelId.trim());
+      const jitsiUrl = `https://meet.ffmuc.net/${sanitizedRoom}#config.prejoinPageEnabled=false`;
+      log(`Opening Jitsi Room: ${jitsiUrl}`, 'Call');
+      window.open(jitsiUrl, '_blank');
+    }
+
+    // Normalize utilities — handles Flutter's capitalized Male/Female as well as pc_tester
+    function normalizeGender(value) {
+      if (!value) return '';
+      const normalized = value.trim().toLowerCase();
+      if (normalized === 'men' || normalized === 'man' || normalized === 'male') return 'male';
+      if (normalized === 'women' || normalized === 'woman' || normalized === 'female') return 'female';
+      if (normalized === 'any') return 'any';
+      return normalized;
+    }
+
+    function textMatches(left, right) {
+      const a = (left || '').trim().toLowerCase();
+      const b = (right || '').trim().toLowerCase();
+      return a === b || a.includes(b) || b.includes(a);
+    }
+
+    // Event Bindings
+    document.getElementById('startBtn').addEventListener('click', startMatchmaking);
+    document.getElementById('cancelMatchBtn').addEventListener('click', cancelMatchmaking);
+    document.getElementById('acceptBtn').addEventListener('click', acceptMatch);
+    document.getElementById('declineBtn').addEventListener('click', declineMatch);
+    document.getElementById('openRoomBtn').addEventListener('click', () => joinJitsiRoom());
+    document.getElementById('endCallBtn').addEventListener('click', endCall);
+    document.getElementById('nextCallBtn').addEventListener('click', nextCall);
+
+    // Initialize Lucide icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>

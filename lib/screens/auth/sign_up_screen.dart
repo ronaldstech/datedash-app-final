@@ -67,7 +67,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       );
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final String? countryCode = data['countryCode']; // ip-api uses countryCode
+        final String? countryCode =
+            data['countryCode']; // ip-api uses countryCode
         if (countryCode != null && countryCode.length == 2 && mounted) {
           setState(() {
             _detectedCountryCode = countryCode.toUpperCase();
@@ -86,8 +87,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
         _phoneNumber.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text(
-                context.read<LanguageProvider>().getString('fill_all_fields'))),
+          content: Text(
+            context.read<LanguageProvider>().getString('fill_all_fields'),
+          ),
+        ),
       );
       return;
     }
@@ -125,16 +128,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
       await _emailVerificationService.requestCode(email);
     } on EmailVerificationException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message)));
       }
       return false;
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Could not send verification email. Please try again.'),
+            content: Text(
+              'Could not send verification email. Please try again.',
+            ),
           ),
         );
       }
@@ -143,9 +148,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     if (!mounted) return false;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Verification code sent to $email')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Verification code sent to $email')));
 
     final codeController = TextEditingController();
     final isVerified = await showDialog<bool>(
@@ -288,9 +293,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -311,7 +316,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             children: [
               Center(
                 child: Image.asset(
-                  'assets/images/signlogo.png',
+                  'assets/images/newlogo.png',
                   height: 120,
                   fit: BoxFit.cover,
                 ),
@@ -330,10 +335,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               Text(
                 languageProvider.getString('signup_sub'),
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
+                style: const TextStyle(fontSize: 16, color: Colors.grey),
               ),
               const SizedBox(height: 12),
               _buildTextField(
@@ -354,11 +356,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: Theme.of(context).dividerColor.withValues(alpha: 	0.4),
+                    color: Theme.of(
+                      context,
+                    ).dividerColor.withValues(alpha: 0.4),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 	0.02),
+                      color: Colors.black.withValues(alpha: 0.02),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -369,10 +373,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     hintText: 'Phone Number',
                     counterText: "",
                     hintStyle: TextStyle(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurfaceVariant
-                          .withValues(alpha: 	0.6),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                       fontSize: 15,
                     ),
                     border: OutlineInputBorder(
@@ -390,12 +393,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     filled: true,
                     fillColor: Colors.transparent,
                     contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 16),
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
                     prefixIcon: Container(
                       padding: const EdgeInsets.all(12),
-                      child: Icon(Iconsax.mobile,
-                          color: Theme.of(context).colorScheme.primary,
-                          size: 22),
+                      child: Icon(
+                        Iconsax.mobile,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 22,
+                      ),
                     ),
                   ),
                   initialCountryCode: _detectedCountryCode,
@@ -408,14 +415,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   pickerDialogStyle: PickerDialogStyle(
                     backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                     countryCodeStyle: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface),
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                     countryNameStyle: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface),
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                     searchFieldInputDecoration: InputDecoration(
                       hintText: 'Search country',
                       prefixIcon: const Icon(Icons.search),
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                   flagsButtonPadding: const EdgeInsets.only(left: 8),
@@ -448,7 +458,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   elevation: 5,
-                  shadowColor: const Color(0xFFFF4D85).withValues(alpha: 	0.5),
+                  shadowColor: const Color(0xFFFF4D85).withValues(alpha: 0.5),
                 ),
                 child: _isLoading
                     ? const SizedBox(
@@ -527,7 +537,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).dividerColor.withValues(alpha: 	0.4),
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.4),
         ),
       ),
       child: TextField(
@@ -537,8 +547,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle:
-              TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+          hintStyle: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
           prefixIcon: Icon(icon, color: Theme.of(context).colorScheme.primary),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
@@ -546,8 +557,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
           filled: true,
           fillColor: Colors.transparent,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 16,
+          ),
         ),
       ),
     );

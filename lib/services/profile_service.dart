@@ -81,6 +81,7 @@ class ProfileService {
     final filterEducationLevel =
         currentUserProfile.filterEducationLevel ?? 'Any';
     final filterVerifiedOnly = currentUserProfile.filterVerifiedOnly;
+    final filterOnlineOnly = currentUserProfile.filterOnlineOnly;
     final filterKids = currentUserProfile.filterKids ?? 'Any';
     final filterPets = currentUserProfile.filterPets ?? 'Any';
     final filterIntrovertExtrovert =
@@ -129,6 +130,9 @@ class ProfileService {
       }
       if (filterVerifiedOnly) {
         if (profile.isVerified != true) continue;
+      }
+      if (filterOnlineOnly) {
+        if (profile.isOnline != true) continue;
       }
       if (filterKids != 'Any' && filterKids.isNotEmpty) {
         if (profile.wantKids != filterKids) continue;

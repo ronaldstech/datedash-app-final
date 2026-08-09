@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 import '../providers/profile_provider.dart';
 import '../services/chat_service.dart';
@@ -42,10 +44,14 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
+  WebViewController? _webViewController;
+  CameraController? _cameraController;
+  bool _isCameraInitialized = false;
+  bool _isVideoMuted = false;
+
   Timer? _durationTimer;
   StreamSubscription<DocumentSnapshot>? _callSessionSubscription;
   int _callDuration = 0;
-  bool _launchedRoom = false;
   bool _callLifecycleReady = false;
 
   @override
@@ -53,7 +59,9 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     super.initState();
     _secureScreen();
     _startTimer();
-    Future.delayed(const Duration(milliseconds: 500), _launchRoom);
+    _initInAppVideo();
+    _initLocalCamera();
+
     Future.delayed(const Duration(seconds: 2), () {
       if (!mounted) return;
       _callLifecycleReady = true;
@@ -66,22 +74,42 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     _clearSecureScreen();
     _durationTimer?.cancel();
     _callSessionSubscription?.cancel();
+    _cameraController?.dispose();
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
-  Future<void> _launchRoom() async {
-    if (_launchedRoom) return;
-    _launchedRoom = true;
-    final launched = await _jitsiCallService.launchRoom(
+  void _initInAppVideo() {
+    final roomUri = _jitsiCallService.buildRoomUri(
       roomName: widget.channelId,
       isVideo: true,
     );
-    if (!launched && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open the video room.')),
+    _webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(Colors.black)
+      ..loadRequest(roomUri);
+  }
+
+  void _initLocalCamera() async {
+    try {
+      final cameras = await availableCameras();
+      if (cameras.isEmpty) return;
+      final frontCamera = cameras.firstWhere(
+        (cam) => cam.lensDirection == CameraLensDirection.front,
+        orElse: () => cameras.first,
       );
+      _cameraController = CameraController(
+        frontCamera,
+        ResolutionPreset.medium,
+        enableAudio: false,
+      );
+      await _cameraController!.initialize();
+      if (mounted) {
+        setState(() => _isCameraInitialized = true);
+      }
+    } catch (e) {
+      debugPrint('Error initializing local camera preview for video call: $e');
     }
   }
 
@@ -280,6 +308,243 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     );
   }
 
+  void _showChatBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (modalContext) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final bool isUnlocked = _callDuration >= 60;
+
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.7,
+              decoration: const BoxDecoration(
+                color: Color(0xFF14141A),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+              ),
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                top: 14,
+                left: 16,
+                right: 16,
+              ),
+              child: Column(
+                children: [
+                  // Handle
+                  Container(
+                    width: 40,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Header
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 20,
+                        backgroundColor: const Color(0xFFFF4D85).withValues(alpha: 0.2),
+                        backgroundImage: widget.partnerPhoto.isNotEmpty
+                            ? NetworkImage(widget.partnerPhoto)
+                            : null,
+                        child: widget.partnerPhoto.isEmpty
+                            ? const Icon(Iconsax.user, color: Colors.white, size: 20)
+                            : null,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '1-on-1 Chat with ${widget.partnerName}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 16,
+                              ),
+                            ),
+                            Text(
+                              isUnlocked
+                                  ? '🔓 Messages save directly to Inbox'
+                                  : '🔒 Unlocks in ${60 - _callDuration}s...',
+                              style: TextStyle(
+                                color: isUnlocked
+                                    ? const Color(0xFF00E676)
+                                    : const Color(0xFFFF8C00),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(modalContext),
+                        icon: const Icon(Iconsax.close_circle, color: Colors.white54),
+                      ),
+                    ],
+                  ),
+                  const Divider(color: Colors.white12, height: 24),
+
+                  // Live Messages Stream
+                  Expanded(
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('video_chat_calls')
+                          .doc(widget.channelId)
+                          .collection('messages')
+                          .orderBy('timestamp', descending: false)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return const Center(
+                            child: CircularProgressIndicator(color: Color(0xFFFF4D85)),
+                          );
+                        }
+                        final docs = snapshot.data!.docs;
+                        _scrollToBottom();
+
+                        if (docs.isEmpty) {
+                          return Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Iconsax.message_text,
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  size: 48,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  isUnlocked
+                                      ? 'Say hi to ${widget.partnerName}!'
+                                      : 'Chat unlocks after 60 seconds of call',
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.5),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+
+                        return ListView.builder(
+                          controller: _scrollController,
+                          itemCount: docs.length,
+                          itemBuilder: (context, index) {
+                            final data = docs[index].data() as Map<String, dynamic>;
+                            final senderName = data['senderName'] ?? 'User';
+                            final message = data['message'] ?? '';
+                            final myUid = context.read<ProfileProvider>().userProfile?.uid;
+                            final isMe = data['senderId'] == myUid;
+
+                            return Align(
+                              alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(vertical: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: isMe
+                                      ? const Color(0xFFFF4D85)
+                                      : Colors.white.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Text(
+                                  isMe ? message : '$senderName: $message',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Input Box
+                  TextField(
+                    controller: _messageController,
+                    enabled: isUnlocked,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      hintText: isUnlocked
+                          ? 'Type a message (saves to Inbox)...'
+                          : 'Chat unlocks in ${60 - _callDuration}s...',
+                      hintStyle: TextStyle(
+                        color: isUnlocked
+                            ? Colors.white54
+                            : Colors.white.withValues(alpha: 0.35),
+                      ),
+                      filled: true,
+                      fillColor: Colors.black.withValues(alpha: 0.4),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24),
+                        borderSide: BorderSide(
+                          color: isUnlocked
+                              ? const Color(0xFFFF4D85)
+                              : Colors.white12,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24),
+                        borderSide: BorderSide(
+                          color: isUnlocked
+                              ? const Color(0xFFFF4D85).withValues(alpha: 0.6)
+                              : Colors.white12,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24),
+                        borderSide: const BorderSide(
+                          color: Color(0xFFFF4D85),
+                          width: 1.5,
+                        ),
+                      ),
+                      suffixIcon: IconButton(
+                        onPressed: isUnlocked
+                            ? () {
+                                _sendMessage();
+                                setModalState(() {});
+                              }
+                            : null,
+                        icon: Icon(
+                          Iconsax.send_15,
+                          color: isUnlocked
+                              ? const Color(0xFFFF4D85)
+                              : Colors.white24,
+                        ),
+                      ),
+                    ),
+                    onSubmitted: (_) {
+                      if (isUnlocked) {
+                        _sendMessage();
+                        setModalState(() {});
+                      }
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   String _formatDuration(int seconds) {
     final min = (seconds ~/ 60).toString().padLeft(2, '0');
     final sec = (seconds % 60).toString().padLeft(2, '0');
@@ -296,7 +561,14 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            Positioned.fill(child: _buildBackdrop(userPhoto)),
+            // WhatsApp-style Remote Video View (In-App WebView Jitsi Stream)
+            Positioned.fill(
+              child: _webViewController != null
+                  ? WebViewWidget(controller: _webViewController!)
+                  : _buildBackdrop(userPhoto),
+            ),
+
+            // Gradient Overlay for readability
             Positioned.fill(
               child: DecoratedBox(
                 decoration: BoxDecoration(
@@ -304,34 +576,75 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.black.withValues(alpha: 0.4),
-                      Colors.black.withValues(alpha: 0.15),
-                      Colors.black.withValues(alpha: 0.85),
+                      Colors.black.withValues(alpha: 0.45),
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: 0.8),
                     ],
                   ),
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 20),
-              child: Column(
-                children: [
-                  _buildTopBar(),
-                  const Spacer(),
-                  _buildRoomCard(),
-                  const SizedBox(height: 12),
-                  if (_callDuration < 60)
-                    _buildUnlockProgressWidget()
-                  else
-                    _buildUnlockedBanner(),
-                  const SizedBox(height: 12),
-                  _buildMessages(),
-                  const SizedBox(height: 12),
-                  _buildMessageInput(),
-                  const SizedBox(height: 14),
-                  _buildControls(),
-                ],
+
+            // Top Header Bar
+            Positioned(
+              top: 14,
+              left: 16,
+              right: 16,
+              child: _buildTopBar(),
+            ),
+
+            // Floating Local Camera Preview Card (Picture-in-Picture)
+            Positioned(
+              top: 80,
+              right: 16,
+              child: Container(
+                width: 110,
+                height: 155,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: const Color(0xFFFF4D85).withValues(alpha: 0.6),
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.6),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: _isVideoMuted ||
+                          !_isCameraInitialized ||
+                          _cameraController == null ||
+                          !_cameraController!.value.isInitialized
+                      ? Container(
+                          color: const Color(0xFF15151A),
+                          child: const Center(
+                            child: Icon(Iconsax.user, color: Colors.white54, size: 36),
+                          ),
+                        )
+                      : FittedBox(
+                          fit: BoxFit.cover,
+                          child: SizedBox(
+                            width: _cameraController!.value.previewSize?.height ?? 100,
+                            height: _cameraController!.value.previewSize?.width ?? 100,
+                            child: CameraPreview(_cameraController!),
+                          ),
+                        ),
+                ),
               ),
+            ),
+
+            // Redesigned Control Bar at the Bottom
+            Positioned(
+              bottom: 24,
+              left: 16,
+              right: 16,
+              child: _buildControls(),
             ),
           ],
         ),
@@ -431,336 +744,98 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     );
   }
 
-  Widget _buildRoomCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Iconsax.video_tick, color: Color(0xFFFF4D85), size: 24),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  'Live Call with ${widget.partnerName}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 17,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          ElevatedButton.icon(
-            onPressed: _launchRoom,
-            icon: const Icon(Iconsax.export_3, size: 18),
-            label: const Text('Open Video Call Room', style: TextStyle(fontWeight: FontWeight.w800)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF4D85),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 11),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildUnlockProgressWidget() {
+  Widget _buildControls() {
     final double progress = (_callDuration / 60.0).clamp(0.0, 1.0);
-    final int secondsLeft = 60 - _callDuration;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.65),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: const Color(0xFFFF4D85).withValues(alpha: 0.4),
-          width: 1.2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFFF4D85).withValues(alpha: 0.2),
-            blurRadius: 16,
-            spreadRadius: 1,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFF4D85).withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Iconsax.lock_1,
-                  color: Color(0xFFFF4D85),
-                  size: 16,
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: Text(
-                  '1-on-1 Chat Unlocks in Video Call',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 13,
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFF4D85),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  '${secondsLeft}s',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-
-          // Glowing Linear Progress Bar
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Stack(
-              children: [
-                Container(
-                  height: 10,
-                  width: double.infinity,
-                  color: Colors.white.withValues(alpha: 0.12),
-                ),
-                FractionallySizedBox(
-                  widthFactor: progress,
-                  child: Container(
-                    height: 10,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFFF4D85), Color(0xFFFF8C00)],
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFFF4D85).withValues(alpha: 0.6),
-                          blurRadius: 6,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Video chat for 60s to unlock permanent messaging',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.7),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Text(
-                '${(progress * 100).toInt()}%',
-                style: const TextStyle(
-                  color: Color(0xFFFF8C00),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildUnlockedBanner() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            const Color(0xFF00E676).withValues(alpha: 0.25),
-            const Color(0xFF00B0FF).withValues(alpha: 0.25),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFF00E676).withValues(alpha: 0.5),
-        ),
-      ),
-      child: Row(
-        children: const [
-          Icon(Iconsax.unlock5, color: Color(0xFF00E676), size: 18),
-          SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              '🔓 Real Messages Unlocked! Saved directly to your Chats inbox.',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-                fontSize: 12,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMessages() {
-    return SizedBox(
-      height: 120,
-      child: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('video_chat_calls')
-            .doc(widget.channelId)
-            .collection('messages')
-            .orderBy('timestamp', descending: false)
-            .limit(20)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) return const SizedBox();
-          final docs = snapshot.data!.docs;
-          _scrollToBottom();
-          return ListView.builder(
-            controller: _scrollController,
-            itemCount: docs.length,
-            itemBuilder: (context, index) {
-              final data = docs[index].data() as Map<String, dynamic>;
-              final senderName = data['senderName'] ?? 'User';
-              final message = data['message'] ?? '';
-              final myUid = context.read<ProfileProvider>().userProfile?.uid;
-              final isMe = data['senderId'] == myUid;
-
-              return Align(
-                alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                child: Container(
-                  margin: const EdgeInsets.symmetric(vertical: 3),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isMe
-                        ? const Color(0xFFFF4D85).withValues(alpha: 0.85)
-                        : Colors.black.withValues(alpha: 0.6),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: isMe
-                          ? Colors.transparent
-                          : Colors.white.withValues(alpha: 0.15),
-                    ),
-                  ),
-                  child: Text(
-                    isMe ? message : '$senderName: $message',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                    ),
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildMessageInput() {
     final bool isUnlocked = _callDuration >= 60;
 
-    return TextField(
-      controller: _messageController,
-      enabled: isUnlocked,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        hintText: isUnlocked
-            ? 'Type a message (saves to Chats)...'
-            : 'Chat unlocks in ${60 - _callDuration}s...',
-        hintStyle: TextStyle(
-          color: isUnlocked
-              ? Colors.white70
-              : Colors.white.withValues(alpha: 0.45),
-        ),
-        filled: true,
-        fillColor: Colors.black.withValues(alpha: 0.65),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(24),
-          borderSide: BorderSide(
-            color: isUnlocked
-                ? const Color(0xFFFF4D85).withValues(alpha: 0.6)
-                : Colors.white.withValues(alpha: 0.16),
-          ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(24),
-          borderSide: BorderSide(
-            color: isUnlocked
-                ? const Color(0xFFFF4D85).withValues(alpha: 0.6)
-                : Colors.white.withValues(alpha: 0.16),
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(24),
-          borderSide: const BorderSide(
-            color: Color(0xFFFF4D85),
-            width: 1.5,
-          ),
-        ),
-        suffixIcon: IconButton(
-          onPressed: isUnlocked ? _sendMessage : null,
-          icon: Icon(
-            Iconsax.send_15,
-            color: isUnlocked
-                ? const Color(0xFFFF4D85)
-                : Colors.white.withValues(alpha: 0.3),
-          ),
-        ),
-      ),
-      onSubmitted: (_) => _sendMessage(),
-    );
-  }
-
-  Widget _buildControls() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _roundButton(Iconsax.video, const Color(0xFFFF4D85), _launchRoom),
+        // Button 1: Camera Mute Toggle
+        _roundButton(
+          _isVideoMuted ? Iconsax.video_slash : Iconsax.video,
+          _isVideoMuted ? Colors.white30 : const Color(0xFFFF4D85),
+          () => setState(() => _isVideoMuted = !_isVideoMuted),
+        ),
+
+        // Button 2: Redesigned 1-on-1 Chat Button with Circular Progress Border Ring
+        GestureDetector(
+          onTap: _showChatBottomSheet,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Circular Progress Indicator Ring around the button
+              SizedBox(
+                width: 66,
+                height: 66,
+                child: CircularProgressIndicator(
+                  value: progress,
+                  strokeWidth: 3.5,
+                  backgroundColor: Colors.white.withValues(alpha: 0.15),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    isUnlocked ? const Color(0xFF00E676) : const Color(0xFFFF4D85),
+                  ),
+                ),
+              ),
+              // Main Circular Button
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: isUnlocked
+                      ? const LinearGradient(
+                          colors: [Color(0xFF00E676), Color(0xFF00B0FF)],
+                        )
+                      : const LinearGradient(
+                          colors: [Color(0xFFFF4D85), Color(0xFFFF8C00)],
+                        ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: (isUnlocked
+                              ? const Color(0xFF00E676)
+                              : const Color(0xFFFF4D85))
+                          .withValues(alpha: 0.45),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  isUnlocked ? Iconsax.message_text : Iconsax.lock_1,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+              // Timer tag badge when locked
+              if (!isUnlocked)
+                Positioned(
+                  bottom: 0,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFFFF4D85), width: 1),
+                    ),
+                    child: Text(
+                      '${60 - _callDuration}s',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+
+        // Button 3: Send Gift
         _roundButton(Iconsax.gift, Colors.amber, _showGifts),
+
+        // Button 4: End Call
         _roundButton(Iconsax.call_remove5, Colors.redAccent, _endCall),
       ],
     );

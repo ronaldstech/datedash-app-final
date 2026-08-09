@@ -27,6 +27,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
   late String _zodiac;
   late String _educationLevel;
   late bool _verifiedOnly;
+  late bool _onlineOnly;
   late String _kids;
   late String _pets;
   late String _introvertExtrovert;
@@ -65,6 +66,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
     'Any', 
     'Single', 
     'In a relationship', 
+    'In an open relationship',
     'Engaged', 
     'Married', 
     'Divorced', 
@@ -75,6 +77,8 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
     'Any', 
     'Christian', 
     'Muslim', 
+    'Jewish',
+    'Orthodox',
     'Hindu', 
     'Buddhist', 
     'Atheist', 
@@ -142,6 +146,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
     _zodiac = profile?.filterZodiac ?? 'Any';
     _educationLevel = profile?.filterEducationLevel ?? 'Any';
     _verifiedOnly = profile?.filterVerifiedOnly ?? false;
+    _onlineOnly = profile?.filterOnlineOnly ?? false;
     _kids = profile?.filterKids ?? 'Any';
     _pets = profile?.filterPets ?? 'Any';
     _introvertExtrovert = profile?.filterIntrovertExtrovert ?? 'Any';
@@ -170,6 +175,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
             filterZodiac: _zodiac,
             filterEducationLevel: _educationLevel,
             filterVerifiedOnly: _verifiedOnly,
+            filterOnlineOnly: _onlineOnly,
             filterKids: _kids,
             filterPets: _pets,
             filterIntrovertExtrovert: _introvertExtrovert,
@@ -818,6 +824,18 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                           value: _verifiedOnly,
                           activeColor: const Color(0xFFFF4D85),
                           onChanged: (val) => setState(() => _verifiedOnly = val),
+                          isPremiumLocked: !isPremium,
+                        ),
+                      ),
+                      
+                      // Online Status Only
+                      _buildGroupCard(
+                        child: _buildToggleRow(
+                          title: 'Online Now Only',
+                          subtitle: 'Only show users who are currently active.',
+                          value: _onlineOnly,
+                          activeColor: const Color(0xFF4CAF50),
+                          onChanged: (val) => setState(() => _onlineOnly = val),
                           isPremiumLocked: !isPremium,
                         ),
                       ),

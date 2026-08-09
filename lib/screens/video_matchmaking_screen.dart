@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
@@ -39,6 +40,9 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
   Timer? _searchRetryTimer;
   late AnimationController _pulseController;
 
+  CameraController? _cameraController;
+  bool _isCameraInitialized = false;
+
   bool _isSearching = false;
   bool _isAccepting = false;
   bool _navigatingToCall = false;
@@ -53,13 +57,37 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1400),
     )..repeat(reverse: true);
+    _initCamera();
     _listenToTicket();
     _search();
     _startSearchRetry();
   }
 
+  void _initCamera() async {
+    try {
+      final cameras = await availableCameras();
+      if (cameras.isEmpty) return;
+      final frontCamera = cameras.firstWhere(
+        (cam) => cam.lensDirection == CameraLensDirection.front,
+        orElse: () => cameras.first,
+      );
+      _cameraController = CameraController(
+        frontCamera,
+        ResolutionPreset.medium,
+        enableAudio: false,
+      );
+      await _cameraController!.initialize();
+      if (mounted) {
+        setState(() => _isCameraInitialized = true);
+      }
+    } catch (e) {
+      debugPrint('Error initializing camera preview for matchmaking: $e');
+    }
+  }
+
   @override
   void dispose() {
+    _cameraController?.dispose();
     _ticketSubscription?.cancel();
     _searchRetryTimer?.cancel();
     _pulseController.dispose();
@@ -245,6 +273,20 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
   }
 
   Widget _buildWaitingBackdrop(String currentPhoto) {
+    if (_isCameraInitialized &&
+        _cameraController != null &&
+        _cameraController!.value.isInitialized) {
+      return SizedBox.expand(
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: _cameraController!.value.previewSize?.height ?? 100,
+            height: _cameraController!.value.previewSize?.width ?? 100,
+            child: CameraPreview(_cameraController!),
+          ),
+        ),
+      );
+    }
     return DecoratedBox(
       decoration: const BoxDecoration(
         gradient: LinearGradient(

@@ -335,18 +335,6 @@ class _LiveListScreenState extends State<LiveListScreen>
       backgroundColor: isDark
           ? const Color(0xFF0D0D11)
           : const Color(0xFFF7F7F9),
-      appBar: AppBar(
-        title: Text(
-          lp.getString('video_chat'),
-          style: const TextStyle(
-            fontWeight: FontWeight.w900,
-            letterSpacing: -0.5,
-          ),
-        ),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ),
       body: Stack(
         children: [
           // Background decoration
@@ -379,10 +367,27 @@ class _LiveListScreenState extends State<LiveListScreen>
     final bool isPremium = pp.userProfile?.isPremium == true;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+      padding: EdgeInsets.fromLTRB(
+        20,
+        MediaQuery.of(context).padding.top + 16,
+        20,
+        100,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Inline header (scrolls with content)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(
+              lp.getString('video_chat'),
+              style: const TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 22,
+                letterSpacing: -0.5,
+              ),
+            ),
+          ),
           _buildHeroPanel(pp),
           const SizedBox(height: 18),
           _buildQuickStats(isDark, isPremium),
@@ -506,7 +511,7 @@ class _LiveListScreenState extends State<LiveListScreen>
                   ),
                 ),
                 child: const Icon(
-                  Iconsax.video_tick5,
+                  Iconsax.video_tick,
                   size: 28,
                   color: Colors.white,
                 ),
@@ -517,16 +522,16 @@ class _LiveListScreenState extends State<LiveListScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '1-on-1 Video Chat',
+                      'Verify First Love For Real',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-                    SizedBox(height: 4),
-                    Text(
-                      'Match first, preview profiles, then both accept.',
+                    const SizedBox(height: 4),
+                    const Text(
+                      "Don't act just be you for 60 seconds.",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -544,6 +549,7 @@ class _LiveListScreenState extends State<LiveListScreen>
               CircleAvatar(
                 radius: 24,
                 backgroundColor: Colors.white.withValues(alpha: 0.2),
+                foregroundColor: Colors.white,
                 backgroundImage: photo.isNotEmpty ? NetworkImage(photo) : null,
                 child: photo.isEmpty
                     ? const Icon(Iconsax.user, color: Colors.white)
@@ -609,9 +615,7 @@ class _LiveListScreenState extends State<LiveListScreen>
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.06)
-            : Colors.white,
+        color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: isDark

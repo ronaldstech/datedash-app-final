@@ -99,6 +99,7 @@ class UserProfile {
   String? filterZodiac;
   String? filterEducationLevel;
   bool filterVerifiedOnly;
+  bool filterOnlineOnly;
   String? filterKids;
   String? filterPets;
   String? filterIntrovertExtrovert;
@@ -220,6 +221,7 @@ class UserProfile {
     this.filterZodiac = 'Any',
     this.filterEducationLevel = 'Any',
     this.filterVerifiedOnly = false,
+    this.filterOnlineOnly = false,
     this.filterKids = 'Any',
     this.filterPets = 'Any',
     this.filterIntrovertExtrovert = 'Any',
@@ -386,6 +388,7 @@ class UserProfile {
         filterZodiac: map['filterZodiac']?.toString() ?? 'Any',
         filterEducationLevel: map['filterEducationLevel']?.toString() ?? 'Any',
         filterVerifiedOnly: map['filterVerifiedOnly'] ?? false,
+        filterOnlineOnly: map['filterOnlineOnly'] ?? false,
         filterKids: map['filterKids']?.toString() ?? 'Any',
         filterPets: map['filterPets']?.toString() ?? 'Any',
         filterIntrovertExtrovert: map['filterIntrovertExtrovert']?.toString() ?? 'Any',
@@ -519,6 +522,7 @@ class UserProfile {
       'filterZodiac': filterZodiac,
       'filterEducationLevel': filterEducationLevel,
       'filterVerifiedOnly': filterVerifiedOnly,
+      'filterOnlineOnly': filterOnlineOnly,
       'filterKids': filterKids,
       'filterPets': filterPets,
       'filterIntrovertExtrovert': filterIntrovertExtrovert,
@@ -546,7 +550,6 @@ class UserProfile {
   }
 
   int get completionPercentage {
-    int totalFields = 28;
     int filledFields = 0;
 
     if (firstName != null && firstName!.isNotEmpty) filledFields++;
@@ -599,7 +602,7 @@ class UserProfile {
     if (promptGreenFlag != null && promptGreenFlag!.isNotEmpty) filledFields++;
     if (promptTwoTruths != null && promptTwoTruths!.isNotEmpty) filledFields++;
 
-    totalFields = 42;
+    const totalFields = 43;
     return ((filledFields / totalFields) * 100).round();
   }
 

@@ -418,6 +418,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           value: _profile.relationshipStatus,
           items: const [
             'Single',
+            'In an open relationship',
             'Married',
             'Divorced',
             'Widowed',
@@ -431,6 +432,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           options: const [
             'Christian',
             'Muslim',
+            'Jewish',
+            'Orthodox',
             'Hindu',
             'Spiritual',
             'Agnostic',
