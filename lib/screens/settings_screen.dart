@@ -47,7 +47,8 @@ class SettingsScreen extends StatelessWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const EditProfileScreen()),
+                builder: (context) => const EditProfileScreen(),
+              ),
             ),
           ),
           _buildVerificationTile(context, languageProvider, profileProvider),
@@ -59,7 +60,8 @@ class SettingsScreen extends StatelessWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const SecuritySettingsScreen()),
+                builder: (context) => const SecuritySettingsScreen(),
+              ),
             ),
           ),
           const SizedBox(height: 20),
@@ -77,7 +79,8 @@ class SettingsScreen extends StatelessWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const NotificationSettingsScreen()),
+                builder: (context) => const NotificationSettingsScreen(),
+              ),
             ),
           ),
           _buildLanguageTile(context),
@@ -135,8 +138,11 @@ class SettingsScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 	
-                Theme.of(context).brightness == Brightness.light ? 0.03 : 0.2),
+            color: Colors.black.withValues(
+              alpha: Theme.of(context).brightness == Brightness.light
+                  ? 0.03
+                  : 0.2,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -147,7 +153,7 @@ class SettingsScreen extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: const Color(0xFFFF4D85).withValues(alpha: 	0.1),
+            color: const Color(0xFFFF4D85).withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: const Color(0xFFFF4D85), size: 22),
@@ -158,10 +164,7 @@ class SettingsScreen extends StatelessWidget {
         ),
         subtitle: Text(
           subtitle,
-          style: TextStyle(
-            color: Theme.of(context).hintColor,
-            fontSize: 12,
-          ),
+          style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
         ),
         trailing: Icon(
           Iconsax.arrow_right_3,
@@ -177,16 +180,16 @@ class SettingsScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.orange.withValues(alpha: 	0.06),
+        color: Colors.orange.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.orange.withValues(alpha: 	0.2)),
+        border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.orange.withValues(alpha: 	0.15),
+            color: Colors.orange.withValues(alpha: 0.15),
             shape: BoxShape.circle,
           ),
           child: const Icon(Iconsax.refresh, color: Colors.orange, size: 22),
@@ -203,8 +206,11 @@ class SettingsScreen extends StatelessWidget {
           context.read<LanguageProvider>().getString('reset_swipes_sub'),
           style: const TextStyle(color: Colors.orange, fontSize: 12),
         ),
-        trailing:
-            const Icon(Iconsax.arrow_right_3, size: 18, color: Colors.orange),
+        trailing: const Icon(
+          Iconsax.arrow_right_3,
+          size: 18,
+          color: Colors.orange,
+        ),
         onTap: () =>
             _showResetSwipesDialog(context, context.read<LanguageProvider>()),
       ),
@@ -212,7 +218,9 @@ class SettingsScreen extends StatelessWidget {
   }
 
   void _showResetSwipesDialog(
-      BuildContext context, LanguageProvider languageProvider) {
+    BuildContext context,
+    LanguageProvider languageProvider,
+  ) {
     final profileProvider = context.read<ProfileProvider>();
     final isPremium = profileProvider.userProfile?.isPremium ?? false;
 
@@ -221,14 +229,17 @@ class SettingsScreen extends StatelessWidget {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
           title: Row(
             children: [
               const Icon(Iconsax.refresh, color: Colors.orange),
               const SizedBox(width: 10),
-              Text(languageProvider.getString('reset_swipes_title'),
-                  style: const TextStyle(fontWeight: FontWeight.w800)),
+              Text(
+                languageProvider.getString('reset_swipes_title'),
+                style: const TextStyle(fontWeight: FontWeight.w800),
+              ),
             ],
           ),
           content: Text(
@@ -238,8 +249,10 @@ class SettingsScreen extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: Text(languageProvider.getString('cancel'),
-                  style: const TextStyle(fontWeight: FontWeight.w600)),
+              child: Text(
+                languageProvider.getString('cancel'),
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
             ),
             FilledButton(
               style: FilledButton.styleFrom(backgroundColor: Colors.orange),
@@ -252,15 +265,20 @@ class SettingsScreen extends StatelessWidget {
                       SnackBar(
                         content: Row(
                           children: [
-                            const Icon(Icons.check_circle_rounded,
-                                color: Colors.white, size: 20),
+                            const Icon(
+                              Icons.check_circle_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
-                                languageProvider
-                                    .getString('swipes_reset_success'),
+                                languageProvider.getString(
+                                  'swipes_reset_success',
+                                ),
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.w600),
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ],
@@ -268,7 +286,8 @@ class SettingsScreen extends StatelessWidget {
                         backgroundColor: Colors.orange,
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15)),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
                         margin: const EdgeInsets.all(16),
                       ),
                     );
@@ -278,19 +297,23 @@ class SettingsScreen extends StatelessWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                            languageProvider.getString('swipes_reset_failed')),
+                          languageProvider.getString('swipes_reset_failed'),
+                        ),
                         backgroundColor: Colors.red,
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15)),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
                         margin: const EdgeInsets.all(16),
                       ),
                     );
                   }
                 }
               },
-              child: Text(languageProvider.getString('reset'),
-                  style: const TextStyle(fontWeight: FontWeight.w700)),
+              child: Text(
+                languageProvider.getString('reset'),
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
             ),
           ],
         ),
@@ -309,8 +332,10 @@ class SettingsScreen extends StatelessWidget {
           children: [
             const Icon(Iconsax.refresh, color: Color(0xFFFF4D85)),
             const SizedBox(width: 10),
-            Text(languageProvider.getString('refresh_cost_title'),
-                style: const TextStyle(fontWeight: FontWeight.w800)),
+            Text(
+              languageProvider.getString('refresh_cost_title'),
+              style: const TextStyle(fontWeight: FontWeight.w800),
+            ),
           ],
         ),
         content: Text(
@@ -322,27 +347,34 @@ class SettingsScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(languageProvider.getString('cancel'),
-                style: const TextStyle(fontWeight: FontWeight.w600)),
+            child: Text(
+              languageProvider.getString('cancel'),
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: const Color(0xFFFF4D85),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             onPressed: () async {
               Navigator.pop(ctx);
               if (sparks < 50) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content:
-                      Text(languageProvider.getString('not_enough_credits')),
-                  backgroundColor: const Color(0xFFFF4D85),
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                  margin: const EdgeInsets.all(20),
-                ));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      languageProvider.getString('not_enough_credits'),
+                    ),
+                    backgroundColor: const Color(0xFFFF4D85),
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    margin: const EdgeInsets.all(20),
+                  ),
+                );
                 return;
               }
 
@@ -354,15 +386,20 @@ class SettingsScreen extends StatelessWidget {
                     SnackBar(
                       content: Row(
                         children: [
-                          const Icon(Icons.check_circle_rounded,
-                              color: Colors.white, size: 20),
+                          const Icon(
+                            Icons.check_circle_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              languageProvider
-                                  .getString('swipes_reset_success'),
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.w600),
+                              languageProvider.getString(
+                                'swipes_reset_success',
+                              ),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],
@@ -370,7 +407,8 @@ class SettingsScreen extends StatelessWidget {
                       backgroundColor: Colors.green,
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
                       margin: const EdgeInsets.all(16),
                     ),
                   );
@@ -380,27 +418,34 @@ class SettingsScreen extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                          languageProvider.getString('swipes_reset_failed')),
+                        languageProvider.getString('swipes_reset_failed'),
+                      ),
                       backgroundColor: Colors.red,
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
                       margin: const EdgeInsets.all(16),
                     ),
                   );
                 }
               }
             },
-            child: Text(languageProvider.getString('pay_refresh'),
-                style: const TextStyle(fontWeight: FontWeight.w700)),
+            child: Text(
+              languageProvider.getString('pay_refresh'),
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildThemeTile(BuildContext context, ThemeProvider themeProvider,
-      LanguageProvider languageProvider) {
+  Widget _buildThemeTile(
+    BuildContext context,
+    ThemeProvider themeProvider,
+    LanguageProvider languageProvider,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -408,8 +453,11 @@ class SettingsScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 	
-                Theme.of(context).brightness == Brightness.light ? 0.03 : 0.2),
+            color: Colors.black.withValues(
+              alpha: Theme.of(context).brightness == Brightness.light
+                  ? 0.03
+                  : 0.2,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -420,7 +468,7 @@ class SettingsScreen extends StatelessWidget {
         secondary: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.deepPurple.withValues(alpha: 	0.1),
+            color: Colors.deepPurple.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -437,10 +485,7 @@ class SettingsScreen extends StatelessWidget {
           themeProvider.isDarkMode
               ? languageProvider.getString('night_mode_on')
               : languageProvider.getString('night_mode_off'),
-          style: TextStyle(
-            color: Theme.of(context).hintColor,
-            fontSize: 12,
-          ),
+          style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
         ),
         value: themeProvider.isDarkMode,
         activeThumbColor: const Color(0xFFFF4D85),
@@ -457,9 +502,9 @@ class SettingsScreen extends StatelessWidget {
         Container(
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
-            color: Colors.orange.withValues(alpha: 	0.05),
+            color: Colors.orange.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.orange.withValues(alpha: 	0.1)),
+            border: Border.all(color: Colors.orange.withValues(alpha: 0.1)),
           ),
           child: ListTile(
             leading: Container(
@@ -476,8 +521,10 @@ class SettingsScreen extends StatelessWidget {
             ),
             subtitle: Text(
               languageProvider.getString('wipe_local_data_sub'),
-              style:
-                  TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 12,
+              ),
             ),
             onTap: () => _showWipeDataConfirmation(context),
           ),
@@ -485,9 +532,9 @@ class SettingsScreen extends StatelessWidget {
         // Delete Account Tile
         Container(
           decoration: BoxDecoration(
-            color: Colors.red.withValues(alpha: 	0.05),
+            color: Colors.red.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.red.withValues(alpha: 	0.1)),
+            border: Border.all(color: Colors.red.withValues(alpha: 0.1)),
           ),
           child: ListTile(
             leading: Container(
@@ -556,7 +603,9 @@ class SettingsScreen extends StatelessWidget {
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(
-                                strokeWidth: 2, color: Colors.white),
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
                           ),
                           const SizedBox(width: 16),
                           Text(languageProvider.getString('saving_label')),
@@ -590,7 +639,8 @@ class SettingsScreen extends StatelessWidget {
                       backgroundColor: Colors.green,
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
                       margin: const EdgeInsets.all(16),
                     ),
                   );
@@ -603,7 +653,8 @@ class SettingsScreen extends StatelessWidget {
                       backgroundColor: Colors.red,
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
                       margin: const EdgeInsets.all(16),
                     ),
                   );
@@ -615,7 +666,8 @@ class SettingsScreen extends StatelessWidget {
               foregroundColor: Colors.white,
               elevation: 0,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             child: Text(
               languageProvider.getString('confirm_button'),
@@ -628,7 +680,9 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget _buildPrivacySection(
-      BuildContext context, LanguageProvider languageProvider) {
+    BuildContext context,
+    LanguageProvider languageProvider,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -639,7 +693,10 @@ class SettingsScreen extends StatelessWidget {
             if (profile == null) return const SizedBox.shrink();
 
             final isPremium = profileProvider.userProfile?.isPremium ?? false;
-            final isElite = isPremium && profileProvider.userProfile?.premiumType?.toUpperCase() == 'ELITE';
+            final isElite =
+                isPremium &&
+                profileProvider.userProfile?.premiumType?.toUpperCase() ==
+                    'ELITE';
 
             return Column(
               children: [
@@ -651,7 +708,11 @@ class SettingsScreen extends StatelessWidget {
                   profile.showAge,
                   (val) {
                     if (!isElite) {
-                      _showPremiumDialog(context, languageProvider, requiredTier: 'ELITE');
+                      _showPremiumDialog(
+                        context,
+                        languageProvider,
+                        requiredTier: 'ELITE',
+                      );
                       return;
                     }
                     profile.showAge = val;
@@ -670,7 +731,11 @@ class SettingsScreen extends StatelessWidget {
                   profile.showDistance,
                   (val) {
                     if (!isPremium) {
-                      _showPremiumDialog(context, languageProvider, requiredTier: 'PREMIUM');
+                      _showPremiumDialog(
+                        context,
+                        languageProvider,
+                        requiredTier: 'PREMIUM',
+                      );
                       return;
                     }
                     profile.showDistance = val;
@@ -689,7 +754,11 @@ class SettingsScreen extends StatelessWidget {
                   profile.hideProfile,
                   (val) {
                     if (!isElite) {
-                      _showPremiumDialog(context, languageProvider, requiredTier: 'ELITE');
+                      _showPremiumDialog(
+                        context,
+                        languageProvider,
+                        requiredTier: 'ELITE',
+                      );
                       return;
                     }
                     profile.hideProfile = val;
@@ -723,12 +792,15 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget _buildMeetupSection(
-      BuildContext context, LanguageProvider languageProvider) {
+    BuildContext context,
+    LanguageProvider languageProvider,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionHeader(
-            languageProvider.getString('booking_section_title')),
+          languageProvider.getString('booking_section_title'),
+        ),
         Consumer<ProfileProvider>(
           builder: (context, profileProvider, _) {
             final profile = profileProvider.userProfile;
@@ -765,8 +837,11 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildVerificationTile(BuildContext context,
-      LanguageProvider languageProvider, ProfileProvider profileProvider) {
+  Widget _buildVerificationTile(
+    BuildContext context,
+    LanguageProvider languageProvider,
+    ProfileProvider profileProvider,
+  ) {
     final profile = profileProvider.userProfile;
     final status = profile?.verificationStatus ?? 'unverified';
 
@@ -788,8 +863,11 @@ class SettingsScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 	
-                Theme.of(context).brightness == Brightness.light ? 0.03 : 0.2),
+            color: Colors.black.withValues(
+              alpha: Theme.of(context).brightness == Brightness.light
+                  ? 0.03
+                  : 0.2,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -800,7 +878,7 @@ class SettingsScreen extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: iconColor.withValues(alpha: 	0.1),
+            color: iconColor.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(iconData, color: iconColor, size: 22),
@@ -810,8 +888,10 @@ class SettingsScreen extends StatelessWidget {
             Expanded(
               child: Text(
                 languageProvider.getString('verification_status_$status'),
-                style:
-                    const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
+                ),
               ),
             ),
             if (status == 'verified') ...[
@@ -819,17 +899,17 @@ class SettingsScreen extends StatelessWidget {
               const Icon(Icons.verified, color: Colors.green, size: 16),
             ] else if (status == 'pending') ...[
               const SizedBox(width: 6),
-              const Icon(Icons.hourglass_empty_rounded,
-                  color: Colors.orange, size: 16),
+              const Icon(
+                Icons.hourglass_empty_rounded,
+                color: Colors.orange,
+                size: 16,
+              ),
             ],
           ],
         ),
         subtitle: Text(
           languageProvider.getString('verification_status_${status}_sub'),
-          style: TextStyle(
-            color: Theme.of(context).hintColor,
-            fontSize: 12,
-          ),
+          style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
         ),
         trailing: Icon(
           Iconsax.arrow_right_3,
@@ -863,7 +943,8 @@ class SettingsScreen extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom +
+          bottom:
+              MediaQuery.of(context).viewInsets.bottom +
               MediaQuery.of(context).padding.bottom +
               20,
           top: 20,
@@ -884,7 +965,7 @@ class SettingsScreen extends StatelessWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 	0.3),
+                    color: Colors.grey.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -892,28 +973,36 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 20),
               Row(
                 children: [
-                  const Icon(Iconsax.calendar_edit,
-                      color: Color(0xFFFFA000), size: 28),
+                  const Icon(
+                    Iconsax.calendar_edit,
+                    color: Color(0xFFFFA000),
+                    size: 28,
+                  ),
                   const SizedBox(width: 12),
                   Text(
                     languageProvider.getString('booking_details'),
                     style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.w800),
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 8),
               Text(
                 languageProvider.getString('booking_details_hint'),
-                style:
-                    TextStyle(color: Theme.of(context).hintColor, fontSize: 13),
+                style: TextStyle(
+                  color: Theme.of(context).hintColor,
+                  fontSize: 13,
+                ),
               ),
               const SizedBox(height: 24),
               TextField(
                 controller: locationCtrl,
                 decoration: InputDecoration(
-                  labelText:
-                      languageProvider.getString('booking_location_label'),
+                  labelText: languageProvider.getString(
+                    'booking_location_label',
+                  ),
                   hintText: 'e.g., Downtown, Starbucks, Central Park',
                   prefixIcon: const Icon(Iconsax.location),
                   filled: true,
@@ -929,7 +1018,7 @@ class SettingsScreen extends StatelessWidget {
                 controller: rateCtrl,
                 decoration: InputDecoration(
                   labelText: languageProvider.getString('booking_rate_label'),
-                  hintText: 'e.g., \$50/hr, Drinks on you, Free',
+                  hintText: 'e.g., Drinks on you, Free',
                   prefixIcon: const Icon(Iconsax.money),
                   filled: true,
                   fillColor: Theme.of(context).cardColor,
@@ -976,21 +1065,26 @@ class SettingsScreen extends StatelessWidget {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                          content:
-                              Text(languageProvider.getString('saving_label'))),
+                        content: Text(
+                          languageProvider.getString('saving_label'),
+                        ),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFFA000),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                     elevation: 0,
                   ),
                   child: Text(
                     languageProvider.getString('save'),
                     style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w700),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
@@ -1002,7 +1096,10 @@ class SettingsScreen extends StatelessWidget {
   }
 
   void _showPremiumDialog(
-      BuildContext context, LanguageProvider languageProvider, {String requiredTier = 'Premium'}) {
+    BuildContext context,
+    LanguageProvider languageProvider, {
+    String requiredTier = 'Premium',
+  }) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -1032,8 +1129,9 @@ class SettingsScreen extends StatelessWidget {
             child: Text(
               languageProvider.getString('cancel'),
               style: TextStyle(
-                  color: Theme.of(context).hintColor,
-                  fontWeight: FontWeight.w600),
+                color: Theme.of(context).hintColor,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           ElevatedButton(
@@ -1049,7 +1147,8 @@ class SettingsScreen extends StatelessWidget {
               foregroundColor: Colors.white,
               elevation: 0,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             child: Text(
               languageProvider.currentLanguageCode == 'sw'
@@ -1079,8 +1178,11 @@ class SettingsScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 	
-                Theme.of(context).brightness == Brightness.light ? 0.03 : 0.2),
+            color: Colors.black.withValues(
+              alpha: Theme.of(context).brightness == Brightness.light
+                  ? 0.03
+                  : 0.2,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -1091,22 +1193,20 @@ class SettingsScreen extends StatelessWidget {
         secondary: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: const Color(0xFFFF4D85).withValues(alpha: 	0.1),
+            color: const Color(0xFFFF4D85).withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: Icon(
-            icon,
-            color: const Color(0xFFFF4D85),
-            size: 22,
-          ),
+          child: Icon(icon, color: const Color(0xFFFF4D85), size: 22),
         ),
         title: Row(
           children: [
             Expanded(
               child: Text(
                 title,
-                style:
-                    const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
+                ),
               ),
             ),
             if (isPremiumLocked) ...[
@@ -1114,10 +1214,12 @@ class SettingsScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.amber.withValues(alpha: 	0.15),
+                  color: Colors.amber.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
                   border: Border.all(
-                      color: Colors.amber.withValues(alpha: 	0.3), width: 0.5),
+                    color: Colors.amber.withValues(alpha: 0.3),
+                    width: 0.5,
+                  ),
                 ),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
@@ -1140,10 +1242,7 @@ class SettingsScreen extends StatelessWidget {
         ),
         subtitle: Text(
           subtitle,
-          style: TextStyle(
-            color: Theme.of(context).hintColor,
-            fontSize: 12,
-          ),
+          style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
         ),
         value: value,
         activeThumbColor: const Color(0xFFFF4D85),
@@ -1188,7 +1287,9 @@ class SettingsScreen extends StatelessWidget {
                 Text(
                   languageProvider.getString('select_language'),
                   style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.w800),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close_rounded),
@@ -1210,7 +1311,7 @@ class SettingsScreen extends StatelessWidget {
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? const Color(0xFFFF4D85).withValues(alpha: 	0.1)
+                              ? const Color(0xFFFF4D85).withValues(alpha: 0.1)
                               : Colors.transparent,
                           shape: BoxShape.circle,
                         ),
@@ -1225,14 +1326,17 @@ class SettingsScreen extends StatelessWidget {
                       title: Text(
                         lang['name']!,
                         style: TextStyle(
-                          fontWeight:
-                              isSelected ? FontWeight.w700 : FontWeight.w500,
+                          fontWeight: isSelected
+                              ? FontWeight.w700
+                              : FontWeight.w500,
                           color: isSelected ? const Color(0xFFFF4D85) : null,
                         ),
                       ),
                       trailing: isSelected
-                          ? const Icon(Icons.check_circle_rounded,
-                              color: Color(0xFFFF4D85))
+                          ? const Icon(
+                              Icons.check_circle_rounded,
+                              color: Color(0xFFFF4D85),
+                            )
                           : null,
                       onTap: () {
                         languageProvider.setLanguage(lang['code']!);
