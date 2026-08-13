@@ -45,6 +45,7 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
 
   CameraController? _cameraController;
   bool _isCameraInitialized = false;
+  bool _isSwitchingCamera = false;
 
   bool _isSearching = false;
   bool _isAccepting = false;
@@ -949,6 +950,8 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
   }
 
   Future<void> _switchCamera() async {
+    if (_isSwitchingCamera) return;
+    _isSwitchingCamera = true;
     try {
       final cameras = await availableCameras();
       if (cameras.length < 2) return;
@@ -963,6 +966,8 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
         orElse: () => cameras.first,
       );
 
+      // Prevent building a preview on the disposed controller during the swap
+      if (mounted) setState(() => _isCameraInitialized = false);
       await _cameraController?.dispose();
       _cameraController = CameraController(
         newCamera,
@@ -971,9 +976,11 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
       );
       await _cameraController!.initialize();
 
-      if (mounted) setState(() {});
+      if (mounted) setState(() => _isCameraInitialized = true);
     } catch (e) {
       debugPrint('Error switching camera: $e');
+    } finally {
+      _isSwitchingCamera = false;
     }
   }
 
