@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import '../models/user_profile_model.dart';
@@ -246,6 +248,54 @@ class VideoChatService {
         .where('status', isEqualTo: 'active')
         .snapshots()
         .map((snapshot) => snapshot.docs.length * 2);
+  }
+
+  Stream<int> getOnlineUsersCountStream() {
+    final controller = StreamController<int>();
+    QuerySnapshot? waitingSnap;
+    QuerySnapshot? callsSnap;
+
+    void emit() {
+      if (waitingSnap == null || callsSnap == null) return;
+      final uids = <String>{};
+      for (final doc in waitingSnap!.docs) {
+        final data = doc.data() as Map<String, dynamic>?;
+        uids.add(data?['uid'] as String? ?? doc.id);
+      }
+      for (final doc in callsSnap!.docs) {
+        final data = doc.data() as Map<String, dynamic>?;
+        final host = data?['hostId'] as String?;
+        final guest = data?['guestId'] as String?;
+        if (host != null) uids.add(host);
+        if (guest != null) uids.add(guest);
+      }
+      controller.add(uids.length);
+    }
+
+    final sub1 = _firestore
+        .collection('video_chat_waiting')
+        .where('status', whereIn: ['waiting', 'proposed'])
+        .snapshots()
+        .listen((snap) {
+      waitingSnap = snap;
+      emit();
+    });
+
+    final sub2 = _firestore
+        .collection('video_chat_calls')
+        .where('status', isEqualTo: 'active')
+        .snapshots()
+        .listen((snap) {
+      callsSnap = snap;
+      emit();
+    });
+
+    controller.onCancel = () {
+      sub1.cancel();
+      sub2.cancel();
+    };
+
+    return controller.stream;
   }
 
   Future<Map<String, dynamic>?> acceptMatch(String userId) async {
