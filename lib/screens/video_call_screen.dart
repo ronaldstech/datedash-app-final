@@ -8,11 +8,13 @@ import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
 
+import '../models/gift_model.dart';
 import '../providers/profile_provider.dart';
 import '../services/chat_service.dart';
 import '../services/profile_service.dart';
 import '../services/video_chat_service.dart';
 import '../widgets/gift_selection_sheet.dart';
+import 'video_matchmaking_screen.dart';
 
 class VideoCallScreen extends StatefulWidget {
   final String channelId;
@@ -35,7 +37,9 @@ class VideoCallScreen extends StatefulWidget {
 }
 
 class _VideoCallScreenState extends State<VideoCallScreen> {
-  static const _securityChannel = MethodChannel('com.example.datedash/security');
+  static const _securityChannel = MethodChannel(
+    'com.example.datedash/security',
+  );
 
   final VideoChatService _videoChatService = VideoChatService();
   final TextEditingController _messageController = TextEditingController();
@@ -130,30 +134,30 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     _callSessionSubscription = _videoChatService
         .getCallSessionStream(widget.channelId)
         .listen((snapshot) {
-      if (!mounted || !_callLifecycleReady) return;
+          if (!mounted || !_callLifecycleReady) return;
 
-      if (!snapshot.exists) {
-        _exitCallScreen(showMessage: 'Call ended by partner');
-        if (currentUserId != null) {
-          _videoChatService.cleanupOwnTicket(currentUserId);
-        }
-        return;
-      }
+          if (!snapshot.exists) {
+            _exitCallScreen(showMessage: 'Call ended by partner');
+            if (currentUserId != null) {
+              _videoChatService.cleanupOwnTicket(currentUserId);
+            }
+            return;
+          }
 
-      final data = snapshot.data() as Map<String, dynamic>?;
-      final status = data?['status'] as String?;
-      final endedBy = data?['endedBy'] as String?;
-      if (status == 'ended' && endedBy != currentUserId) {
-        _exitCallScreen(showMessage: 'Call ended by partner');
-        if (currentUserId != null) {
-          _videoChatService.cleanupOwnTicket(currentUserId);
-        }
-      }
-    });
+          final data = snapshot.data() as Map<String, dynamic>?;
+          final status = data?['status'] as String?;
+          final endedBy = data?['endedBy'] as String?;
+          if (status == 'ended' && endedBy != currentUserId) {
+            _exitCallScreen(showMessage: 'Call ended by partner');
+            if (currentUserId != null) {
+              _videoChatService.cleanupOwnTicket(currentUserId);
+            }
+          }
+        });
   }
 
   Future<void> _sendMessage() async {
-    if (_callDuration < 60) return;
+    if (_callDuration < 180) return;
     final messageText = _messageController.text.trim();
     if (messageText.isEmpty) return;
     _messageController.clear();
@@ -164,7 +168,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
 
     // 1. Write to real 1-on-1 chat in Firestore so messages appear in the Chats screen!
     try {
-      final chatId = await ChatService().getOrCreateChat(myUid, widget.partnerId);
+      final chatId = await ChatService().getOrCreateChat(
+        myUid,
+        widget.partnerId,
+      );
       await ChatService().sendMessage(
         chatId: chatId,
         senderId: myUid,
@@ -181,11 +188,11 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         .doc(widget.channelId)
         .collection('messages')
         .add({
-      'senderId': myUid,
-      'senderName': profile?.firstName ?? 'User',
-      'message': messageText,
-      'timestamp': FieldValue.serverTimestamp(),
-    });
+          'senderId': myUid,
+          'senderName': profile?.firstName ?? 'User',
+          'message': messageText,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
 
     _scrollToBottom();
   }
@@ -202,21 +209,137 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     });
   }
 
-  void _showReportBlockDialog() {
+  void _showReportDialog() {
+    String selectedReason = 'Inappropriate behavior';
+    final reasons = [
+      'Inappropriate behavior',
+      'Nudity or sexual content',
+      'Harassment or hate speech',
+      'Fake profile or scam',
+      'Other',
+    ];
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: const Color(0xFF1E1E24),
+          title: const Row(
+            children: [
+              Icon(Iconsax.warning_2, color: Colors.orangeAccent),
+              SizedBox(width: 8),
+              Text(
+                'Report User',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Report ${widget.partnerName} for violating guidelines:',
+                style: const TextStyle(color: Colors.white70, fontSize: 13),
+              ),
+              const SizedBox(height: 12),
+              ...reasons.map(
+                (reason) {
+                  final isSelected = selectedReason == reason;
+                  return InkWell(
+                    onTap: () => setDialogState(() => selectedReason = reason),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+                      child: Row(
+                        children: [
+                          Icon(
+                            isSelected
+                                ? Icons.radio_button_checked
+                                : Icons.radio_button_unchecked,
+                            color: isSelected ? const Color(0xFFFF4D85) : Colors.white54,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            reason,
+                            style: const TextStyle(color: Colors.white, fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                await _submitReport(selectedReason);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orangeAccent,
+                foregroundColor: Colors.black,
+              ),
+              child: const Text('Submit Report', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _submitReport(String reason) async {
+    final currentUserId = context.read<ProfileProvider>().userProfile?.uid;
+    if (currentUserId == null) return;
+
+    await FirebaseFirestore.instance.collection('reports').add({
+      'reporterId': currentUserId,
+      'reportedId': widget.partnerId,
+      'timestamp': FieldValue.serverTimestamp(),
+      'reason': reason,
+      'channelId': widget.channelId,
+    });
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Report submitted. Skipping to next user...'),
+          backgroundColor: Colors.orangeAccent,
+        ),
+      );
+    }
+    await _skipAndNext();
+  }
+
+  void _showBlockDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text(
-          'Report & Block',
-          style: TextStyle(fontWeight: FontWeight.w900),
+        backgroundColor: const Color(0xFF1E1E24),
+        title: const Row(
+          children: [
+            Icon(Iconsax.user_remove, color: Colors.redAccent),
+            SizedBox(width: 8),
+            Text(
+              'Block User',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+            ),
+          ],
         ),
-        content: const Text(
-          'Do you want to report and block this user? You will immediately exit the call and they will not be able to match with you again.',
+        content: Text(
+          'Are you sure you want to block ${widget.partnerName}? You will disconnect and won\'t match with them again.',
+          style: const TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -224,10 +347,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
               _blockUser();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: Colors.redAccent,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Report & Block'),
+            child: const Text('Block User', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -241,16 +364,27 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
 
     if (!provider.userProfile!.blockedUsers.contains(widget.partnerId)) {
       provider.userProfile!.blockedUsers.add(widget.partnerId);
-      await ProfileService().saveUserProfile(currentUserId, provider.userProfile!);
+      await ProfileService().saveUserProfile(
+        currentUserId,
+        provider.userProfile!,
+      );
     }
     await FirebaseFirestore.instance.collection('reports').add({
       'reporterId': currentUserId,
       'reportedId': widget.partnerId,
       'timestamp': FieldValue.serverTimestamp(),
       'reason': 'Blocked during video call',
+      'channelId': widget.channelId,
     });
-    await _videoChatService.endCall(currentUserId, widget.channelId);
-    _exitCallScreen();
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Blocked ${widget.partnerName}. Skipping to next user...'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
+    await _skipAndNext();
   }
 
   Future<void> _endCall() async {
@@ -262,11 +396,35 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   }
 
   Future<void> _skipAndNext() async {
-    final currentUserId = context.read<ProfileProvider>().userProfile?.uid;
+    final profileProvider = context.read<ProfileProvider>();
+    final currentUser = profileProvider.userProfile;
+    final currentUserId = currentUser?.uid;
+
     if (currentUserId != null) {
       await _videoChatService.endCall(currentUserId, widget.channelId);
     }
-    if (mounted) Navigator.pop(context);
+
+    if (!mounted) return;
+
+    if (currentUser != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => VideoMatchmakingScreen(
+            currentUser: currentUser,
+            filterLanguage: 'Any',
+            filterGender: currentUser.isPremium
+                ? (currentUser.interestedIn ?? 'Any')
+                : 'Any',
+            filterMinAge: 18,
+            filterMaxAge: 99,
+            filterCountry: 'Any',
+          ),
+        ),
+      );
+    } else {
+      Navigator.pop(context);
+    }
   }
 
   void _exitCallScreen({String? showMessage}) {
@@ -292,8 +450,30 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       builder: (context) => GiftSelectionSheet(
         targetUserId: widget.partnerId,
         targetUserName: widget.partnerName,
+        onGiftSent: _handleGiftSent,
       ),
     );
+  }
+
+  Future<void> _handleGiftSent(GiftItem gift) async {
+    final profile = context.read<ProfileProvider>().userProfile;
+    final myUid = profile?.uid;
+    if (myUid == null) return;
+
+    await FirebaseFirestore.instance
+        .collection('video_chat_calls')
+        .doc(widget.channelId)
+        .collection('messages')
+        .add({
+          'senderId': myUid,
+          'senderName': profile?.firstName ?? 'User',
+          'message': '🎁 Sent ${gift.name} ${gift.icon} (${gift.cost} sparks)',
+          'isGift': true,
+          'giftIcon': gift.icon,
+          'giftName': gift.name,
+          'giftCost': gift.cost,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
   }
 
   Future<void> _switchCamera() async {
@@ -305,9 +485,11 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
 
       final currentLens = _cameraController?.description.lensDirection;
       final newCamera = cameras.firstWhere(
-        (cam) => cam.lensDirection == (currentLens == CameraLensDirection.front
-            ? CameraLensDirection.back
-            : CameraLensDirection.front),
+        (cam) =>
+            cam.lensDirection ==
+            (currentLens == CameraLensDirection.front
+                ? CameraLensDirection.back
+                : CameraLensDirection.front),
         orElse: () => cameras.first,
       );
 
@@ -354,7 +536,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       builder: (modalContext) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            final bool isUnlocked = _callDuration >= 60;
+            final bool isUnlocked = _callDuration >= 180;
 
             return Container(
               height: MediaQuery.of(context).size.height * 0.7,
@@ -386,12 +568,18 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                     children: [
                       CircleAvatar(
                         radius: 20,
-                        backgroundColor: const Color(0xFFFF4D85).withValues(alpha: 0.2),
+                        backgroundColor: const Color(
+                          0xFFFF4D85,
+                        ).withValues(alpha: 0.2),
                         backgroundImage: widget.partnerPhoto.isNotEmpty
                             ? NetworkImage(widget.partnerPhoto)
                             : null,
                         child: widget.partnerPhoto.isEmpty
-                            ? const Icon(Iconsax.user, color: Colors.white, size: 20)
+                            ? const Icon(
+                                Iconsax.user,
+                                color: Colors.white,
+                                size: 20,
+                              )
                             : null,
                       ),
                       const SizedBox(width: 10),
@@ -410,7 +598,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                             Text(
                               isUnlocked
                                   ? '🔓 Messages save directly to Inbox'
-                                  : '🔒 Unlocks in ${60 - _callDuration}s...',
+                                  : '🔒 Unlocks in ${180 - _callDuration}s...',
                               style: TextStyle(
                                 color: isUnlocked
                                     ? const Color(0xFF00E676)
@@ -424,7 +612,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       ),
                       IconButton(
                         onPressed: () => Navigator.pop(modalContext),
-                        icon: const Icon(Iconsax.close_circle, color: Colors.white54),
+                        icon: const Icon(
+                          Iconsax.close_circle,
+                          color: Colors.white54,
+                        ),
                       ),
                     ],
                   ),
@@ -442,7 +633,9 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
                           return const Center(
-                            child: CircularProgressIndicator(color: Color(0xFFFF4D85)),
+                            child: CircularProgressIndicator(
+                              color: Color(0xFFFF4D85),
+                            ),
                           );
                         }
                         final docs = snapshot.data!.docs;
@@ -462,7 +655,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                                 Text(
                                   isUnlocked
                                       ? 'Say hi to ${widget.partnerName}!'
-                                      : 'Chat unlocks after 60 seconds of call',
+                                      : 'Chat unlocks after 3 minutes (180s) of call',
                                   style: TextStyle(
                                     color: Colors.white.withValues(alpha: 0.5),
                                     fontSize: 13,
@@ -478,17 +671,74 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                           controller: _scrollController,
                           itemCount: docs.length,
                           itemBuilder: (context, index) {
-                            final data = docs[index].data() as Map<String, dynamic>;
+                            final data =
+                                docs[index].data() as Map<String, dynamic>;
                             final senderName = data['senderName'] ?? 'User';
                             final message = data['message'] ?? '';
-                            final myUid = context.read<ProfileProvider>().userProfile?.uid;
+                            final myUid = context
+                                .read<ProfileProvider>()
+                                .userProfile
+                                ?.uid;
                             final isMe = data['senderId'] == myUid;
+                            final isGift = data['isGift'] == true;
+
+                            if (isGift) {
+                              return Align(
+                                alignment: isMe
+                                    ? Alignment.centerRight
+                                    : Alignment.centerLeft,
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.amber.shade700.withValues(alpha: 0.85),
+                                        Colors.orange.shade800.withValues(alpha: 0.85),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: Colors.amberAccent.withValues(alpha: 0.6),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        data['giftIcon'] ?? '🎁',
+                                        style: const TextStyle(fontSize: 20),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        isMe
+                                            ? 'You sent ${data['giftName'] ?? 'a gift'}!'
+                                            : '$senderName sent ${data['giftName'] ?? 'a gift'}!',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
 
                             return Align(
-                              alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                              alignment: isMe
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
                               child: Container(
                                 margin: const EdgeInsets.symmetric(vertical: 4),
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 10,
+                                ),
                                 decoration: BoxDecoration(
                                   color: isMe
                                       ? const Color(0xFFFF4D85)
@@ -523,7 +773,9 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                             decoration: BoxDecoration(
                               color: Colors.amber.withValues(alpha: 0.2),
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.amber.withValues(alpha: 0.5)),
+                              border: Border.all(
+                                color: Colors.amber.withValues(alpha: 0.5),
+                              ),
                             ),
                             child: const Icon(
                               Iconsax.gift,
@@ -549,7 +801,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                             ),
                             filled: true,
                             fillColor: Colors.black.withValues(alpha: 0.4),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 18,
+                              vertical: 14,
+                            ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(24),
                               borderSide: BorderSide(
@@ -562,7 +817,9 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                               borderRadius: BorderRadius.circular(24),
                               borderSide: BorderSide(
                                 color: isUnlocked
-                                    ? const Color(0xFFFF4D85).withValues(alpha: 0.6)
+                                    ? const Color(
+                                        0xFFFF4D85,
+                                      ).withValues(alpha: 0.6)
                                     : Colors.white12,
                               ),
                             ),
@@ -647,12 +904,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                 ),
 
                 // Top Header Bar
-                Positioned(
-                  top: 14,
-                  left: 16,
-                  right: 16,
-                  child: _buildTopBar(),
-                ),
+                Positioned(top: 14, left: 16, right: 16, child: _buildTopBar()),
 
                 // Draggable Small Preview Tile (Picture-in-Picture)
                 Positioned(
@@ -715,7 +967,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   }
 
   Widget _buildLocalVideo({bool large = false}) {
-    final showPlaceholder = _isVideoMuted ||
+    final showPlaceholder =
+        _isVideoMuted ||
         !_isCameraInitialized ||
         _cameraController == null ||
         !_cameraController!.value.isInitialized;
@@ -768,16 +1021,74 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   Widget _buildTopBar() {
     return Row(
       children: [
-        IconButton(
-          onPressed: _showReportBlockDialog,
-          icon: const Icon(Iconsax.shield_cross, color: Colors.redAccent),
-          style: IconButton.styleFrom(
-            backgroundColor: Colors.black.withValues(alpha: 0.45),
+        // Report Button
+        InkWell(
+          onTap: _showReportDialog,
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.55),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.orangeAccent.withValues(alpha: 0.5),
+              ),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Iconsax.warning_2, color: Colors.orangeAccent, size: 14),
+                SizedBox(width: 4),
+                Text(
+                  'Report',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
+        const SizedBox(width: 8),
+
+        // Block Button
+        InkWell(
+          onTap: _showBlockDialog,
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.55),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.redAccent.withValues(alpha: 0.5),
+              ),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Iconsax.user_remove, color: Colors.redAccent, size: 14),
+                SizedBox(width: 4),
+                Text(
+                  'Block',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
         const Spacer(),
+
+        // Call Timer Badge
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           decoration: BoxDecoration(
             color: Colors.black.withValues(alpha: 0.55),
             borderRadius: BorderRadius.circular(20),
@@ -801,8 +1112,19 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
             ],
           ),
         ),
+
         const Spacer(),
-        const SizedBox(width: 48),
+
+        // Exit / End Call Button
+        IconButton(
+          onPressed: _endCall,
+          icon: const Icon(Iconsax.call_remove, color: Colors.white70, size: 18),
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.red.withValues(alpha: 0.3),
+            padding: const EdgeInsets.all(8),
+          ),
+          tooltip: 'End Call',
+        ),
       ],
     );
   }
@@ -811,21 +1133,19 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     return ElevatedButton.icon(
       onPressed: _skipAndNext,
       icon: const Icon(Iconsax.next, size: 16),
-      label: const Text('Skip'),
+      label: const Text('NEXT'),
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFFFF4D85),
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       ),
     );
   }
 
   Widget _buildControls() {
-    final double progress = (_callDuration / 60.0).clamp(0.0, 1.0);
-    final bool isUnlocked = _callDuration >= 60;
+    final double progress = (_callDuration / 180.0).clamp(0.0, 1.0);
+    final bool isUnlocked = _callDuration >= 180;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -843,7 +1163,9 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           // Button 1: Camera Mute Toggle
           _roundButton(
             _isVideoMuted ? Iconsax.video_slash : Iconsax.video,
-            _isVideoMuted ? Colors.redAccent.withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.15),
+            _isVideoMuted
+                ? Colors.redAccent.withValues(alpha: 0.3)
+                : Colors.white.withValues(alpha: 0.15),
             _isVideoMuted ? Colors.redAccent : Colors.white,
             () => setState(() => _isVideoMuted = !_isVideoMuted),
           ),
@@ -871,7 +1193,9 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                     strokeWidth: 3,
                     backgroundColor: Colors.white.withValues(alpha: 0.15),
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      isUnlocked ? const Color(0xFF00E676) : const Color(0xFFFF4D85),
+                      isUnlocked
+                          ? const Color(0xFF00E676)
+                          : const Color(0xFFFF4D85),
                     ),
                   ),
                 ),
@@ -892,7 +1216,9 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   ),
                   child: Icon(
                     isUnlocked ? Iconsax.message_text : Iconsax.lock_1,
-                    color: isUnlocked ? const Color(0xFF00E676) : const Color(0xFFFF4D85),
+                    color: isUnlocked
+                        ? const Color(0xFF00E676)
+                        : const Color(0xFFFF4D85),
                     size: 22,
                   ),
                 ),
@@ -901,14 +1227,20 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   Positioned(
                     bottom: 0,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFFFF4D85).withValues(alpha: 0.6), width: 1),
+                        border: Border.all(
+                          color: const Color(0xFFFF4D85).withValues(alpha: 0.6),
+                          width: 1,
+                        ),
                       ),
                       child: Text(
-                        '${60 - _callDuration}s',
+                        '${180 - _callDuration}s',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 9,
@@ -941,7 +1273,12 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     );
   }
 
-  Widget _roundButton(IconData icon, Color bgColor, Color iconColor, VoidCallback onTap) {
+  Widget _roundButton(
+    IconData icon,
+    Color bgColor,
+    Color iconColor,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -950,9 +1287,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         decoration: BoxDecoration(
           color: bgColor,
           shape: BoxShape.circle,
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.15),
-          ),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
         ),
         child: Icon(icon, color: iconColor, size: 22),
       ),
