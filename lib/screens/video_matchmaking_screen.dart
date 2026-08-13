@@ -34,11 +34,14 @@ class VideoMatchmakingScreen extends StatefulWidget {
 }
 
 class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final VideoChatService _videoChatService = VideoChatService();
   StreamSubscription<DocumentSnapshot>? _ticketSubscription;
   Timer? _searchRetryTimer;
   late AnimationController _pulseController;
+  Timer? _countdownTimer;
+  int _countdownSeconds = 10;
+  late AnimationController _countdownController;
 
   CameraController? _cameraController;
   bool _isCameraInitialized = false;
@@ -57,6 +60,10 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1400),
     )..repeat(reverse: true);
+    _countdownController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 10),
+    );
     _initCamera();
     _listenToTicket();
     _search();
@@ -87,6 +94,8 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
 
   @override
   void dispose() {
+    _countdownTimer?.cancel();
+    _countdownController.dispose();
     _cameraController?.dispose();
     _ticketSubscription?.cancel();
     _searchRetryTimer?.cancel();
@@ -98,40 +107,71 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
   }
 
   void _listenToTicket() {
-    _ticketSubscription = _videoChatService.getTicketStream(_userId).listen((
-      snapshot,
-    ) {
-      if (!mounted || !snapshot.exists) return;
-      final data = snapshot.data() as Map<String, dynamic>?;
-      if (data == null) return;
+    _ticketSubscription = _videoChatService
+        .getTicketStream(_userId)
+        .listen(
+          (snapshot) {
+            if (!mounted || !snapshot.exists) return;
+            final data = snapshot.data() as Map<String, dynamic>?;
+            if (data == null) return;
 
-      final status = data['status'] as String?;
-      if (status == 'proposed') {
-        setState(() {
-          _isSearching = false;
-          _proposal = {
-            'channelId': data['channelId'],
-            'matchedWith': data['matchedWith'],
-            'partnerName': data['partnerName'] ?? 'User',
-            'partnerPhoto': data['partnerPhoto'] ?? '',
-            'partnerGender': data['partnerGender'] ?? 'Other',
-            'partnerAge': (data['partnerAge'] as num?)?.toInt() ?? 25,
-            'partnerCountry': data['partnerCountry'] ?? 'Unknown',
-            'isHost': data['isHost'] == true,
-          };
-        });
-      } else if (status == 'matched') {
-        _openCallFromTicket(data);
-      } else if (status == 'waiting' && _proposal != null) {
-        setState(() {
-          _proposal = null;
-          _isAccepting = false;
-        });
-        _search();
-      }
-    }, onError: (error) {
-      debugPrint('Video matchmaking ticket listener failed: $error');
+            final status = data['status'] as String?;
+            if (status == 'proposed') {
+              setState(() {
+                _isSearching = false;
+                _proposal = {
+                  'channelId': data['channelId'],
+                  'matchedWith': data['matchedWith'],
+                  'partnerName': data['partnerName'] ?? 'User',
+                  'partnerPhoto': data['partnerPhoto'] ?? '',
+                  'partnerGender': data['partnerGender'] ?? 'Other',
+                  'partnerAge': (data['partnerAge'] as num?)?.toInt() ?? 25,
+                  'partnerCountry': data['partnerCountry'] ?? 'Unknown',
+                  'isHost': data['isHost'] == true,
+                };
+              });
+              _startCountdown();
+            } else if (status == 'matched') {
+              _openCallFromTicket(data);
+            } else if (status == 'waiting' && _proposal != null) {
+              _cancelCountdown();
+              setState(() {
+                _proposal = null;
+                _isAccepting = false;
+              });
+              _search();
+            }
+          },
+          onError: (error) {
+            debugPrint('Video matchmaking ticket listener failed: $error');
+          },
+        );
+  }
+
+  void _startCountdown() {
+    _countdownTimer?.cancel();
+    _countdownController.stop();
+    _countdownController.reset();
+    setState(() {
+      _countdownSeconds = 10;
     });
+    _countdownController.forward(from: 0);
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return;
+      setState(() {
+        _countdownSeconds--;
+      });
+      if (_countdownSeconds <= 0) {
+        timer.cancel();
+        _nextProposal();
+      }
+    });
+  }
+
+  void _cancelCountdown() {
+    _countdownTimer?.cancel();
+    _countdownController.stop();
+    _countdownController.reset();
   }
 
   void _startSearchRetry() {
@@ -166,6 +206,7 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
         _isSearching = false;
         _proposal = result;
       });
+      _startCountdown();
     } else {
       setState(() => _isSearching = false);
     }
@@ -173,6 +214,7 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
 
   Future<void> _acceptProposal() async {
     if (_isAccepting) return;
+    _cancelCountdown();
     setState(() => _isAccepting = true);
     final result = await _videoChatService.acceptMatch(_userId);
     if (!mounted) return;
@@ -182,6 +224,7 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
   }
 
   Future<void> _nextProposal() async {
+    _cancelCountdown();
     setState(() {
       _proposal = null;
       _isAccepting = false;
@@ -211,6 +254,7 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
   Future<void> _openCall(Map<String, dynamic> data) async {
     if (_navigatingToCall) return;
     _navigatingToCall = true;
+    _cancelCountdown();
     await _ticketSubscription?.cancel();
     if (!mounted) return;
 
@@ -262,7 +306,14 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
                   if (_proposal == null) _buildSearchingPanel(currentPhoto),
                   if (_proposal != null) _buildProposalCard(_proposal!),
                   const SizedBox(height: 18),
-                  _buildCancelButton(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildFlipCameraButton(),
+                      const SizedBox(width: 18),
+                      _buildCancelButton(),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -292,11 +343,7 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF111116),
-            Color(0xFF26131C),
-            Color(0xFF111116),
-          ],
+          colors: [Color(0xFF111116), Color(0xFF26131C), Color(0xFF111116)],
         ),
       ),
       child: Center(
@@ -339,7 +386,7 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
                 ),
               ),
               StreamBuilder<int>(
-                stream: _videoChatService.getActiveVideoUsersCountStream(),
+                stream: _videoChatService.getOnlineUsersCountStream(),
                 builder: (context, snapshot) {
                   final count = snapshot.data ?? 0;
                   return Row(
@@ -354,7 +401,7 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        '$count active users chatting',
+                        '$count active users online',
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.8),
                           fontWeight: FontWeight.w700,
@@ -379,10 +426,11 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: (_proposal == null
-                        ? const Color(0xFFFF4D85)
-                        : const Color(0xFF00E676))
-                    .withValues(alpha: 0.4),
+                color:
+                    (_proposal == null
+                            ? const Color(0xFFFF4D85)
+                            : const Color(0xFF00E676))
+                        .withValues(alpha: 0.4),
                 blurRadius: 10,
                 offset: const Offset(0, 3),
               ),
@@ -509,9 +557,7 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
           ),
           const SizedBox(height: 20),
           Text(
-            _isSearching
-                ? 'Looking for video match...'
-                : 'Waiting in queue...',
+            _isSearching ? 'Looking for video match...' : 'Waiting in queue...',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 21,
@@ -545,6 +591,78 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCountdownRing() {
+    return AnimatedBuilder(
+      animation: _countdownController,
+      builder: (context, _) {
+        return SizedBox(
+          width: 128,
+          height: 128,
+          child: CircularProgressIndicator(
+            value: 1 - _countdownController.value,
+            strokeWidth: 5,
+            strokeCap: StrokeCap.round,
+            backgroundColor: Colors.white.withValues(alpha: 0.1),
+            valueColor: const AlwaysStoppedAnimation<Color>(
+              Color(0xFFFF4D85),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCountdownBadge() {
+    return AnimatedBuilder(
+      animation: _countdownController,
+      builder: (context, _) {
+        return Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.black.withValues(alpha: 0.75),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.2),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.3),
+                blurRadius: 8,
+              ),
+            ],
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                width: 36,
+                height: 36,
+                child: CircularProgressIndicator(
+                  value: 1 - _countdownController.value,
+                  strokeWidth: 3,
+                  strokeCap: StrokeCap.round,
+                  backgroundColor: Colors.white.withValues(alpha: 0.15),
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                    Color(0xFFFF8C00),
+                  ),
+                ),
+              ),
+              Text(
+                '$_countdownSeconds',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -610,29 +728,51 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
           ),
           const SizedBox(height: 18),
 
-          // Partner Photo Avatar with Glowing Halo
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: const LinearGradient(
-                colors: [Color(0xFFFF4D85), Color(0xFFFF8C00), Color(0xFFFFD700)],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFFF4D85).withValues(alpha: 0.4),
-                  blurRadius: 16,
-                  spreadRadius: 2,
+          // Partner Photo Avatar with Countdown Progress Ring
+          SizedBox(
+            width: 132,
+            height: 132,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                if (!_isAccepting) _buildCountdownRing(),
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color(0xFFFF4D85),
+                        Color(0xFFFF8C00),
+                        Color(0xFFFFD700),
+                      ],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFFF4D85).withValues(alpha: 0.4),
+                        blurRadius: 16,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: CircleAvatar(
+                    radius: 48,
+                    backgroundColor: Colors.black,
+                    backgroundImage: photo.isNotEmpty
+                        ? NetworkImage(photo)
+                        : null,
+                    child: photo.isEmpty
+                        ? const Icon(Iconsax.user, color: Colors.white, size: 44)
+                        : null,
+                  ),
                 ),
+                if (!_isAccepting)
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: _buildCountdownBadge(),
+                  ),
               ],
-            ),
-            child: CircleAvatar(
-              radius: 48,
-              backgroundColor: Colors.black,
-              backgroundImage: photo.isNotEmpty ? NetworkImage(photo) : null,
-              child: photo.isEmpty
-                  ? const Icon(Iconsax.user, color: Colors.white, size: 44)
-                  : null,
             ),
           ),
           const SizedBox(height: 14),
@@ -649,8 +789,11 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Iconsax.user,
-                  color: Colors.white.withValues(alpha: 0.7), size: 14),
+              Icon(
+                Iconsax.user,
+                color: Colors.white.withValues(alpha: 0.7),
+                size: 14,
+              ),
               const SizedBox(width: 4),
               Text(
                 gender,
@@ -667,8 +810,11 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Icon(Iconsax.global,
-                  color: Colors.white.withValues(alpha: 0.7), size: 14),
+              Icon(
+                Iconsax.global,
+                color: Colors.white.withValues(alpha: 0.7),
+                size: 14,
+              ),
               const SizedBox(width: 4),
               Text(
                 country,
@@ -779,12 +925,56 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
   Widget _buildCancelButton() {
     return IconButton(
       onPressed: () => Navigator.pop(context),
-      icon: const Icon(Iconsax.close_circle, color: Colors.redAccent, size: 30),
+      icon: const Icon(Iconsax.call_remove5, color: Colors.redAccent, size: 30),
       style: IconButton.styleFrom(
         backgroundColor: Colors.black.withValues(alpha: 0.5),
         fixedSize: const Size(58, 58),
       ),
     );
+  }
+
+  Widget _buildFlipCameraButton() {
+    return IconButton(
+      onPressed: _isCameraInitialized ? _switchCamera : null,
+      icon: const Icon(
+        Icons.flip_camera_android,
+        color: Colors.white,
+        size: 24,
+      ),
+      style: IconButton.styleFrom(
+        backgroundColor: Colors.black.withValues(alpha: 0.5),
+        fixedSize: const Size(58, 58),
+      ),
+    );
+  }
+
+  Future<void> _switchCamera() async {
+    try {
+      final cameras = await availableCameras();
+      if (cameras.length < 2) return;
+
+      final currentLens = _cameraController?.description.lensDirection;
+      final newCamera = cameras.firstWhere(
+        (cam) =>
+            cam.lensDirection ==
+            (currentLens == CameraLensDirection.front
+                ? CameraLensDirection.back
+                : CameraLensDirection.front),
+        orElse: () => cameras.first,
+      );
+
+      await _cameraController?.dispose();
+      _cameraController = CameraController(
+        newCamera,
+        ResolutionPreset.medium,
+        enableAudio: false,
+      );
+      await _cameraController!.initialize();
+
+      if (mounted) setState(() {});
+    } catch (e) {
+      debugPrint('Error switching camera: $e');
+    }
   }
 
   Widget _criteriaChip(IconData icon, String label) {
