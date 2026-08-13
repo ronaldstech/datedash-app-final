@@ -4,11 +4,11 @@ import 'package:snellum/models/payment_operator_model.dart';
 
 class PaymentService {
   static const String _operatorsEndpoint =
-      'https://unimarket-mw.com/snellum/api/paychangu/get_operators.php';
+      'https://lynxtechmedia.com/ronaldstech/snellum/api/paychangu/get_operators.php';
   static const String _initEndpoint =
-      'https://unimarket-mw.com/snellum/api/paychangu/initialize_payment.php';
+      'https://lynxtechmedia.com/ronaldstech/snellum/api/paychangu/initialize_payment.php';
   static const String _verifyEndpoint =
-      'https://unimarket-mw.com/snellum/api/paychangu/verify_payment.php';
+      'https://lynxtechmedia.com/ronaldstech/snellum/api/paychangu/verify_payment.php';
 
   /// Fetches the supported mobile money operators from the remote backend.
   Future<List<PaymentOperator>> getMobileOperators() async {
@@ -23,7 +23,8 @@ class PaymentService {
           return data.map((json) => PaymentOperator.fromJson(json)).toList();
         } else {
           throw Exception(
-              responseData['message'] ?? 'Failed to load operators');
+            responseData['message'] ?? 'Failed to load operators',
+          );
         }
       } else {
         throw Exception('Server error: ${response.statusCode}');
@@ -60,7 +61,9 @@ class PaymentService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-        if (data['status'] == 'success' || data['message'] == 'Transaction initialized successfully' || data['message'] == 'Payment initiated successfully.') {
+        if (data['status'] == 'success' ||
+            data['message'] == 'Transaction initialized successfully' ||
+            data['message'] == 'Payment initiated successfully.') {
           // Return the full 'data' object which contains ref_id, trans_id, status etc.
           return data['data'] ?? data;
         } else {
@@ -77,7 +80,9 @@ class PaymentService {
   /// Verifies a payment status using the transaction reference.
   Future<Map<String, dynamic>> verifyPayment(String txRef) async {
     try {
-      final response = await http.get(Uri.parse('$_verifyEndpoint?txRef=$txRef'));
+      final response = await http.get(
+        Uri.parse('$_verifyEndpoint?txRef=$txRef'),
+      );
 
       if (response.statusCode == 200) {
         return json.decode(response.body);
