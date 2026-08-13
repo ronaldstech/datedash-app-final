@@ -1,21 +1,24 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
-import '../providers/profile_provider.dart';
+import '../models/gift_model.dart';
 import '../providers/language_provider.dart';
+import '../providers/profile_provider.dart';
+import '../services/chat_service.dart';
 import '../services/notification_service.dart';
 import '../services/profile_service.dart';
-
-import '../models/gift_model.dart';
 
 class GiftSelectionSheet extends StatelessWidget {
   final String targetUserId;
   final String targetUserName;
+  final Function(GiftItem gift)? onGiftSent;
 
   const GiftSelectionSheet({
     super.key,
     required this.targetUserId,
     required this.targetUserName,
+    this.onGiftSent,
   });
 
   static List<GiftItem> get gifts => GiftData.gifts;
@@ -330,14 +333,41 @@ class GiftSelectionSheet extends StatelessWidget {
         // 2. Add full reward to recipient
         await ProfileService().addCredits(targetUserId, gift.cost);
 
-        // 3. Send notification to recipient
+        // 3. Record gift transaction in Firestore
+        await FirebaseFirestore.instance.collection('gift_transactions').add({
+          'senderId': myUid,
+          'receiverId': targetUserId,
+          'giftName': gift.name,
+          'giftIcon': gift.icon,
+          'cost': gift.cost,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+
+        // 4. Send notification to recipient
         await NotificationService().sendNotification(
           recipientId: targetUserId,
           senderId: myUid,
           senderName: profileProvider.displayName,
           type: 'gift',
-          message: '${gift.icon} ${gift.name}',
+          message: '${gift.icon} Sent you a ${gift.name} (${gift.cost} sparks)',
         );
+
+        // 5. Send real chat message to 1-on-1 inbox
+        try {
+          final chatId = await ChatService().getOrCreateChat(myUid, targetUserId);
+          await ChatService().sendGift(
+            chatId: chatId,
+            senderId: myUid,
+            receiverId: targetUserId,
+            giftType: '${gift.icon} ${gift.name}',
+            giftValue: gift.cost,
+          );
+        } catch (e) {
+          debugPrint('Error sending gift chat message: $e');
+        }
+
+        // 6. Invoke callback for in-call live stream overlay
+        onGiftSent?.call(gift);
 
         if (context.mounted) {
           Navigator.pop(context); // Close selection sheet
