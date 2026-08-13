@@ -62,7 +62,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         title: Text(
           languageProvider.getString('my_profile'),
-          style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: -0.3),
+          style: const TextStyle(
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.3,
+          ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -108,7 +111,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onRefresh: _loadProfile,
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
                 children: [
                   _buildProfileHeader(languageProvider, isDark),
                   const SizedBox(height: 28),
@@ -146,11 +152,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: _primaryColor.withValues(alpha: isDark ? 0.35 : 0.2),
+                      color: _primaryColor.withValues(
+                        alpha: isDark ? 0.35 : 0.2,
+                      ),
                       blurRadius: 24,
                       spreadRadius: 2,
                       offset: const Offset(0, 8),
-                    )
+                    ),
                   ],
                 ),
                 child: CircleAvatar(
@@ -160,7 +168,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     radius: 60,
                     backgroundColor: _primaryColor.withValues(alpha: 0.1),
                     child: ClipOval(
-                      child: (_profile.photos.isNotEmpty || _user?.photoURL != null)
+                      child:
+                          (_profile.photos.isNotEmpty ||
+                              _user?.photoURL != null)
                           ? Image.network(
                               _profile.photos.isNotEmpty
                                   ? _profile.photos.first
@@ -168,17 +178,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               width: 120,
                               height: 120,
                               fit: BoxFit.cover,
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: _primaryColor,
-                                  ),
-                                );
-                              },
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Center(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: _primaryColor,
+                                      ),
+                                    );
+                                  },
                               errorBuilder: (context, error, stackTrace) {
-                                return Icon(Iconsax.user, size: 48, color: _primaryColor);
+                                return Icon(
+                                  Iconsax.user,
+                                  size: 48,
+                                  color: _primaryColor,
+                                );
                               },
                             )
                           : Icon(Iconsax.user, size: 48, color: _primaryColor),
@@ -202,10 +217,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: Colors.black.withValues(alpha: 0.15),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
-                    )
+                    ),
                   ],
                 ),
-                child: const Icon(Iconsax.edit_2, color: Colors.white, size: 18),
+                child: const Icon(
+                  Iconsax.edit_2,
+                  color: Colors.white,
+                  size: 18,
+                ),
               ),
             ],
           ),
@@ -233,7 +252,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (_user?.email != null && _user!.email!.isNotEmpty) ...[
           const SizedBox(height: 4),
           Text(
-            _user!.email!,
+            _user.email!,
             style: TextStyle(
               fontSize: 14,
               color: isDark
@@ -265,8 +284,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           borderRadius: BorderRadius.circular(26),
           boxShadow: [
             BoxShadow(
-              color: (isComplete ? Colors.green : _primaryColor)
-                  .withValues(alpha: isDark ? 0.4 : 0.25),
+              color: (isComplete ? Colors.green : _primaryColor).withValues(
+                alpha: isDark ? 0.4 : 0.25,
+              ),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -284,7 +304,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     value: _profile.completionPercentage / 100,
                     strokeWidth: 5.5,
                     backgroundColor: Colors.white.withValues(alpha: 0.25),
-                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      Colors.white,
+                    ),
                   ),
                 ),
                 Text(
@@ -333,7 +355,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: Colors.white.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Iconsax.arrow_right_3, color: Colors.white, size: 20),
+              child: const Icon(
+                Iconsax.arrow_right_3,
+                color: Colors.white,
+                size: 20,
+              ),
             ),
           ],
         ),
