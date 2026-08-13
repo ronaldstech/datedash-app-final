@@ -308,6 +308,38 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     );
   }
 
+  Future<void> _switchCamera() async {
+    try {
+      final cameras = await availableCameras();
+      if (cameras.length < 2) return;
+
+      final currentLens = _cameraController?.description.lensDirection;
+      final newCamera = cameras.firstWhere(
+        (cam) => cam.lensDirection == (currentLens == CameraLensDirection.front
+            ? CameraLensDirection.back
+            : CameraLensDirection.front),
+        orElse: () => cameras.first,
+      );
+
+      await _cameraController?.dispose();
+      _cameraController = CameraController(
+        newCamera,
+        ResolutionPreset.medium,
+        enableAudio: false,
+      );
+      await _cameraController!.initialize();
+
+      // Switch camera on webview/jitsi if available
+      _webViewController?.runJavaScript(
+        'if (window.jitsiAPI) { window.jitsiAPI.executeCommand("toggleCamera"); }'
+      );
+
+      if (mounted) setState(() {});
+    } catch (e) {
+      debugPrint('Error switching camera: $e');
+    }
+  }
+
   void _showChatBottomSheet() {
     showModalBottomSheet(
       context: context,
@@ -474,67 +506,91 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   ),
                   const SizedBox(height: 12),
 
-                  // Input Box
-                  TextField(
-                    controller: _messageController,
-                    enabled: isUnlocked,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      hintText: isUnlocked
-                          ? 'Type a message (saves to Inbox)...'
-                          : 'Chat unlocks in ${60 - _callDuration}s...',
-                      hintStyle: TextStyle(
-                        color: isUnlocked
-                            ? Colors.white54
-                            : Colors.white.withValues(alpha: 0.35),
-                      ),
-                      filled: true,
-                      fillColor: Colors.black.withValues(alpha: 0.4),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide(
-                          color: isUnlocked
-                              ? const Color(0xFFFF4D85)
-                              : Colors.white12,
+                  // Input Box with Gifting Button
+                  Row(
+                    children: [
+                      if (isUnlocked)
+                        IconButton(
+                          onPressed: _showGifts,
+                          icon: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.amber.withValues(alpha: 0.2),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.amber.withValues(alpha: 0.5)),
+                            ),
+                            child: const Icon(
+                              Iconsax.gift,
+                              color: Colors.amber,
+                              size: 20,
+                            ),
+                          ),
+                          tooltip: 'Send Gift',
+                        ),
+                      Expanded(
+                        child: TextField(
+                          controller: _messageController,
+                          enabled: isUnlocked,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            hintText: isUnlocked
+                                ? 'Type a message (saves to Inbox)...'
+                                : 'Chat unlocks in ${60 - _callDuration}s...',
+                            hintStyle: TextStyle(
+                              color: isUnlocked
+                                  ? Colors.white54
+                                  : Colors.white.withValues(alpha: 0.35),
+                            ),
+                            filled: true,
+                            fillColor: Colors.black.withValues(alpha: 0.4),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(24),
+                              borderSide: BorderSide(
+                                color: isUnlocked
+                                    ? const Color(0xFFFF4D85)
+                                    : Colors.white12,
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(24),
+                              borderSide: BorderSide(
+                                color: isUnlocked
+                                    ? const Color(0xFFFF4D85).withValues(alpha: 0.6)
+                                    : Colors.white12,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(24),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFFF4D85),
+                                width: 1.5,
+                              ),
+                            ),
+                            suffixIcon: IconButton(
+                              onPressed: isUnlocked
+                                  ? () {
+                                      _sendMessage();
+                                      setModalState(() {});
+                                    }
+                                  : null,
+                              icon: Icon(
+                                Iconsax.send_15,
+                                color: isUnlocked
+                                    ? const Color(0xFFFF4D85)
+                                    : Colors.white24,
+                              ),
+                            ),
+                          ),
+                          onSubmitted: (_) {
+                            if (isUnlocked) {
+                              _sendMessage();
+                              setModalState(() {});
+                            }
+                          },
                         ),
                       ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide(
-                          color: isUnlocked
-                              ? const Color(0xFFFF4D85).withValues(alpha: 0.6)
-                              : Colors.white12,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: const BorderSide(
-                          color: Color(0xFFFF4D85),
-                          width: 1.5,
-                        ),
-                      ),
-                      suffixIcon: IconButton(
-                        onPressed: isUnlocked
-                            ? () {
-                                _sendMessage();
-                                setModalState(() {});
-                              }
-                            : null,
-                        icon: Icon(
-                          Iconsax.send_15,
-                          color: isUnlocked
-                              ? const Color(0xFFFF4D85)
-                              : Colors.white24,
-                        ),
-                      ),
-                    ),
-                    onSubmitted: (_) {
-                      if (isUnlocked) {
-                        _sendMessage();
-                        setModalState(() {});
-                      }
-                    },
+                    ],
                   ),
                 ],
               ),
@@ -699,22 +755,16 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFFFF4D85), Color(0xFFFF8C00)],
-            ),
+            color: Colors.black.withValues(alpha: 0.55),
             borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFFFF4D85).withValues(alpha: 0.4),
-                blurRadius: 10,
-                offset: const Offset(0, 3),
-              ),
-            ],
+            border: Border.all(
+              color: const Color(0xFFFF4D85).withValues(alpha: 0.4),
+            ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Iconsax.timer_1, color: Colors.white, size: 16),
+              const Icon(Iconsax.timer_1, color: Color(0xFFFF4D85), size: 16),
               const SizedBox(width: 6),
               Text(
                 _formatDuration(_callDuration),
@@ -733,8 +783,9 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           icon: const Icon(Iconsax.next, size: 16),
           label: const Text('Next'),
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFFFF4D85),
+            backgroundColor: Colors.black.withValues(alpha: 0.55),
             foregroundColor: Colors.white,
+            side: BorderSide(color: const Color(0xFFFF4D85).withValues(alpha: 0.5)),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18),
             ),
@@ -748,117 +799,134 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     final double progress = (_callDuration / 60.0).clamp(0.0, 1.0);
     final bool isUnlocked = _callDuration >= 60;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        // Button 1: Camera Mute Toggle
-        _roundButton(
-          _isVideoMuted ? Iconsax.video_slash : Iconsax.video,
-          _isVideoMuted ? Colors.white30 : const Color(0xFFFF4D85),
-          () => setState(() => _isVideoMuted = !_isVideoMuted),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.65),
+        borderRadius: BorderRadius.circular(36),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.15),
+          width: 1,
         ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          // Button 1: Camera Mute Toggle
+          _roundButton(
+            _isVideoMuted ? Iconsax.video_slash : Iconsax.video,
+            _isVideoMuted ? Colors.redAccent.withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.15),
+            _isVideoMuted ? Colors.redAccent : Colors.white,
+            () => setState(() => _isVideoMuted = !_isVideoMuted),
+          ),
 
-        // Button 2: Redesigned 1-on-1 Chat Button with Circular Progress Border Ring
-        GestureDetector(
-          onTap: _showChatBottomSheet,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // Circular Progress Indicator Ring around the button
-              SizedBox(
-                width: 66,
-                height: 66,
-                child: CircularProgressIndicator(
-                  value: progress,
-                  strokeWidth: 3.5,
-                  backgroundColor: Colors.white.withValues(alpha: 0.15),
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    isUnlocked ? const Color(0xFF00E676) : const Color(0xFFFF4D85),
+          // Button 2: Switch Camera (Front/Back)
+          _roundButton(
+            Icons.flip_camera_android,
+            Colors.white.withValues(alpha: 0.15),
+            Colors.white,
+            _switchCamera,
+          ),
+
+          // Button 3: Redesigned 1-on-1 Chat Button with Circular Progress Border Ring
+          GestureDetector(
+            onTap: _showChatBottomSheet,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Circular Progress Indicator Ring around the button
+                SizedBox(
+                  width: 58,
+                  height: 58,
+                  child: CircularProgressIndicator(
+                    value: progress,
+                    strokeWidth: 3,
+                    backgroundColor: Colors.white.withValues(alpha: 0.15),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      isUnlocked ? const Color(0xFF00E676) : const Color(0xFFFF4D85),
+                    ),
                   ),
                 ),
-              ),
-              // Main Circular Button
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: isUnlocked
-                      ? const LinearGradient(
-                          colors: [Color(0xFF00E676), Color(0xFF00B0FF)],
-                        )
-                      : const LinearGradient(
-                          colors: [Color(0xFFFF4D85), Color(0xFFFF8C00)],
+                // Main Circular Button
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: isUnlocked
+                        ? const Color(0xFF00E676).withValues(alpha: 0.25)
+                        : Colors.white.withValues(alpha: 0.15),
+                    border: Border.all(
+                      color: isUnlocked
+                          ? const Color(0xFF00E676).withValues(alpha: 0.6)
+                          : const Color(0xFFFF4D85).withValues(alpha: 0.4),
+                    ),
+                  ),
+                  child: Icon(
+                    isUnlocked ? Iconsax.message_text : Iconsax.lock_1,
+                    color: isUnlocked ? const Color(0xFF00E676) : const Color(0xFFFF4D85),
+                    size: 22,
+                  ),
+                ),
+                // Timer tag badge when locked
+                if (!isUnlocked)
+                  Positioned(
+                    bottom: 0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.9),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFFF4D85).withValues(alpha: 0.6), width: 1),
+                      ),
+                      child: Text(
+                        '${60 - _callDuration}s',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w900,
                         ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: (isUnlocked
-                              ? const Color(0xFF00E676)
-                              : const Color(0xFFFF4D85))
-                          .withValues(alpha: 0.45),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  isUnlocked ? Iconsax.message_text : Iconsax.lock_1,
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
-              // Timer tag badge when locked
-              if (!isUnlocked)
-                Positioned(
-                  bottom: 0,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xFFFF4D85), width: 1),
-                    ),
-                    child: Text(
-                      '${60 - _callDuration}s',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w900,
                       ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
-        ),
 
-        // Button 3: Send Gift
-        _roundButton(Iconsax.gift, Colors.amber, _showGifts),
+          // Button 4: Send Gift
+          _roundButton(
+            Iconsax.gift,
+            Colors.amber.withValues(alpha: 0.2),
+            Colors.amber,
+            _showGifts,
+          ),
 
-        // Button 4: End Call
-        _roundButton(Iconsax.call_remove5, Colors.redAccent, _endCall),
-      ],
+          // Button 5: End Call
+          _roundButton(
+            Iconsax.call_remove5,
+            Colors.redAccent.withValues(alpha: 0.85),
+            Colors.white,
+            _endCall,
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _roundButton(IconData icon, Color color, VoidCallback onTap) {
+  Widget _roundButton(IconData icon, Color bgColor, Color iconColor, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 56,
-        height: 56,
+        width: 48,
+        height: 48,
         decoration: BoxDecoration(
-          color: color,
+          color: bgColor,
           shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: color.withValues(alpha: 0.4),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.15),
+          ),
         ),
-        child: Icon(icon, color: Colors.white, size: 24),
+        child: Icon(icon, color: iconColor, size: 22),
       ),
     );
   }
