@@ -7,11 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 import '../providers/profile_provider.dart';
 import '../services/chat_service.dart';
-import '../services/jitsi_call_service.dart';
 import '../services/profile_service.dart';
 import '../services/video_chat_service.dart';
 import '../widgets/gift_selection_sheet.dart';
@@ -40,14 +38,16 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   static const _securityChannel = MethodChannel('com.example.datedash/security');
 
   final VideoChatService _videoChatService = VideoChatService();
-  final JitsiCallService _jitsiCallService = JitsiCallService();
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  WebViewController? _webViewController;
   CameraController? _cameraController;
   bool _isCameraInitialized = false;
+  bool _isSwitchingCamera = false;
   bool _isVideoMuted = false;
+  bool _isLocalLarge = false;
+  double? _pipLeft;
+  double? _pipTop;
 
   Timer? _durationTimer;
   StreamSubscription<DocumentSnapshot>? _callSessionSubscription;
@@ -59,7 +59,6 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     super.initState();
     _secureScreen();
     _startTimer();
-    _initInAppVideo();
     _initLocalCamera();
 
     Future.delayed(const Duration(seconds: 2), () {
@@ -78,17 +77,6 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
-  }
-
-  void _initInAppVideo() {
-    final roomUri = _jitsiCallService.buildRoomUri(
-      roomName: widget.channelId,
-      isVideo: true,
-    );
-    _webViewController = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(Colors.black)
-      ..loadRequest(roomUri);
   }
 
   void _initLocalCamera() async {
@@ -309,6 +297,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   }
 
   Future<void> _switchCamera() async {
+    if (_isSwitchingCamera) return;
+    _isSwitchingCamera = true;
     try {
       final cameras = await availableCameras();
       if (cameras.length < 2) return;
@@ -321,6 +311,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         orElse: () => cameras.first,
       );
 
+      // Prevent building a preview on the disposed controller during the swap
+      if (mounted) setState(() => _isCameraInitialized = false);
       await _cameraController?.dispose();
       _cameraController = CameraController(
         newCamera,
@@ -328,16 +320,30 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         enableAudio: false,
       );
       await _cameraController!.initialize();
-
-      // Switch camera on webview/jitsi if available
-      _webViewController?.runJavaScript(
-        'if (window.jitsiAPI) { window.jitsiAPI.executeCommand("toggleCamera"); }'
-      );
-
-      if (mounted) setState(() {});
+      if (mounted) setState(() => _isCameraInitialized = true);
     } catch (e) {
       debugPrint('Error switching camera: $e');
+    } finally {
+      _isSwitchingCamera = false;
     }
+  }
+
+  void _togglePreviewSwap() {
+    setState(() {
+      _isLocalLarge = !_isLocalLarge;
+    });
+  }
+
+  void _onPipDrag(DragUpdateDetails details, BoxConstraints constraints) {
+    const pipW = 110.0;
+    const pipH = 155.0;
+    final left =
+        (_pipLeft ?? (constraints.maxWidth - pipW - 16)) + details.delta.dx;
+    final top = (_pipTop ?? 80.0) + details.delta.dy;
+    setState(() {
+      _pipLeft = left.clamp(8.0, constraints.maxWidth - pipW - 8);
+      _pipTop = top.clamp(72.0, constraints.maxHeight - pipH - 8);
+    });
   }
 
   void _showChatBottomSheet() {
@@ -609,119 +615,137 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final profile = context.watch<ProfileProvider>().userProfile;
-    final userPhoto = profile?.photos.isNotEmpty == true ? profile!.photos.first : '';
-
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: Stack(
-          children: [
-            // WhatsApp-style Remote Video View (In-App WebView Jitsi Stream)
-            Positioned.fill(
-              child: _webViewController != null
-                  ? WebViewWidget(controller: _webViewController!)
-                  : _buildBackdrop(userPhoto),
-            ),
-
-            // Gradient Overlay for readability
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.black.withValues(alpha: 0.45),
-                      Colors.transparent,
-                      Colors.black.withValues(alpha: 0.8),
-                    ],
-                  ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Stack(
+              children: [
+                // WhatsApp-style Main Video Tile (large)
+                Positioned.fill(
+                  child: _isLocalLarge
+                      ? _buildLocalVideo(large: true)
+                      : _buildRemoteVideo(),
                 ),
-              ),
-            ),
 
-            // Top Header Bar
-            Positioned(
-              top: 14,
-              left: 16,
-              right: 16,
-              child: _buildTopBar(),
-            ),
-
-            // Floating Local Camera Preview Card (Picture-in-Picture)
-            Positioned(
-              top: 80,
-              right: 16,
-              child: Container(
-                width: 110,
-                height: 155,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: const Color(0xFFFF4D85).withValues(alpha: 0.6),
-                    width: 2,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.6),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
+                // Gradient Overlay for readability
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.45),
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.8),
+                        ],
+                      ),
                     ),
-                  ],
+                  ),
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: _isVideoMuted ||
-                          !_isCameraInitialized ||
-                          _cameraController == null ||
-                          !_cameraController!.value.isInitialized
-                      ? Container(
-                          color: const Color(0xFF15151A),
-                          child: const Center(
-                            child: Icon(Iconsax.user, color: Colors.white54, size: 36),
-                          ),
-                        )
-                      : FittedBox(
-                          fit: BoxFit.cover,
-                          child: SizedBox(
-                            width: _cameraController!.value.previewSize?.height ?? 100,
-                            height: _cameraController!.value.previewSize?.width ?? 100,
-                            child: CameraPreview(_cameraController!),
-                          ),
-                        ),
-                ),
-              ),
-            ),
 
-            // Redesigned Control Bar at the Bottom
-            Positioned(
-              bottom: 24,
-              left: 16,
-              right: 16,
-              child: _buildControls(),
-            ),
-          ],
+                // Top Header Bar
+                Positioned(
+                  top: 14,
+                  left: 16,
+                  right: 16,
+                  child: _buildTopBar(),
+                ),
+
+                // Draggable Small Preview Tile (Picture-in-Picture)
+                Positioned(
+                  left: _pipLeft ?? (constraints.maxWidth - 110 - 16),
+                  top: _pipTop ?? 80,
+                  child: GestureDetector(
+                    onTap: _togglePreviewSwap,
+                    onPanUpdate: (details) => _onPipDrag(details, constraints),
+                    child: _buildPipPreview(),
+                  ),
+                ),
+
+                // Skip Button above the Control Bar
+                Positioned(
+                  bottom: 112,
+                  left: 0,
+                  right: 0,
+                  child: Center(child: _buildSkipButton()),
+                ),
+
+                // Control Bar at the Bottom
+                Positioned(
+                  bottom: 24,
+                  left: 16,
+                  right: 16,
+                  child: _buildControls(),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildBackdrop(String userPhoto) {
-    return Row(
-      children: [
-        Expanded(child: _profileImage(widget.partnerPhoto, widget.partnerName)),
-        Expanded(child: _profileImage(userPhoto, 'You')),
-      ],
+  Widget _buildPipPreview() {
+    return Container(
+      width: 110,
+      height: 155,
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFFF4D85).withValues(alpha: 0.6),
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.6),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: _isLocalLarge ? _buildRemoteVideo() : _buildLocalVideo(),
+      ),
     );
   }
 
-  Widget _profileImage(String photo, String name) {
+  Widget _buildLocalVideo({bool large = false}) {
+    final showPlaceholder = _isVideoMuted ||
+        !_isCameraInitialized ||
+        _cameraController == null ||
+        !_cameraController!.value.isInitialized;
+    if (showPlaceholder) {
+      return Container(
+        color: const Color(0xFF15151A),
+        child: Center(
+          child: Icon(
+            _isVideoMuted ? Iconsax.video_slash : Iconsax.user,
+            color: Colors.white54,
+            size: large ? 56 : 36,
+          ),
+        ),
+      );
+    }
+    return FittedBox(
+      fit: BoxFit.cover,
+      child: SizedBox(
+        width: _cameraController!.value.previewSize?.height ?? 100,
+        height: _cameraController!.value.previewSize?.width ?? 100,
+        child: CameraPreview(_cameraController!),
+      ),
+    );
+  }
+
+  Widget _buildRemoteVideo() {
     return Container(
       color: const Color(0xFF15151A),
-      child: photo.isNotEmpty
-          ? Image.network(photo, fit: BoxFit.cover)
+      child: widget.partnerPhoto.isNotEmpty
+          ? Image.network(widget.partnerPhoto, fit: BoxFit.cover)
           : Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -729,7 +753,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   const Icon(Iconsax.user, color: Colors.white38, size: 56),
                   const SizedBox(height: 8),
                   Text(
-                    name,
+                    widget.partnerName,
                     style: const TextStyle(
                       color: Colors.white70,
                       fontWeight: FontWeight.w800,
@@ -778,20 +802,24 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           ),
         ),
         const Spacer(),
-        ElevatedButton.icon(
-          onPressed: _skipAndNext,
-          icon: const Icon(Iconsax.next, size: 16),
-          label: const Text('Next'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black.withValues(alpha: 0.55),
-            foregroundColor: Colors.white,
-            side: BorderSide(color: const Color(0xFFFF4D85).withValues(alpha: 0.5)),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
-          ),
-        ),
+        const SizedBox(width: 48),
       ],
+    );
+  }
+
+  Widget _buildSkipButton() {
+    return ElevatedButton.icon(
+      onPressed: _skipAndNext,
+      icon: const Icon(Iconsax.next, size: 16),
+      label: const Text('Skip'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFFFF4D85),
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+      ),
     );
   }
 
