@@ -8,6 +8,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
 
+import 'verify_email_screen.dart';
+import '../../services/email_verification_service.dart';
+
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
@@ -37,10 +40,38 @@ class _SignInScreenState extends State<SignInScreen> {
         _passwordController.text.trim(),
       );
     } on FirebaseAuthException catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message ?? 'An error occurred')),
-        );
+      if (e.code == 'EMAIL_NOT_VERIFIED') {
+        final email = _emailController.text.trim();
+        final password = _passwordController.text.trim();
+
+        // Send a fresh code and navigate to verification screen
+        await EmailVerificationService().requestCode(email);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(e.message ?? 'Please verify your account'),
+              backgroundColor: const Color(0xFFFF4D85),
+            ),
+          );
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => VerifyEmailScreen(
+                email: email,
+                password: password,
+                isSignUpFlow: false,
+              ),
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.message ?? 'An error occurred')),
+          );
+        }
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

@@ -11,6 +11,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
 
+import 'verify_email_screen.dart';
+
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -81,9 +83,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<void> _handleSignUp() async {
-    if (_emailController.text.isEmpty ||
-        _passwordController.text.isEmpty ||
-        _nameController.text.isEmpty ||
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final name = _nameController.text.trim();
+
+    if (email.isEmpty ||
+        password.isEmpty ||
+        name.isEmpty ||
         _phoneNumber.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -98,187 +104,43 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final email = _emailController.text.trim();
-      final isEmailVerified = await _verifyEmailBeforeSignup(email);
-      if (!isEmailVerified) {
-        return;
-      }
+      // 1. Send verification code
+      await _emailVerificationService.requestCode(email);
 
-      await _authService.signUpWithEmail(
-        email,
-        _passwordController.text.trim(),
-        _nameController.text.trim(),
-        _phoneNumber,
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Verification code sent to $email'),
+          backgroundColor: const Color(0xFFFF4D85),
+        ),
       );
-    } on FirebaseAuthException catch (e) {
+
+      // 2. Navigate to dedicated VerifyEmailScreen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => VerifyEmailScreen(
+            email: email,
+            password: password,
+            name: name,
+            phoneNumber: _phoneNumber,
+            isSignUpFlow: true,
+          ),
+        ),
+      );
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message ?? 'An error occurred')),
+          SnackBar(
+            content: Text('Could not send verification code: $e'),
+            backgroundColor: Colors.redAccent,
+          ),
         );
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
-  }
-
-  Future<bool> _verifyEmailBeforeSignup(String email) async {
-    final languageProvider = context.read<LanguageProvider>();
-
-    try {
-      await _emailVerificationService.requestCode(email);
-    } on EmailVerificationException catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.message)));
-      }
-      return false;
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Could not send verification email. Please try again.',
-            ),
-          ),
-        );
-      }
-      return false;
-    }
-
-    if (!mounted) return false;
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Verification code sent to $email')));
-
-    final codeController = TextEditingController();
-    final isVerified = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        bool isVerifying = false;
-        bool isResending = false;
-        String? errorMessage;
-
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            Future<void> verifyCode() async {
-              final code = codeController.text.trim();
-              if (code.length != 6) {
-                setDialogState(() {
-                  errorMessage = 'Enter the 6-digit code.';
-                });
-                return;
-              }
-
-              setDialogState(() {
-                isVerifying = true;
-                errorMessage = null;
-              });
-
-              try {
-                await _emailVerificationService.verifyCode(
-                  email: email,
-                  code: code,
-                );
-                if (dialogContext.mounted) {
-                  Navigator.of(dialogContext).pop(true);
-                }
-              } on EmailVerificationException catch (e) {
-                setDialogState(() {
-                  errorMessage = e.message;
-                  isVerifying = false;
-                });
-              } catch (_) {
-                setDialogState(() {
-                  errorMessage = 'Could not verify code. Please try again.';
-                  isVerifying = false;
-                });
-              }
-            }
-
-            Future<void> resendCode() async {
-              setDialogState(() {
-                isResending = true;
-                errorMessage = null;
-              });
-
-              try {
-                await _emailVerificationService.requestCode(email);
-                setDialogState(() {
-                  isResending = false;
-                  errorMessage = 'A new code was sent to $email';
-                });
-              } on EmailVerificationException catch (e) {
-                setDialogState(() {
-                  isResending = false;
-                  errorMessage = e.message;
-                });
-              } catch (_) {
-                setDialogState(() {
-                  isResending = false;
-                  errorMessage = 'Could not resend code. Please try again.';
-                });
-              }
-            }
-
-            final isBusy = isVerifying || isResending;
-
-            return AlertDialog(
-              title: const Text('Verify your email'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Enter the 6-digit code sent to $email.'),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: codeController,
-                    keyboardType: TextInputType.number,
-                    maxLength: 6,
-                    enabled: !isBusy,
-                    decoration: InputDecoration(
-                      hintText: 'Verification code',
-                      counterText: '',
-                      errorText: errorMessage,
-                    ),
-                    onSubmitted: (_) {
-                      if (!isBusy) verifyCode();
-                    },
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: isBusy
-                      ? null
-                      : () => Navigator.of(dialogContext).pop(false),
-                  child: const Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: isBusy ? null : resendCode,
-                  child: Text(isResending ? 'Sending...' : 'Resend'),
-                ),
-                ElevatedButton(
-                  onPressed: isBusy ? null : verifyCode,
-                  child: isVerifying
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(languageProvider.getString('signup_button')),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-    codeController.dispose();
-
-    return isVerified ?? false;
   }
 
   Future<void> _handleGoogleSignIn() async {

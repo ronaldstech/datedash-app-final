@@ -241,6 +241,7 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
     String filterFamilyPlans = 'Any',
     String filterCommunicationStyle = 'Any',
     String filterLoveStyle = 'Any',
+    String filterCountry = 'Any',
   }) async {
     if (_userProfile == null || _currentUser == null) return;
     
@@ -267,6 +268,7 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
     _userProfile!.filterFamilyPlans = filterFamilyPlans;
     _userProfile!.filterCommunicationStyle = filterCommunicationStyle;
     _userProfile!.filterLoveStyle = filterLoveStyle;
+    _userProfile!.filterCountry = filterCountry;
     
     notifyListeners();
     
@@ -352,6 +354,42 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
       notifyListeners();
     } catch (e) {
       debugPrint('ProfileProvider: Error rewinding swipe: $e');
+      rethrow;
+    }
+  }
+
+  /// Activates a profile boost for 1, 2, or 3 weeks.
+  /// Deducts sparks if using sparks (1 week = 100, 2 weeks = 180, 3 weeks = 250).
+  Future<bool> activateProfileBoost(int weeks, {bool useSparks = false}) async {
+    final uid = _currentUser?.uid;
+    if (_userProfile == null || uid == null) return false;
+
+    int cost = 0;
+    if (weeks == 1) { cost = 100; }
+    else if (weeks == 2) { cost = 180; }
+    else if (weeks == 3) { cost = 250; }
+
+    if (useSparks) {
+      if (_userProfile!.sparks < cost) {
+        throw Exception('Insufficient Sparks. You need $cost Sparks.');
+      }
+      _userProfile!.sparks -= cost;
+    }
+
+    final currentExpiry = _userProfile!.boostExpiry;
+    final now = DateTime.now();
+    final baseDate = (currentExpiry != null && now.isBefore(currentExpiry))
+        ? currentExpiry
+        : now;
+
+    _userProfile!.boostExpiry = baseDate.add(Duration(days: 7 * weeks));
+    notifyListeners();
+
+    try {
+      await saveUserProfile(uid, _userProfile!);
+      return true;
+    } catch (e) {
+      debugPrint('ProfileProvider: Error activating boost: $e');
       rethrow;
     }
   }
