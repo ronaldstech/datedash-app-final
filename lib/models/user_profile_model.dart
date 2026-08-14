@@ -63,6 +63,7 @@ class UserProfile {
   // 📸 Media & Verification
   String? videoIntro;
   bool isVerified;
+  bool isEmailVerified;
   bool isOnline;
   String? verificationStatus; // 'unverified', 'pending', 'verified'
   String? nationalId;
@@ -109,11 +110,14 @@ class UserProfile {
   String? filterFamilyPlans;
   String? filterCommunicationStyle;
   String? filterLoveStyle;
+  String? filterCountry;
 
   // 💰 Monetization
   bool isPremium;
   String? premiumType; // 'Pro', 'Premium', 'Elite'
   DateTime? premiumExpiry;
+  DateTime? boostExpiry;
+  bool get isBoosted => boostExpiry != null && DateTime.now().isBefore(boostExpiry!);
   int sparks;
   int get credits => sparks;
   set credits(int v) => sparks = v;
@@ -173,6 +177,7 @@ class UserProfile {
     this.coreValues,
     this.videoIntro,
     this.isVerified = false,
+    this.isEmailVerified = false,
     this.isOnline = false,
     this.verificationStatus = 'unverified',
     this.nationalId,
@@ -203,6 +208,7 @@ class UserProfile {
     this.isPremium = false,
     this.premiumType,
     this.premiumExpiry,
+    this.boostExpiry,
     this.sparks = 0,
     this.unlockedLikes = const [],
     this.unlockedViewers = const [],
@@ -231,6 +237,7 @@ class UserProfile {
     this.filterFamilyPlans = 'Any',
     this.filterCommunicationStyle = 'Any',
     this.filterLoveStyle = 'Any',
+    this.filterCountry = 'Any',
     this.fcmToken,
   });
 
@@ -353,6 +360,7 @@ class UserProfile {
         coreValues: map['coreValues']?.toString(),
         videoIntro: map['videoIntro']?.toString(),
         isVerified: map['isVerified'] == true,
+        isEmailVerified: map['isEmailVerified'] == true,
         isOnline: map['isOnline'] == true,
         verificationStatus: map['verificationStatus']?.toString() ?? 'unverified',
         nationalId: map['nationalId']?.toString(),
@@ -398,9 +406,11 @@ class UserProfile {
         filterFamilyPlans: map['filterFamilyPlans']?.toString() ?? 'Any',
         filterCommunicationStyle: map['filterCommunicationStyle']?.toString() ?? 'Any',
         filterLoveStyle: map['filterLoveStyle']?.toString() ?? 'Any',
+        filterCountry: map['filterCountry']?.toString() ?? 'Any',
         isPremium: map['isPremium'] == true,
         premiumType: map['premiumType']?.toString(),
         premiumExpiry: _parseDate(map['premiumExpiry']),
+        boostExpiry: _parseDate(map['boostExpiry']),
         sparks: (map['credits'] as num?)?.toInt() ?? 0,
         unlockedLikes: _parseList(map['unlockedLikes']),
         unlockedViewers: _parseList(map['unlockedViewers']),
@@ -486,6 +496,7 @@ class UserProfile {
       'coreValues': coreValues,
       'videoIntro': videoIntro,
       'isVerified': isVerified,
+      'isEmailVerified': isEmailVerified,
       'isOnline': isOnline,
       'verificationStatus': verificationStatus,
       'nationalId': nationalId,
@@ -532,9 +543,11 @@ class UserProfile {
       'filterFamilyPlans': filterFamilyPlans,
       'filterCommunicationStyle': filterCommunicationStyle,
       'filterLoveStyle': filterLoveStyle,
+      'filterCountry': filterCountry,
       'isPremium': isPremium,
       'premiumType': premiumType,
       'premiumExpiry': premiumExpiry != null ? Timestamp.fromDate(premiumExpiry!) : null,
+      'boostExpiry': boostExpiry != null ? Timestamp.fromDate(boostExpiry!) : null,
       'credits': sparks,
       'unlockedLikes': unlockedLikes,
       'unlockedViewers': unlockedViewers,
