@@ -16,6 +16,8 @@ import '../providers/language_provider.dart';
 import 'gift_selection_sheet.dart';
 import 'meetup_sheet.dart';
 import '../services/chat_service.dart';
+import 'boost_sheet.dart';
+import '../screens/premium_screen.dart';
 
 class SwipeView extends StatefulWidget {
   final String? category;
@@ -185,9 +187,13 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
         targetProfile.uid!,
         swipeType,
         senderName: profileProvider.displayName,
-      ).then((isMatch) {
-        if (isMatch && mounted) {
-          _showMatchDialog(targetProfile);
+      ).then((result) {
+        if (result && mounted) {
+          if (direction == 'right') {
+            _showMatchDialog(targetProfile);
+          } else {
+            _showMissedMatchDialog();
+          }
         }
       }).catchError((e) {
         debugPrint('SwipeView: Error processing swipe in background: $e');
@@ -2076,6 +2082,152 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
                     letterSpacing: 1,
                   ),
                 ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showMissedMatchDialog() {
+    final isPremium = context.read<ProfileProvider>().userProfile?.isPremium == true;
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(28),
+          decoration: BoxDecoration(
+            color: const Color(0xFF14141E),
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(
+              color: const Color(0xFFFF4D85).withValues(alpha: 0.4),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFFF4D85).withValues(alpha: 0.2),
+                blurRadius: 40,
+                spreadRadius: 5,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFFFF4D85).withValues(alpha: 0.15),
+                ),
+                child: const Icon(
+                  Iconsax.heart_slash5,
+                  size: 48,
+                  color: Color(0xFFFF4D85),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'YOU MISSED A MATCH!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFFFF4D85),
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.5,
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Someone who liked your profile was just passed. They were interested in you!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 24),
+              // Mystery Teaser Avatar
+              Container(
+                width: 86,
+                height: 86,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0xFFFF4D85), width: 3),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFF4D85), Color(0xFFFF1A60)],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFF4D85).withValues(alpha: 0.4),
+                      blurRadius: 16,
+                    ),
+                  ],
+                ),
+                child: const Center(
+                  child: Icon(
+                    Iconsax.user_search,
+                    size: 38,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 28),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.white24),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        'Keep Swiping',
+                        style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF4D85),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        if (isPremium) {
+                          _handleRewind();
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const PremiumScreen(),
+                            ),
+                          );
+                        }
+                      },
+                      child: Text(
+                        isPremium ? 'Rewind Match' : 'Unlock Rewind',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

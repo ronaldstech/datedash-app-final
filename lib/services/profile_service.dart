@@ -93,6 +93,9 @@ class ProfileService {
     final filterCommunicationStyle =
         currentUserProfile.filterCommunicationStyle ?? 'Any';
     final filterLoveStyle = currentUserProfile.filterLoveStyle ?? 'Any';
+    final filterCountry = currentUserProfile.isElite
+        ? (currentUserProfile.filterCountry ?? 'Any')
+        : 'Any';
 
     List<UserProfile> strictProfiles = [];
     List<UserProfile> relaxedProfiles = [];
@@ -163,6 +166,13 @@ class ProfileService {
       if (filterLoveStyle != 'Any' && filterLoveStyle.isNotEmpty) {
         if (profile.loveStyle != filterLoveStyle) continue;
       }
+      if (filterCountry != 'Any' && filterCountry.isNotEmpty) {
+        final loc = (profile.location ?? '').toLowerCase();
+        final cCode = (profile.countryCode ?? '').toLowerCase();
+        final target = filterCountry.toLowerCase();
+        final isMatch = loc.contains(target) || cCode.contains(target) || target.contains(loc);
+        if (!isMatch) continue;
+      }
 
       bool isStrictMatch = true;
 
@@ -201,6 +211,14 @@ class ProfileService {
     }
 
     strictProfiles.addAll(relaxedProfiles);
+
+    // Boosted profiles get priority visibility — sort them to the front
+    strictProfiles.sort((a, b) {
+      if (a.isBoosted && !b.isBoosted) return -1;
+      if (!a.isBoosted && b.isBoosted) return 1;
+      return 0;
+    });
+
     return strictProfiles;
   }
 
@@ -339,6 +357,19 @@ class ProfileService {
             senderName: senderName ?? 'Someone',
             type: 'like',
           );
+        }
+      } // end if (type == 'like')
+
+      if (type == 'dislike') {
+        final reverseLike = await _firestore
+            .collection('swipes')
+            .where('fromId', isEqualTo: toId)
+            .where('toId', isEqualTo: fromId)
+            .where('type', isEqualTo: 'like')
+            .limit(1)
+            .get();
+        if (reverseLike.docs.isNotEmpty) {
+          return true; // Missed match
         }
       }
       return isNewMatch;

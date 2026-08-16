@@ -98,8 +98,6 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               .doc(cred!.user!.uid)
               .update({
             'isEmailVerified': true,
-            'isVerified': true,
-            'verificationStatus': 'verified',
           });
         }
       } else {
@@ -115,8 +113,6 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 .doc(cred.user!.uid)
                 .update({
               'isEmailVerified': true,
-              'isVerified': true,
-              'verificationStatus': 'verified',
             });
           }
         }

@@ -37,24 +37,50 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
   late String _familyPlans;
   late String _communicationStyle;
   late String _loveStyle;
+  late String _country;
 
   bool _isSaving = false;
 
   final List<String> _genderOptions = ['Men', 'Women', 'Everyone'];
   
-  // Custom Filter options lists
+  // Custom Filter options lists (matching Edit Profile options)
   final List<String> _lookingForOptions = [
     'Any',
     'Marriage',
     'Long Term Relationship',
     'Short Term Relationship',
-    'Hookups',
+    'Casual',
     'Short Term Fun',
     'New Friends',
     'Coffee Date',
     'Learn Cultures',
-    'Sponsor',
-    'Figuring Out'
+    'Travel the World',
+    'Figuring Out',
+  ];
+
+  final List<String> _countryOptions = [
+    'Any',
+    'United States',
+    'United Kingdom',
+    'Canada',
+    'Australia',
+    'Germany',
+    'France',
+    'Italy',
+    'Spain',
+    'Netherlands',
+    'Sweden',
+    'Switzerland',
+    'Malawi',
+    'South Africa',
+    'Kenya',
+    'Nigeria',
+    'Ghana',
+    'Brazil',
+    'Japan',
+    'India',
+    'China',
+    'Mexico',
   ];
   
   final List<String> _familyPlansOptions = ['Any', 'Want some day', 'Don\'t want', 'Have and want more', 'Have and don\'t want more', 'Not sure yet'];
@@ -156,6 +182,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
     _familyPlans = profile?.filterFamilyPlans ?? 'Any';
     _communicationStyle = profile?.filterCommunicationStyle ?? 'Any';
     _loveStyle = profile?.filterLoveStyle ?? 'Any';
+    _country = profile?.filterCountry ?? 'Any';
   }
 
   Future<void> _saveFilters() async {
@@ -185,6 +212,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
             filterFamilyPlans: _familyPlans,
             filterCommunicationStyle: _communicationStyle,
             filterLoveStyle: _loveStyle,
+            filterCountry: _country,
           );
       if (mounted) {
         Navigator.pop(context);
@@ -216,7 +244,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
     );
   }
 
-  void _showPremiumUpgradePrompt() {
+  void _showPremiumUpgradePrompt({String tierName = 'Premium'}) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -232,7 +260,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.amber.withValues(alpha: 	0.12),
+                    color: Colors.amber.withValues(alpha: 0.12),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -242,10 +270,10 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'Premium Feature',
+                Text(
+                  '$tierName Feature',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -0.5,
@@ -253,7 +281,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Advanced filters are exclusive to premium members. Upgrade your plan to get unlimited access and unlock advanced filters!',
+                  'Advanced filters are exclusive to $tierName members. Upgrade your plan to get unlimited access and unlock $tierName filters!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -399,10 +427,13 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
     required ValueChanged<String> onChanged,
     required Color color,
     bool isPremiumLocked = false,
+    String tierName = 'Premium',
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
-      onTap: isPremiumLocked ? _showPremiumUpgradePrompt : null,
+      onTap: isPremiumLocked
+          ? () => _showPremiumUpgradePrompt(tierName: tierName)
+          : null,
       behavior: HitTestBehavior.opaque,
       child: AbsorbPointer(
         absorbing: isPremiumLocked,
@@ -412,21 +443,65 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Icon(icon, size: 20, color: isPremiumLocked ? Colors.amber : color),
-                    const SizedBox(width: 12),
-                    Text(
-                      title,
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                    ),
-                    if (isPremiumLocked) ...[
-                      const SizedBox(width: 8),
-                      const Icon(Iconsax.crown, color: Colors.amber, size: 14),
+                Expanded(
+                  child: Row(
+                    children: [
+                      Icon(
+                        icon,
+                        size: 20,
+                        color: isPremiumLocked ? Colors.amber : color,
+                      ),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child: Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ),
+                      if (isPremiumLocked) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.amber.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: Colors.amber, width: 0.8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Iconsax.crown,
+                                color: Colors.amber,
+                                size: 11,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                tierName.toUpperCase(),
+                                style: const TextStyle(
+                                  color: Colors.amber,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 DropdownButton<String>(
+                  isDense: true,
                   value: value,
                   dropdownColor: Theme.of(context).cardColor,
                   underline: const SizedBox(),
@@ -474,6 +549,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final profileProvider = context.watch<ProfileProvider>();
     final isPremium = profileProvider.userProfile?.isPremium ?? false;
+    final isElite = profileProvider.userProfile?.isElite ?? false;
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
@@ -750,6 +826,18 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                       // 2. Advanced Premium filters
                       _buildSectionHeader('Premium Advanced Filters'),
                       
+                      // Country / Green Card Filter
+                      _buildDropdownCard(
+                        icon: Icons.public_rounded,
+                        title: 'Partner Country (Green Card)',
+                        value: _country,
+                        items: _countryOptions,
+                        onChanged: (val) => setState(() => _country = val),
+                        color: Colors.green,
+                        isPremiumLocked: !isElite,
+                        tierName: 'Elite',
+                      ),
+
                       // Relationship Goal
                       _buildDropdownCard(
                         icon: Icons.favorite_rounded,

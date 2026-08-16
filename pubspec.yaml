@@ -20,6 +20,7 @@ dependencies:
   flutter_svg: ^2.3.0
   geolocator: ^14.0.3
   google_sign_in: ^7.2.0
+  http: ^1.2.0
   iconsax: ^0.0.8
   image_cropper: ^12.2.1
   image_picker: ^1.2.2
@@ -36,6 +37,7 @@ dependencies:
   camera: ^0.11.0
   webview_flutter: ^4.10.0
   wakelock_plus: ^1.6.1
+  firebase_core: ^4.13.0
 
 dev_dependencies:
   flutter_test:

@@ -11,6 +11,7 @@ import 'edit_profile_screen.dart';
 import 'settings_screen.dart';
 import 'likes_screen.dart';
 import 'profile_viewers_screen.dart';
+import '../widgets/boost_sheet.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -259,6 +260,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ? Colors.white.withValues(alpha: 0.5)
                   : Colors.black.withValues(alpha: 0.5),
               fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+        if (_profile.isPremium && _profile.premiumType != null) ...[
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFFFFD700), Color(0xFFFF9E00)],
+              ),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFFF9E00).withValues(alpha: 0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Iconsax.crown5, color: Colors.black, size: 16),
+                const SizedBox(width: 6),
+                Text(
+                  '${_profile.premiumType!.toUpperCase()} MEMBER',
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 12,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -576,15 +612,91 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ? Colors.white.withValues(alpha: 0.06)
                 : Colors.black.withValues(alpha: 0.05),
           ),
-          _buildMenuItem(
-            icon: Iconsax.crown5,
-            title: languageProvider.getString('get_premium'),
-            subtitle: languageProvider.getString('my_credits'),
-            color: const Color(0xFFFFB300),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const PremiumScreen()),
-            ),
+          // ⚡ Boost Profile entry
+          Consumer<ProfileProvider>(
+            builder: (context, pp, _) {
+              final isBoosted = pp.userProfile?.isBoosted == true;
+              final boostExpiry = pp.userProfile?.boostExpiry;
+              return ListTile(
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (_) => const BoostSheet(),
+                  );
+                },
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24)),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                leading: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    gradient: isBoosted
+                        ? const LinearGradient(
+                            colors: [Color(0xFFFF4D85), Color(0xFFFF9E00)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          )
+                        : null,
+                    color: isBoosted
+                        ? null
+                        : const Color(0xFFFF9E00).withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Iconsax.flash5,
+                      color: isBoosted ? Colors.white : const Color(0xFFFF9E00),
+                      size: 20),
+                ),
+                title: const Text(
+                  'Boost Profile',
+                  style:
+                      TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                ),
+                subtitle: Text(
+                  isBoosted && boostExpiry != null
+                      ? '⚡ Active until ${boostExpiry.day}/${boostExpiry.month}/${boostExpiry.year}'
+                      : 'Get 10x more visibility',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isBoosted
+                        ? const Color(0xFFFF9E00)
+                        : Theme.of(context).hintColor,
+                    fontWeight: isBoosted ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                ),
+                trailing: Icon(
+                  Iconsax.arrow_right_3,
+                  size: 18,
+                  color:
+                      Theme.of(context).hintColor.withValues(alpha: 0.5),
+                ),
+              );
+            },
+          ),
+          Divider(
+            height: 1,
+            indent: 64,
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.06)
+                : Colors.black.withValues(alpha: 0.05),
+          ),
+          Consumer<ProfileProvider>(
+            builder: (context, pp, _) {
+              final isPremium = pp.userProfile?.isPremium == true;
+              final planName = pp.userProfile?.premiumType ?? 'Premium';
+              return _buildMenuItem(
+                icon: Iconsax.crown5,
+                title: isPremium ? '$planName Subscription' : languageProvider.getString('get_premium'),
+                subtitle: isPremium ? 'Active Plan • Manage or Upgrade' : languageProvider.getString('my_credits'),
+                color: const Color(0xFFFFB300),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const PremiumScreen()),
+                ),
+              );
+            },
           ),
           Divider(
             height: 1,

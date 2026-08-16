@@ -102,10 +102,11 @@ class _LiveListScreenState extends State<LiveListScreen>
     }
 
     final bool isPremium = currentUser.isPremium;
+    final bool isElite = currentUser.isElite;
 
-    // Premium restriction: non-premium users are locked to 'Any'
+    // Premium/Elite restriction: non-premium users locked on gender, non-elite users locked on country
     final String effectiveGender = isPremium ? _selectedGender : 'Any';
-    final String effectiveCountry = isPremium ? _selectedCountry : 'Any';
+    final String effectiveCountry = isElite ? _selectedCountry : 'Any';
 
     Navigator.push(
       context,
@@ -194,6 +195,16 @@ class _LiveListScreenState extends State<LiveListScreen>
       }
     }
 
+    // Fallback if countryCode exists directly as uppercase country name
+    if (userLocation.isNotEmpty) {
+      if (mounted) {
+        setState(() {
+          _selectedCountry = userLocation.split(',').last.trim();
+        });
+      }
+      return;
+    }
+
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) return;
@@ -240,7 +251,11 @@ class _LiveListScreenState extends State<LiveListScreen>
     } catch (_) {}
   }
 
-  Widget _buildPremiumLockedOverlay(BuildContext context, String title) {
+  Widget _buildPremiumLockedOverlay(
+    BuildContext context,
+    String title, {
+    String tier = 'Premium',
+  }) {
     return Positioned.fill(
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
@@ -273,7 +288,7 @@ class _LiveListScreenState extends State<LiveListScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '$title Filter (Premium)',
+                              '$title Filter ($tier)',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 12,
@@ -326,7 +341,8 @@ class _LiveListScreenState extends State<LiveListScreen>
     final lp = context.watch<LanguageProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    if (!_countryInitialized && pp.userProfile != null) {
+    if ((!_countryInitialized || (pp.userProfile?.isPremium == true && _selectedCountry == 'Any')) &&
+        pp.userProfile != null) {
       _setDefaultCountryFromGeo(pp);
       _countryInitialized = true;
     }
@@ -365,6 +381,7 @@ class _LiveListScreenState extends State<LiveListScreen>
     LanguageProvider lp,
   ) {
     final bool isPremium = pp.userProfile?.isPremium == true;
+    final bool isElite = pp.userProfile?.isElite == true;
 
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(
@@ -430,10 +447,12 @@ class _LiveListScreenState extends State<LiveListScreen>
           const SizedBox(height: 14),
           _buildFilterPanel(
             isDark: isDark,
-            title: 'Premium filters',
-            subtitle: isPremium
+            title: 'Premium & Elite filters',
+            subtitle: isElite
                 ? 'Tune gender and country for a more focused match.'
-                : 'Upgrade to control gender and country matching.',
+                : (isPremium
+                    ? 'Gender filter unlocked. Country filter requires Elite.'
+                    : 'Upgrade to control gender (Premium) and country (Elite) matching.'),
             children: [
               _buildFilterLabel('Desired Gender', Iconsax.user),
               const SizedBox(height: 10),
@@ -461,14 +480,14 @@ class _LiveListScreenState extends State<LiveListScreen>
               Stack(
                 children: [
                   _buildCountryPickerButton(context, isDark),
-                  if (!isPremium)
-                    _buildPremiumLockedOverlay(context, 'Country'),
+                  if (!isElite)
+                    _buildPremiumLockedOverlay(context, 'Country', tier: 'Elite'),
                 ],
               ),
             ],
           ),
           const SizedBox(height: 18),
-          _buildStartCard(isDark, pp, isPremium),
+          _buildStartCard(isDark, pp, isPremium, isElite),
         ],
       ),
     );
@@ -529,8 +548,8 @@ class _LiveListScreenState extends State<LiveListScreen>
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    const Text(
+                    SizedBox(height: 4),
+                    Text(
                       "Don't act just be you for 60 seconds.",
                       style: TextStyle(
                         color: Colors.white,
@@ -707,7 +726,18 @@ class _LiveListScreenState extends State<LiveListScreen>
     );
   }
 
-  Widget _buildStartCard(bool isDark, ProfileProvider pp, bool isPremium) {
+  Widget _buildStartCard(
+    bool isDark,
+    ProfileProvider pp,
+    bool isPremium,
+    bool isElite,
+  ) {
+    final String infoText = isElite
+        ? 'Your selected filters will be applied.'
+        : (isPremium
+            ? 'Gender filter active. Country set to Any (Elite feature).'
+            : 'Gender and country are set to Any on Basic.');
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -728,9 +758,7 @@ class _LiveListScreenState extends State<LiveListScreen>
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  isPremium
-                      ? 'Your selected filters will be applied.'
-                      : 'Gender and country are set to Any on Basic.',
+                  infoText,
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w800,

@@ -122,23 +122,46 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
 
     if (_selectedHeight != null) profile.height = _selectedHeight;
     if (_selectedOccupation != null) profile.occupation = _selectedOccupation;
+    if (_selectedHeight != null) {
+      profile.height = _selectedHeight;
+    }
+    if (_selectedOccupation != null) {
+      profile.occupation = _selectedOccupation;
+    }
 
-    if (_selectedDob != null) profile.dob = _selectedDob;
-    if (_selectedGender != null) profile.gender = _selectedGender;
+    if (_selectedDob != null) {
+      profile.dob = _selectedDob;
+    }
+    if (_selectedGender != null) {
+      profile.gender = _selectedGender;
+    }
     if (_selectedInterestedIn != null) {
       profile.interestedIn = _selectedInterestedIn;
     }
-    if (_selectedRelationshipStatus != null)
+    if (_selectedRelationshipStatus != null) {
       profile.relationshipStatus = _selectedRelationshipStatus;
-    if (_selectedLookingFor != null)
+    }
+    if (_selectedLookingFor != null) {
       profile.lookingFor = [_selectedLookingFor!];
-    if (_selectedBodyType != null) profile.bodyType = _selectedBodyType;
-    if (_selectedSmoking != null) profile.smoking = _selectedSmoking;
-    if (_selectedDrinking != null) profile.drinking = _selectedDrinking;
-    if (_selectedWantKids != null) profile.wantKids = _selectedWantKids;
-    if (_selectedEducationLevel != null)
+    }
+    if (_selectedBodyType != null) {
+      profile.bodyType = _selectedBodyType;
+    }
+    if (_selectedSmoking != null) {
+      profile.smoking = _selectedSmoking;
+    }
+    if (_selectedDrinking != null) {
+      profile.drinking = _selectedDrinking;
+    }
+    if (_selectedWantKids != null) {
+      profile.wantKids = _selectedWantKids;
+    }
+    if (_selectedEducationLevel != null) {
       profile.educationLevel = _selectedEducationLevel;
-    if (_selectedZodiac != null) profile.zodiac = _selectedZodiac;
+    }
+    if (_selectedZodiac != null) {
+      profile.zodiac = _selectedZodiac;
+    }
 
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -300,7 +323,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
             hintText: hint,
             hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.35)),
             filled: true,
-            fillColor: Colors.black.withValues(alpha: 0.04),
+            fillColor: Colors.white,
             prefixIcon: Icon(
               icon,
               color: Colors.black.withValues(alpha: 0.4),
@@ -345,43 +368,65 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.black.withValues(alpha: 0.8),
+            color: Colors.black.withValues(alpha: 0.85),
             fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 12),
         Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          spacing: 10,
+          runSpacing: 10,
           children: chipItems.map((item) {
             final isSelected = value == item;
-            return ChoiceChip(
-              label: Text(item),
-              selected: isSelected,
-              selectedColor: _primaryColor,
-              backgroundColor: Colors.black.withValues(alpha: 0.04),
-              labelStyle: TextStyle(
-                color: isSelected
-                    ? Colors.white
-                    : Colors.black.withValues(alpha: 0.7),
-                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                fontSize: 14,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: BorderSide(
-                  color: isSelected
-                      ? _primaryColor
-                      : Colors.black.withValues(alpha: 0.1),
-                  width: isSelected ? 0 : 1.5,
+            return GestureDetector(
+              onTap: () => onChanged(item),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  gradient: isSelected
+                      ? LinearGradient(
+                          colors: [_primaryColor, const Color(0xFFFF1A60)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : null,
+                  color: isSelected ? null : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isSelected
+                        ? _primaryColor
+                        : Colors.black.withValues(alpha: 0.12),
+                    width: 1.5,
+                  ),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: _primaryColor.withValues(alpha: 0.35),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ]
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.04),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                ),
+                child: Text(
+                  item,
+                  style: TextStyle(
+                    color: isSelected
+                        ? Colors.white
+                        : Colors.black.withValues(alpha: 0.8),
+                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                    fontSize: 14,
+                  ),
                 ),
               ),
-              showCheckmark: false,
-              onSelected: (selected) {
-                if (selected) onChanged(item);
-              },
             );
           }).toList(),
         ),
@@ -426,11 +471,11 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
               size: 18,
             ),
             filled: true,
-            fillColor: Colors.black.withValues(alpha: 0.04),
+            fillColor: Colors.white,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: Colors.black.withValues(alpha: 0.1),
+                color: Colors.black.withValues(alpha: 0.12),
                 width: 1.5,
               ),
             ),
@@ -483,23 +528,29 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                     decoration: BoxDecoration(
                       color: isSelected
                           ? _primaryColor.withValues(alpha: 0.12)
-                          : Colors.black.withValues(alpha: 0.03),
+                          : Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: isSelected
                             ? _primaryColor
-                            : Colors.black.withValues(alpha: 0.1),
+                            : Colors.black.withValues(alpha: 0.12),
                         width: 1.5,
                       ),
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: _primaryColor.withValues(alpha: 0.2),
+                                color: _primaryColor.withValues(alpha: 0.25),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
                             ]
-                          : [],
+                          : [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.04),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
@@ -570,23 +621,29 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? _primaryColor.withValues(alpha: 0.12)
-                        : Colors.black.withValues(alpha: 0.03),
+                        : Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: isSelected
                           ? _primaryColor
-                          : Colors.black.withValues(alpha: 0.1),
+                          : Colors.black.withValues(alpha: 0.12),
                       width: 1.5,
                     ),
                     boxShadow: isSelected
                         ? [
                             BoxShadow(
-                              color: _primaryColor.withValues(alpha: 0.2),
+                              color: _primaryColor.withValues(alpha: 0.25),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
                           ]
-                        : [],
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.04),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Row(

@@ -17,6 +17,7 @@ import '../screens/live_list_screen.dart';
 import '../screens/meetups_screen.dart';
 import '../services/meetup_service.dart';
 import '../models/meetup_model.dart';
+import '../widgets/boost_sheet.dart';
 
 class ProfileDrawer extends StatelessWidget {
   const ProfileDrawer({super.key});
@@ -179,7 +180,7 @@ class ProfileDrawer extends StatelessWidget {
                               title: 'Membership',
                               value:
                                   profileProvider.userProfile?.isPremium == true
-                                  ? 'Premium'
+                                  ? (profileProvider.userProfile?.premiumType ?? 'Premium')
                                   : 'Free',
                               icon:
                                   profileProvider.userProfile?.isPremium == true
@@ -424,6 +425,21 @@ class ProfileDrawer extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (_) => const GiftsScreen()),
+                      );
+                    },
+                  ),
+                  _buildItem(
+                    context,
+                    Iconsax.flash5,
+                    'Boost Profile',
+                    color: const Color(0xFFFF9E00),
+                    onTap: () {
+                      Navigator.pop(context);
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (_) => const BoostSheet(),
                       );
                     },
                   ),

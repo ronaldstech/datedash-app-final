@@ -115,6 +115,7 @@ class UserProfile {
   // 💰 Monetization
   bool isPremium;
   String? premiumType; // 'Pro', 'Premium', 'Elite'
+  bool get isElite => isPremium && premiumType?.toUpperCase() == 'ELITE';
   DateTime? premiumExpiry;
   DateTime? boostExpiry;
   bool get isBoosted => boostExpiry != null && DateTime.now().isBefore(boostExpiry!);

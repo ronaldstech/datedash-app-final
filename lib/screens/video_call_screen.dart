@@ -137,10 +137,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           if (!mounted || !_callLifecycleReady) return;
 
           if (!snapshot.exists) {
-            _exitCallScreen(showMessage: 'Call ended by partner');
             if (currentUserId != null) {
               _videoChatService.cleanupOwnTicket(currentUserId);
             }
+            _handlePartnerEndedCall();
             return;
           }
 
@@ -148,12 +148,48 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           final status = data?['status'] as String?;
           final endedBy = data?['endedBy'] as String?;
           if (status == 'ended' && endedBy != currentUserId) {
-            _exitCallScreen(showMessage: 'Call ended by partner');
             if (currentUserId != null) {
               _videoChatService.cleanupOwnTicket(currentUserId);
             }
+            _handlePartnerEndedCall();
           }
         });
+  }
+
+  void _handlePartnerEndedCall() {
+    _durationTimer?.cancel();
+    _callSessionSubscription?.cancel();
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Call ended by partner. Finding new match...'),
+        backgroundColor: Color(0xFFFF4D85),
+      ),
+    );
+
+    final profileProvider = context.read<ProfileProvider>();
+    final currentUser = profileProvider.userProfile;
+
+    if (currentUser != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => VideoMatchmakingScreen(
+            currentUser: currentUser,
+            filterLanguage: 'Any',
+            filterGender: currentUser.isPremium
+                ? (currentUser.interestedIn ?? 'Any')
+                : 'Any',
+            filterMinAge: 18,
+            filterMaxAge: 99,
+            filterCountry: 'Any',
+          ),
+        ),
+      );
+    } else {
+      Navigator.pop(context);
+    }
   }
 
   Future<void> _sendMessage() async {

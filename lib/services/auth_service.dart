@@ -1,8 +1,9 @@
 import 'package:flutter/foundation.dart';
-import 'package:snellum/services/notification_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'notification_service.dart';
 import 'profile_service.dart';
+import 'email_verification_service.dart';
 import '../models/user_profile_model.dart';
 
 class AuthService {
@@ -13,13 +14,33 @@ class AuthService {
   // Get user state changes
   Stream<User?> get user => _auth.authStateChanges();
 
-  // Sign in with email & password
+  // Sign in with email & password (enforces email verification)
   Future<UserCredential?> signInWithEmail(String email, String password) async {
     try {
       UserCredential result = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
+
+      final user = result.user;
+      if (user != null) {
+        final profile = await _profileService.getUserProfile(user.uid);
+        final isFirestoreVerified = await EmailVerificationService().isEmailVerified(email);
+
+        final bool isVerified = (user.emailVerified) ||
+            (profile?.isEmailVerified == true) ||
+            (profile?.isVerified == true) ||
+            isFirestoreVerified;
+
+        if (!isVerified) {
+          await _auth.signOut();
+          throw FirebaseAuthException(
+            code: 'EMAIL_NOT_VERIFIED',
+            message: 'Your email is not verified yet. Please verify your account before logging in.',
+          );
+        }
+      }
+
       return result;
     } catch (e) {
       rethrow;
@@ -40,10 +61,17 @@ class AuthService {
       );
 
       if (cred.user != null) {
-        // Initialize user document in Firestore with name, phone and 50 signup sparks
+        // Initialize user document in Firestore with verified status, name, phone and 50 signup sparks
         await _profileService.saveUserProfile(
           cred.user!.uid,
-          UserProfile(firstName: name, phoneNumber: phoneNumber, sparks: 50),
+          UserProfile(
+            firstName: name,
+            phoneNumber: phoneNumber,
+            sparks: 50,
+            isEmailVerified: true,
+            isVerified: true,
+            verificationStatus: 'verified',
+          ),
         );
 
         // Log the signup reward

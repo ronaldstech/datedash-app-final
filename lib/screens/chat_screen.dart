@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:record/record.dart';
@@ -752,6 +753,164 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  void _showReportUserDialog() {
+    String selectedReason = 'Inappropriate Messages';
+    final reasons = [
+      'Inappropriate Messages',
+      'Harassment or Bullying',
+      'Fake Profile or Spam',
+      'Scam or Fraud',
+      'Nudity or Explicit Content',
+      'Other',
+    ];
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setStateDialog) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Row(
+            children: [
+              const Icon(Iconsax.warning_2, color: Colors.orangeAccent),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Report ${widget.otherUserName}',
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Please select a reason for reporting this profile:',
+                style: TextStyle(fontSize: 13, color: Colors.grey),
+              ),
+              const SizedBox(height: 12),
+              ...reasons.map((r) => RadioListTile<String>(
+                    title: Text(r, style: const TextStyle(fontSize: 14)),
+                    value: r,
+                    groupValue: selectedReason,
+                    onChanged: (val) {
+                      if (val != null) setStateDialog(() => selectedReason = val);
+                    },
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    activeColor: const Color(0xFFFF4D85),
+                  )),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orangeAccent,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: () async {
+                Navigator.pop(context);
+                try {
+                  await FirebaseFirestore.instance.collection('reports').add({
+                    'reporterId': FirebaseAuth.instance.currentUser?.uid,
+                    'reportedId': widget.otherUserId,
+                    'reason': selectedReason,
+                    'createdAt': FieldValue.serverTimestamp(),
+                  });
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Report submitted. Thank you for keeping DateDash safe.'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  debugPrint('Error reporting user: $e');
+                }
+              },
+              child: const Text('Submit Report'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showBlockUserConfirm() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Iconsax.user_remove, color: Colors.redAccent),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'Block ${widget.otherUserName}?',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        content: const Text(
+          'You will no longer see their messages, and they will not be able to find your profile or contact you.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            onPressed: () async {
+              Navigator.pop(context);
+              try {
+                final pp = context.read<ProfileProvider>();
+                if (pp.userProfile != null) {
+                  if (!pp.userProfile!.blockedUsers.contains(widget.otherUserId)) {
+                    pp.userProfile!.blockedUsers.add(widget.otherUserId);
+                    await pp.saveUserProfile(pp.userProfile!.uid!, pp.userProfile!);
+                  }
+                }
+                await FirebaseFirestore.instance.collection('blocked_users').add({
+                  'blockerId': FirebaseAuth.instance.currentUser?.uid,
+                  'blockedId': widget.otherUserId,
+                  'createdAt': FieldValue.serverTimestamp(),
+                });
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${widget.otherUserName} has been blocked.'),
+                      backgroundColor: Colors.redAccent,
+                    ),
+                  );
+                  Navigator.pop(context, true);
+                }
+              } catch (e) {
+                debugPrint('Error blocking user: $e');
+              }
+            },
+            child: const Text('Block'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _typingTimer?.cancel();
@@ -912,10 +1071,6 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                     onSelected: (value) async {
                       switch (value) {
-                        case 'clear':
-                          _clearChatConfirm();
-                          break;
-
                         case 'search':
                           setState(() {
                             _showSearch = !_showSearch;
@@ -924,6 +1079,22 @@ class _ChatScreenState extends State<ChatScreen> {
                               _searchController.clear();
                             }
                           });
+                          break;
+
+                        case 'profile':
+                          // handled inline / navigate to profile
+                          break;
+
+                        case 'clear':
+                          _clearChatConfirm();
+                          break;
+
+                        case 'report':
+                          _showReportUserDialog();
+                          break;
+
+                        case 'block':
+                          _showBlockUserConfirm();
                           break;
                       }
                     },
@@ -940,7 +1111,6 @@ class _ChatScreenState extends State<ChatScreen> {
                           ],
                         ),
                       ),
-// Super Request moved to floating action button; menu entry removed.
                       PopupMenuItem(
                         value: 'profile',
                         child: Row(
@@ -955,15 +1125,46 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                       const PopupMenuDivider(),
                       PopupMenuItem(
+                        value: 'report',
+                        child: Row(
+                          children: [
+                            const Icon(Iconsax.warning_2,
+                                size: 20, color: Colors.orangeAccent),
+                            const SizedBox(width: 12),
+                            const Text('Report User',
+                                style: TextStyle(
+                                  color: Colors.orangeAccent,
+                                  fontWeight: FontWeight.w600,
+                                )),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'block',
+                        child: Row(
+                          children: [
+                            const Icon(Iconsax.user_remove,
+                                size: 20, color: Colors.redAccent),
+                            const SizedBox(width: 12),
+                            const Text('Block User',
+                                style: TextStyle(
+                                  color: Colors.redAccent,
+                                  fontWeight: FontWeight.w600,
+                                )),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuDivider(),
+                      PopupMenuItem(
                         value: 'clear',
                         child: Row(
                           children: [
                             Icon(Icons.delete_outline,
-                                size: 20, color: Colors.red.shade400),
+                                size: 20, color: Colors.grey.shade600),
                             const SizedBox(width: 12),
                             Text(languageProvider.getString('clear_chat_title'),
                                 style: TextStyle(
-                                  color: Colors.red.shade400,
+                                  color: Colors.grey.shade600,
                                   fontWeight: FontWeight.w600,
                                 )),
                           ],
