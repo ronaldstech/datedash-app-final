@@ -256,39 +256,58 @@ class VideoChatService {
     QuerySnapshot? callsSnap;
 
     void emit() {
-      if (waitingSnap == null || callsSnap == null) return;
       final uids = <String>{};
-      for (final doc in waitingSnap!.docs) {
-        final data = doc.data() as Map<String, dynamic>?;
-        uids.add(data?['uid'] as String? ?? doc.id);
+      if (waitingSnap != null) {
+        for (final doc in waitingSnap!.docs) {
+          final data = doc.data() as Map<String, dynamic>?;
+          final uid = data?['uid'] as String? ?? doc.id;
+          if (uid.isNotEmpty) uids.add(uid);
+        }
       }
-      for (final doc in callsSnap!.docs) {
-        final data = doc.data() as Map<String, dynamic>?;
-        final host = data?['hostId'] as String?;
-        final guest = data?['guestId'] as String?;
-        if (host != null) uids.add(host);
-        if (guest != null) uids.add(guest);
+      if (callsSnap != null) {
+        for (final doc in callsSnap!.docs) {
+          final data = doc.data() as Map<String, dynamic>?;
+          final host = data?['hostId'] as String?;
+          final guest = data?['guestId'] as String?;
+          if (host != null && host.isNotEmpty) uids.add(host);
+          if (guest != null && guest.isNotEmpty) uids.add(guest);
+        }
       }
-      controller.add(uids.length);
+      if (!controller.isClosed) {
+        controller.add(uids.length);
+      }
     }
 
     final sub1 = _firestore
         .collection('video_chat_waiting')
-        .where('status', whereIn: ['waiting', 'proposed'])
         .snapshots()
-        .listen((snap) {
-      waitingSnap = snap;
-      emit();
-    });
+        .listen(
+          (snap) {
+            waitingSnap = snap;
+            emit();
+          },
+          onError: (e) {
+            debugPrint('Error listening to video_chat_waiting: $e');
+            waitingSnap = null;
+            emit();
+          },
+        );
 
     final sub2 = _firestore
         .collection('video_chat_calls')
         .where('status', isEqualTo: 'active')
         .snapshots()
-        .listen((snap) {
-      callsSnap = snap;
-      emit();
-    });
+        .listen(
+          (snap) {
+            callsSnap = snap;
+            emit();
+          },
+          onError: (e) {
+            debugPrint('Error listening to video_chat_calls: $e');
+            callsSnap = null;
+            emit();
+          },
+        );
 
     controller.onCancel = () {
       sub1.cancel();
