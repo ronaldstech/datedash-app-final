@@ -1052,6 +1052,24 @@ class _ChatScreenState extends State<ChatScreen> {
                       },
                       iconSize: 17,
                     ),
+                  IconButton(
+                    icon: const Icon(
+                      Iconsax.warning_2,
+                      color: Colors.orangeAccent,
+                    ),
+                    tooltip: 'Report User',
+                    onPressed: _showReportUserDialog,
+                    iconSize: 17,
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Iconsax.user_remove,
+                      color: Colors.redAccent,
+                    ),
+                    tooltip: 'Block User',
+                    onPressed: _showBlockUserConfirm,
+                    iconSize: 17,
+                  ),
                   PopupMenuButton<String>(
                     icon: const Icon(Icons.more_vert),
                     shape: RoundedRectangleBorder(

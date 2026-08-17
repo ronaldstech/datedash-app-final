@@ -291,7 +291,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
               SizedBox(width: 8),
               Text(
                 'Report User',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ],
           ),
@@ -304,39 +307,48 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                 style: const TextStyle(color: Colors.white70, fontSize: 13),
               ),
               const SizedBox(height: 12),
-              ...reasons.map(
-                (reason) {
-                  final isSelected = selectedReason == reason;
-                  return InkWell(
-                    onTap: () => setDialogState(() => selectedReason = reason),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
-                      child: Row(
-                        children: [
-                          Icon(
-                            isSelected
-                                ? Icons.radio_button_checked
-                                : Icons.radio_button_unchecked,
-                            color: isSelected ? const Color(0xFFFF4D85) : Colors.white54,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            reason,
-                            style: const TextStyle(color: Colors.white, fontSize: 14),
-                          ),
-                        ],
-                      ),
+              ...reasons.map((reason) {
+                final isSelected = selectedReason == reason;
+                return InkWell(
+                  onTap: () => setDialogState(() => selectedReason = reason),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 6,
+                      horizontal: 4,
                     ),
-                  );
-                },
-              ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          isSelected
+                              ? Icons.radio_button_checked
+                              : Icons.radio_button_unchecked,
+                          color: isSelected
+                              ? const Color(0xFFFF4D85)
+                              : Colors.white54,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          reason,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white54),
+              ),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -347,7 +359,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                 backgroundColor: Colors.orangeAccent,
                 foregroundColor: Colors.black,
               ),
-              child: const Text('Submit Report', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: const Text(
+                'Submit Report',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
@@ -389,7 +404,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
             SizedBox(width: 8),
             Text(
               'Block User',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+              ),
             ),
           ],
         ),
@@ -400,7 +418,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white54),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
@@ -411,7 +432,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
               backgroundColor: Colors.redAccent,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Block User', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text(
+              'Block User',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -440,7 +464,9 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Blocked ${widget.partnerName}. Skipping to next user...'),
+          content: Text(
+            'Blocked ${widget.partnerName}. Skipping to next user...',
+          ),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -749,7 +775,9 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                                     ? Alignment.centerRight
                                     : Alignment.centerLeft,
                                 child: Container(
-                                  margin: const EdgeInsets.symmetric(vertical: 4),
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: 4,
+                                  ),
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 14,
                                     vertical: 10,
@@ -757,13 +785,19 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
-                                        Colors.amber.shade700.withValues(alpha: 0.85),
-                                        Colors.orange.shade800.withValues(alpha: 0.85),
+                                        Colors.amber.shade700.withValues(
+                                          alpha: 0.85,
+                                        ),
+                                        Colors.orange.shade800.withValues(
+                                          alpha: 0.85,
+                                        ),
                                       ],
                                     ),
                                     borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
-                                      color: Colors.amberAccent.withValues(alpha: 0.6),
+                                      color: Colors.amberAccent.withValues(
+                                        alpha: 0.6,
+                                      ),
                                     ),
                                   ),
                                   child: Row(
@@ -1179,7 +1213,11 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         // Exit / End Call Button
         IconButton(
           onPressed: _endCall,
-          icon: const Icon(Iconsax.call_remove, color: Colors.white70, size: 18),
+          icon: const Icon(
+            Iconsax.call_remove,
+            color: Colors.white70,
+            size: 18,
+          ),
           style: IconButton.styleFrom(
             backgroundColor: Colors.red.withValues(alpha: 0.3),
             padding: const EdgeInsets.all(8),
@@ -1205,8 +1243,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   }
 
   Widget _buildControls() {
-    final double progress = (_callDuration / 180.0).clamp(0.0, 1.0);
-    final bool isUnlocked = _callDuration >= 180;
+    final double progress = (_callDuration / 120.0).clamp(0.0, 1.0);
+    final bool isUnlocked = _callDuration >= 120;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -1301,7 +1339,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                         ),
                       ),
                       child: Text(
-                        '${180 - _callDuration}s',
+                        '${120 - _callDuration}s',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 9,
