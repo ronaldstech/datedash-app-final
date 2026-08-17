@@ -19,6 +19,7 @@ class ChatMessage {
   final String? replyToId;
   final String? replyToText;
   final String? replyToSenderName;
+  final bool isSuperRequest;
 
   ChatMessage({
     required this.id,
@@ -37,14 +38,20 @@ class ChatMessage {
     this.replyToId,
     this.replyToText,
     this.replyToSenderName,
+    this.isSuperRequest = false,
   });
 
   factory ChatMessage.fromDoc(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+    final String textContent = data['text'] ?? '';
+    final bool isSuper = data['isSuperRequest'] == true ||
+        textContent.startsWith('🔥 Super Request:') ||
+        textContent.contains('Super Request');
+
     return ChatMessage(
       id: doc.id,
       senderId: data['senderId'] ?? '',
-      text: data['text'] ?? '',
+      text: textContent,
       timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
       isRead: data['isRead'] ?? false,
       isDelivered: data['isDelivered'] ?? true,
@@ -58,6 +65,7 @@ class ChatMessage {
       replyToId: data['replyToId'],
       replyToText: data['replyToText'],
       replyToSenderName: data['replyToSenderName'],
+      isSuperRequest: isSuper,
     );
   }
 
