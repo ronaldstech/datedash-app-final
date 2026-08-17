@@ -262,22 +262,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
     if (user == null) return false;
 
-    // Premium users have unlimited messages
+    // Premium membership users have unlimited messages (0 sparks)
     if (user.isPremium) return true;
 
-    // Check if user has free daily messages left
-    final today = DateTime.now().toIso8601String().split('T')[0];
-    int dailyCount = user.dailyMessageCount;
-    if (user.lastMessageResetDate != today) {
-      dailyCount = 0;
-    }
-
-    if (dailyCount < 5) {
-      // It's a free message, no credits needed!
-      return true;
-    }
-
-    // Daily limit reached, they must use credits
+    // Non-membership users are charged 10 sparks per message
     if (user.credits >= 10) {
       try {
         await profileProvider.useCredits(10);

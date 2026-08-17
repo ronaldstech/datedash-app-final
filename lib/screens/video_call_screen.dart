@@ -193,14 +193,39 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   }
 
   Future<void> _sendMessage() async {
-    if (_callDuration < 180) return;
+    if (_callDuration < 120) return;
     final messageText = _messageController.text.trim();
     if (messageText.isEmpty) return;
-    _messageController.clear();
 
-    final profile = context.read<ProfileProvider>().userProfile;
+    final profileProvider = context.read<ProfileProvider>();
+    final profile = profileProvider.userProfile;
     final myUid = profile?.uid;
     if (myUid == null) return;
+
+    // Check membership: If user is not premium, charge 10 sparks per message
+    if (profile != null && !profile.isPremium) {
+      if (profile.credits < 10) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Insufficient Sparks! You need 10 sparks per message or buy a membership for unlimited messaging.',
+              ),
+              backgroundColor: Colors.redAccent,
+            ),
+          );
+        }
+        return;
+      }
+      try {
+        await profileProvider.useCredits(10);
+      } catch (e) {
+        debugPrint('Error deducting sparks in video call: $e');
+        return;
+      }
+    }
+
+    _messageController.clear();
 
     // 1. Write to real 1-on-1 chat in Firestore so messages appear in the Chats screen!
     try {
@@ -572,7 +597,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       builder: (modalContext) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            final bool isUnlocked = _callDuration >= 180;
+            final bool isUnlocked = _callDuration >= 120;
 
             return Container(
               height: MediaQuery.of(context).size.height * 0.7,
@@ -634,7 +659,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                             Text(
                               isUnlocked
                                   ? '🔓 Messages save directly to Inbox'
-                                  : '🔒 Unlocks in ${180 - _callDuration}s...',
+                                  : '🔒 Unlocks in ${120 - _callDuration}s...',
                               style: TextStyle(
                                 color: isUnlocked
                                     ? const Color(0xFF00E676)
@@ -691,7 +716,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                                 Text(
                                   isUnlocked
                                       ? 'Say hi to ${widget.partnerName}!'
-                                      : 'Chat unlocks after 3 minutes (180s) of call',
+                                      : 'Chat unlocks after 2 minutes (120s) of call',
                                   style: TextStyle(
                                     color: Colors.white.withValues(alpha: 0.5),
                                     fontSize: 13,

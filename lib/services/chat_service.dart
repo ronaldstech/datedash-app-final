@@ -87,8 +87,7 @@ class ChatService {
           dailyCount = 0;
         }
         
-        // We no longer throw an exception here. 
-        // The client-side handles charging sparks after the 5 free messages are used up.
+        // Client-side handles charging 10 sparks per message for non-members (free for membership users).
         
         await senderRef.update({
           'dailyMessageCount': dailyCount + 1,

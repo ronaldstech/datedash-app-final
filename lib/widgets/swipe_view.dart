@@ -16,7 +16,6 @@ import '../providers/language_provider.dart';
 import 'gift_selection_sheet.dart';
 import 'meetup_sheet.dart';
 import '../services/chat_service.dart';
-import 'boost_sheet.dart';
 import '../screens/premium_screen.dart';
 
 class SwipeView extends StatefulWidget {
@@ -641,7 +640,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
                     fit: BoxFit.cover,
                     width: double.infinity,
                     height: double.infinity,
-                    errorBuilder: (_, __, ___) =>
+                    errorBuilder: (context, error, stackTrace) =>
                         const ColoredBox(color: Color(0xFF1A1A2E)),
                     loadingBuilder: (_, child, loadingProgress) {
                       if (loadingProgress == null) return child;
