@@ -656,32 +656,123 @@ class ProfileService {
         });
   }
 
-  /// Updates a user's premium status in Firestore
+  /// Updates or queues a user's premium status in Firestore.
+  /// If the user already has an active subscription, the new one is queued so it will
+  /// activate automatically when the current subscription expires.
   Future<void> updatePremiumStatus(
     String uid,
     String plan,
     bool isMonthly,
   ) async {
     try {
+      final doc = await _usersCollection.doc(uid).get();
+      final now = DateTime.now();
       final days = isMonthly ? 30 : 7;
-      final expiry = DateTime.now().add(Duration(days: days));
+      final isElitePlan = plan.trim().toUpperCase().contains('ELITE');
 
-      Map<String, dynamic> updates = {
-        'isPremium': true,
-        'premiumType': plan,
-        'premiumExpiry': Timestamp.fromDate(expiry),
-      };
-
-      // If Elite, add 2000 sparks
-      if (plan == 'Elite') {
-        updates['credits'] = FieldValue.increment(2000);
+      Map<String, dynamic> currentData = {};
+      if (doc.exists && doc.data() != null) {
+        currentData = doc.data() as Map<String, dynamic>;
       }
 
-      await _usersCollection.doc(uid).update(updates);
-      debugPrint('ProfileService: Updated premium status for $uid to $plan');
+      final isCurrentlyPremium = currentData['isPremium'] == true;
+      DateTime? currentExpiry;
+      if (currentData['premiumExpiry'] is Timestamp) {
+        currentExpiry = (currentData['premiumExpiry'] as Timestamp).toDate();
+      }
+
+      final isCurrentActive = isCurrentlyPremium &&
+          currentExpiry != null &&
+          currentExpiry.isAfter(now);
+
+      if (isCurrentActive) {
+        // Queue the subscription to activate when the current one expires
+        final queuedItem = {
+          'plan': plan,
+          'isMonthly': isMonthly,
+          'days': days,
+          'purchasedAt': Timestamp.fromDate(now),
+        };
+
+        Map<String, dynamic> updates = {
+          'queuedSubscriptions': FieldValue.arrayUnion([queuedItem]),
+        };
+
+        // If Elite, add 2000 sparks immediately upon purchase
+        if (isElitePlan) {
+          updates['credits'] = FieldValue.increment(2000);
+        }
+
+        await _usersCollection.doc(uid).update(updates);
+        debugPrint(
+            'ProfileService: Queued subscription $plan for $uid (active until $currentExpiry)');
+      } else {
+        // Activate immediately
+        final expiry = now.add(Duration(days: days));
+
+        Map<String, dynamic> updates = {
+          'isPremium': true,
+          'premiumType': plan,
+          'premiumPurchasedAt': Timestamp.fromDate(now),
+          'premiumExpiry': Timestamp.fromDate(expiry),
+          'isPlanMonthly': isMonthly,
+        };
+
+        // If Elite, add 2000 sparks immediately
+        if (isElitePlan) {
+          updates['credits'] = FieldValue.increment(2000);
+        }
+
+        await _usersCollection.doc(uid).update(updates);
+        debugPrint(
+            'ProfileService: Activated premium status for $uid to $plan (expires $expiry)');
+      }
     } catch (e) {
       debugPrint('Error updating premium status: $e');
       rethrow;
+    }
+  }
+
+  /// Checks if the current subscription expired and activates the next queued subscription if available
+  Future<void> checkAndActivateQueuedSubscription(String uid) async {
+    try {
+      final doc = await _usersCollection.doc(uid).get();
+      if (!doc.exists || doc.data() == null) return;
+      final data = doc.data() as Map<String, dynamic>;
+
+      final now = DateTime.now();
+      DateTime? currentExpiry;
+      if (data['premiumExpiry'] is Timestamp) {
+        currentExpiry = (data['premiumExpiry'] as Timestamp).toDate();
+      }
+
+      final isExpired = currentExpiry != null && now.isAfter(currentExpiry);
+      final List<dynamic> queued = data['queuedSubscriptions'] as List<dynamic>? ?? [];
+
+      if ((isExpired || data['isPremium'] != true) && queued.isNotEmpty) {
+        // Pop the first queued subscription
+        final nextSub = Map<String, dynamic>.from(queued.first as Map);
+        final remainingQueued = List<dynamic>.from(queued)..removeAt(0);
+
+        final plan = nextSub['plan']?.toString() ?? 'Premium';
+        final isMonthly = nextSub['isMonthly'] == true;
+        final days = (nextSub['days'] as num?)?.toInt() ?? (isMonthly ? 30 : 7);
+        final expiry = now.add(Duration(days: days));
+
+        final updates = <String, dynamic>{
+          'isPremium': true,
+          'premiumType': plan,
+          'premiumPurchasedAt': nextSub['purchasedAt'] ?? Timestamp.fromDate(now),
+          'premiumExpiry': Timestamp.fromDate(expiry),
+          'isPlanMonthly': isMonthly,
+          'queuedSubscriptions': remainingQueued,
+        };
+
+        await _usersCollection.doc(uid).update(updates);
+        debugPrint('ProfileService: Activated queued subscription $plan for $uid');
+      }
+    } catch (e) {
+      debugPrint('Error checking queued subscription: $e');
     }
   }
 
@@ -804,6 +895,72 @@ class ProfileService {
       );
     } catch (e) {
       debugPrint('Error claiming reward in service: $e');
+      rethrow;
+    }
+  }
+
+  /// Ensures the user has a referral code (creates one if missing).
+  /// The code is the first 8 characters of the UID (uppercased).
+  Future<String> ensureReferralCode(String uid) async {
+    try {
+      final doc = await _usersCollection.doc(uid).get();
+      if (doc.exists) {
+        final data = doc.data() as Map<String, dynamic>;
+        final existing = data['referralCode']?.toString();
+        if (existing != null && existing.isNotEmpty) return existing;
+      }
+      final code = uid.substring(0, uid.length >= 8 ? 8 : uid.length).toUpperCase();
+      await _usersCollection.doc(uid).update({'referralCode': code});
+      return code;
+    } catch (e) {
+      debugPrint('Error ensuring referral code: $e');
+      return uid.substring(0, uid.length >= 8 ? 8 : uid.length).toUpperCase();
+    }
+  }
+
+  /// Returns a live stream of users who joined via this user's referral code.
+  Stream<List<Map<String, dynamic>>> getInvitedUsersStream(String referralCode) {
+    return _usersCollection
+        .where('referredBy', isEqualTo: referralCode)
+        .snapshots()
+        .map(
+          (snap) => snap.docs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return {
+              'uid': doc.id,
+              'firstName': data['firstName'] ?? 'User',
+              'isEmailVerified': data['isEmailVerified'] == true,
+              'photos': data['photos'] ?? [],
+            };
+          }).toList(),
+        );
+  }
+
+  /// Claims 500 sparks for each invited user who has verified their email.
+  /// Idempotent: will not award twice for the same invited user.
+  Future<void> claimReferralReward({
+    required String inviterUid,
+    required String invitedUid,
+    required int rewardAmount,
+  }) async {
+    try {
+      final rewardId = 'referral_$invitedUid';
+      final doc = await _usersCollection.doc(inviterUid).get();
+      if (doc.exists) {
+        final data = doc.data() as Map<String, dynamic>;
+        final claimed = List<String>.from(data['claimedRewards'] ?? []);
+        if (claimed.contains(rewardId)) {
+          throw Exception('Reward already claimed for this user');
+        }
+      }
+      await _usersCollection.doc(inviterUid).update({
+        'credits': FieldValue.increment(rewardAmount),
+        'claimedRewards': FieldValue.arrayUnion([rewardId]),
+        'referralRewardCount': FieldValue.increment(1),
+      });
+      debugPrint('ProfileService: Claimed referral reward (+$rewardAmount) for inviting $invitedUid');
+    } catch (e) {
+      debugPrint('Error claiming referral reward: $e');
       rethrow;
     }
   }

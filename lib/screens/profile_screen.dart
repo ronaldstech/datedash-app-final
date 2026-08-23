@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:snellum/providers/profile_provider.dart';
 import 'package:snellum/screens/premium_screen.dart';
 import 'package:flutter/material.dart';
@@ -118,11 +119,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 children: [
                   _buildProfileHeader(languageProvider, isDark),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 20),
+                  _buildSubscriptionStatusCard(languageProvider, isDark),
+                  const SizedBox(height: 20),
                   _buildCompletionCard(languageProvider, isDark),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 24),
                   _buildStatsGrid(languageProvider, isDark),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 24),
                   _buildQuickActionMenu(languageProvider, isDark),
                   const SizedBox(height: 40),
                 ],
@@ -299,6 +302,477 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ],
+    );
+  }
+
+  Widget _buildSubscriptionStatusCard(
+    LanguageProvider languageProvider,
+    bool isDark,
+  ) {
+    return Consumer<ProfileProvider>(
+      builder: (context, profileProvider, _) {
+        final profile = profileProvider.userProfile ?? _profile;
+        final bool isPremium = profile.isPremium;
+        final String planName =
+            profile.premiumType?.toUpperCase() ?? 'FREE PLAN';
+        final DateTime? expiry = profile.premiumExpiry;
+        final DateTime? purchasedAt = profile.premiumPurchasedAt;
+        final bool isExpired = expiry != null && DateTime.now().isAfter(expiry);
+        final bool isActive = isPremium && !isExpired;
+
+        // Calculate days / time remaining
+        String remainingText = '';
+        double progress = 1.0;
+        if (isActive && expiry != null) {
+          final remaining = expiry.difference(DateTime.now());
+          if (remaining.inDays > 1) {
+            remainingText = '${remaining.inDays} days remaining';
+          } else if (remaining.inHours > 0) {
+            remainingText = '${remaining.inHours} hours remaining';
+          } else if (remaining.inMinutes > 0) {
+            remainingText = '${remaining.inMinutes} mins remaining';
+          } else {
+            remainingText = 'Expiring soon';
+          }
+
+          if (purchasedAt != null) {
+            final totalDuration = expiry.difference(purchasedAt).inSeconds;
+            final elapsed = DateTime.now().difference(purchasedAt).inSeconds;
+            if (totalDuration > 0) {
+              progress = (1.0 - (elapsed / totalDuration)).clamp(0.0, 1.0);
+            }
+          }
+        }
+
+        String formatDate(DateTime dt) {
+          final months = [
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'May',
+            'Jun',
+            'Jul',
+            'Aug',
+            'Sep',
+            'Oct',
+            'Nov',
+            'Dec',
+          ];
+          final hour = dt.hour.toString().padLeft(2, '0');
+          final minute = dt.minute.toString().padLeft(2, '0');
+          return '${dt.day} ${months[dt.month - 1]} ${dt.year}, $hour:$minute';
+        }
+
+        final Color amberColor = const Color(0xFFFFB300);
+        final Color greenColor = const Color(0xFF00C853);
+        final Color purpleColor = const Color(0xFF9C27B0);
+
+        Color planAccentColor = amberColor;
+        if (planName.contains('ELITE')) {
+          planAccentColor = purpleColor;
+        } else if (planName.contains('PRO')) {
+          planAccentColor = const Color(0xFF29B6F6);
+        }
+
+        return Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: isActive
+                  ? planAccentColor.withValues(alpha: 0.35)
+                  : isDark
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : Colors.black.withValues(alpha: 0.06),
+              width: isActive ? 1.5 : 1.0,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: isActive
+                    ? planAccentColor.withValues(alpha: isDark ? 0.15 : 0.08)
+                    : Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              // Card Header
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: isActive
+                            ? LinearGradient(
+                                colors: [
+                                  planAccentColor,
+                                  planAccentColor.withValues(alpha: 0.7),
+                                ],
+                              )
+                            : null,
+                        color: isActive
+                            ? null
+                            : (isDark
+                                  ? Colors.white.withValues(alpha: 0.08)
+                                  : Colors.black.withValues(alpha: 0.05)),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        isActive ? Iconsax.crown5 : Iconsax.lock,
+                        color: isActive
+                            ? Colors.white
+                            : (isDark ? Colors.white70 : Colors.black54),
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                isActive ? '$planName PASS' : 'FREE ACCOUNT',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: (isActive ? greenColor : Colors.grey)
+                                      .withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  isActive
+                                      ? 'ACTIVE'
+                                      : (isExpired ? 'EXPIRED' : 'STANDARD'),
+                                  style: TextStyle(
+                                    color: isActive ? greenColor : Colors.grey,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 0.6,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            isActive
+                                ? (profile.isPlanMonthly
+                                      ? 'Monthly Membership • $remainingText'
+                                      : 'Weekly Membership • $remainingText')
+                                : 'Upgrade to unlock all VIP perks & boosts',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Theme.of(context).hintColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Active Subscription Details (Time Purchased, Time of Expiry, Progress Bar)
+              if (isActive && expiry != null) ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                  child: Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: LinearProgressIndicator(
+                          value: progress,
+                          minHeight: 5,
+                          backgroundColor: planAccentColor.withValues(
+                            alpha: 0.15,
+                          ),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            planAccentColor,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.03)
+                              : Colors.grey.shade50,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.05)
+                                : Colors.black.withValues(alpha: 0.04),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            if (purchasedAt != null) ...[
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Iconsax.calendar_tick,
+                                        size: 14,
+                                        color: Theme.of(context).hintColor,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        'Purchased on',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Theme.of(context).hintColor,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    formatDate(purchasedAt),
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                            ],
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Iconsax.timer_1,
+                                      size: 14,
+                                      color: Theme.of(context).hintColor,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'Expires at',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Theme.of(context).hintColor,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  formatDate(expiry),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                    color:
+                                        (expiry
+                                                .difference(DateTime.now())
+                                                .inDays <=
+                                            2)
+                                        ? const Color(0xFFFF5252)
+                                        : null,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+
+              // Queued Subscriptions (Waiting to activate when current expires)
+              if (profile.queuedSubscriptions.isNotEmpty) ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF29B6F6).withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: const Color(0xFF29B6F6).withValues(alpha: 0.25),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Iconsax.clock,
+                              size: 14,
+                              color: Color(0xFF29B6F6),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Queued Subscriptions (${profile.queuedSubscriptions.length})',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF29B6F6),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        ...profile.queuedSubscriptions.map((q) {
+                          final qPlan = q['plan']?.toString() ?? 'Premium';
+                          final qMonthly = q['isMonthly'] == true;
+                          final qDays =
+                              (q['days'] as num?)?.toInt() ??
+                              (qMonthly ? 30 : 7);
+                          if (q['purchasedAt'] is Timestamp) {
+                            (q['purchasedAt'] as Timestamp).toDate();
+                          }
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? Colors.white.withValues(alpha: 0.04)
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: isDark
+                                    ? Colors.white10
+                                    : Colors.black.withValues(alpha: 0.04),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${qPlan.toUpperCase()} (${qMonthly ? "1 Month" : "$qDays Days"})',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Activates automatically upon expiry',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Theme.of(context).hintColor,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(
+                                      0xFF29B6F6,
+                                    ).withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: const Text(
+                                    'QUEUED',
+                                    style: TextStyle(
+                                      color: Color(0xFF29B6F6),
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+
+              // Action button to Manage / Upgrade / Renew
+              InkWell(
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const PremiumScreen(),
+                    ),
+                  );
+                  _loadProfile();
+                },
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(24),
+                ),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: isActive
+                        ? planAccentColor.withValues(alpha: 0.1)
+                        : _primaryColor.withValues(alpha: 0.08),
+                    borderRadius: const BorderRadius.vertical(
+                      bottom: Radius.circular(24),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        isActive
+                            ? 'Manage or Upgrade Plan'
+                            : 'Upgrade to Premium ⚡',
+                        style: TextStyle(
+                          color: isActive ? planAccentColor : _primaryColor,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Icon(
+                        Iconsax.arrow_right_3,
+                        size: 14,
+                        color: isActive ? planAccentColor : _primaryColor,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -627,9 +1101,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   );
                 },
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24)),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 4,
+                ),
                 leading: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
@@ -645,14 +1122,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         : const Color(0xFFFF9E00).withValues(alpha: 0.12),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Iconsax.flash5,
-                      color: isBoosted ? Colors.white : const Color(0xFFFF9E00),
-                      size: 20),
+                  child: Icon(
+                    Iconsax.flash5,
+                    color: isBoosted ? Colors.white : const Color(0xFFFF9E00),
+                    size: 20,
+                  ),
                 ),
                 title: const Text(
                   'Boost Profile',
-                  style:
-                      TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
                 ),
                 subtitle: Text(
                   isBoosted && boostExpiry != null
@@ -669,8 +1147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 trailing: Icon(
                   Iconsax.arrow_right_3,
                   size: 18,
-                  color:
-                      Theme.of(context).hintColor.withValues(alpha: 0.5),
+                  color: Theme.of(context).hintColor.withValues(alpha: 0.5),
                 ),
               );
             },
@@ -688,12 +1165,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               final planName = pp.userProfile?.premiumType ?? 'Premium';
               return _buildMenuItem(
                 icon: Iconsax.crown5,
-                title: isPremium ? '$planName Subscription' : languageProvider.getString('get_premium'),
-                subtitle: isPremium ? 'Active Plan • Manage or Upgrade' : languageProvider.getString('my_credits'),
+                title: isPremium
+                    ? '$planName Subscription'
+                    : languageProvider.getString('get_premium'),
+                subtitle: isPremium
+                    ? 'Active Plan • Manage or Upgrade'
+                    : languageProvider.getString('my_credits'),
                 color: const Color(0xFFFFB300),
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const PremiumScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const PremiumScreen(),
+                  ),
                 ),
               );
             },

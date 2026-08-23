@@ -848,16 +848,57 @@ class _PremiumScreenState extends State<PremiumScreen>
                     ],
                   ),
                   const SizedBox(height: 20),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                      color: isPopular
-                          ? Colors.white
-                          : (isDark ? Colors.white : Colors.black87),
-                      letterSpacing: -0.5,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
+                          color: isPopular
+                              ? Colors.white
+                              : (isDark ? Colors.white : Colors.black87),
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      if (title == 'ELITE') ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFB300).withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: const Color(0xFFFFB300).withValues(alpha: 0.6),
+                              width: 1,
+                            ),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Iconsax.flash5,
+                                size: 12,
+                                color: Color(0xFFFFB300),
+                              ),
+                              SizedBox(width: 3),
+                              Text(
+                                '+2,000 SPARKS',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  color: Color(0xFFFFB300),
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Row(
@@ -1386,6 +1427,21 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
     super.dispose();
   }
 
+  int _baseCreditAmount() {
+    if (widget.type != 'credits') return 0;
+    return int.parse(widget.title.split(' ')[0]);
+  }
+
+  int _bonusCreditAmount(int amount) {
+    if (amount == 50000) return 10000;
+    return 0;
+  }
+
+  int _totalCreditAmount() {
+    final amount = _baseCreditAmount();
+    return amount + _bonusCreditAmount(amount);
+  }
+
   Future<void> _startPayment() async {
     final profileProvider = Provider.of<ProfileProvider>(
       context,
@@ -1433,9 +1489,7 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
         'status': 'pending',
         'type': widget.type,
         'plan': widget.type == 'subscription' ? widget.title : null,
-        'creditAmount': widget.type == 'credits'
-            ? int.parse(widget.title.split(' ')[0])
-            : null,
+        'creditAmount': widget.type == 'credits' ? _totalCreditAmount() : null,
         'operator': _selectedOperator!.shortCode,
         'initResponse': responseData,
       });
@@ -1525,8 +1579,7 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
         widget.isMonthly,
       );
     } else {
-      final amount = int.parse(widget.title.split(' ')[0]);
-      await _profileService.addCredits(uid, amount);
+      await _profileService.addCredits(uid, _totalCreditAmount());
     }
   }
 
@@ -2012,14 +2065,54 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
           ),
           const SizedBox(height: 12),
           Text(
-            'High five! Your ${widget.title} is now active and ready to go.',
+            widget.type == 'subscription'
+                ? (widget.title.toUpperCase() == 'ELITE'
+                    ? 'High five! Your ELITE subscription is active and 2,000 Sparks have been added to your balance!'
+                    : 'High five! Your ${widget.title} subscription is now active and ready to go.')
+                : 'High five! ${_totalCreditAmount().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')} Sparks have been added to your balance!',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
-              color: isDark ? Colors.white54 : Colors.black54,
+              color: isDark ? Colors.white70 : Colors.black87,
               height: 1.5,
             ),
           ),
+          if (widget.type == 'subscription' && widget.title.toUpperCase() == 'ELITE' ||
+              widget.type == 'credits') ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFB300).withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: const Color(0xFFFFB300).withValues(alpha: 0.4),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Iconsax.flash5,
+                    size: 18,
+                    color: Color(0xFFFFB300),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    widget.type == 'subscription'
+                        ? '+2,000 Sparks Added'
+                        : '+${_totalCreditAmount().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')} Sparks Added',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFFFFB300),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 40),
           Container(
             width: double.infinity,
