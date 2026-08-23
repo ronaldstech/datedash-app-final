@@ -105,14 +105,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     try {
       // 1. Send verification code
-      await _emailVerificationService.requestCode(email);
+      await _emailVerificationService.requestCode(email, recipientName: name);
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Verification code sent to $email'),
-          backgroundColor: const Color(0xFFFF4D85),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: const Color(0xFF111827),
+          content: Text(
+            'Verification code sent to $email. Check your inbox and spam folder.',
+          ),
         ),
       );
 

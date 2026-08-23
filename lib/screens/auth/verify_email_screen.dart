@@ -6,6 +6,7 @@ import 'package:iconsax/iconsax.dart';
 
 import '../../services/auth_service.dart';
 import '../../services/email_verification_service.dart';
+import '../landing_screen.dart';
 
 class VerifyEmailScreen extends StatefulWidget {
   final String email;
@@ -13,6 +14,7 @@ class VerifyEmailScreen extends StatefulWidget {
   final String? name;
   final String? phoneNumber;
   final bool isSignUpFlow;
+  final bool sendCodeOnOpen;
 
   const VerifyEmailScreen({
     super.key,
@@ -21,6 +23,7 @@ class VerifyEmailScreen extends StatefulWidget {
     this.name,
     this.phoneNumber,
     this.isSignUpFlow = false,
+    this.sendCodeOnOpen = false,
   });
 
   @override
@@ -29,7 +32,8 @@ class VerifyEmailScreen extends StatefulWidget {
 
 class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   final TextEditingController _codeController = TextEditingController();
-  final EmailVerificationService _verificationService = EmailVerificationService();
+  final EmailVerificationService _verificationService =
+      EmailVerificationService();
   final AuthService _authService = AuthService();
 
   bool _isVerifying = false;
@@ -42,6 +46,9 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   void initState() {
     super.initState();
     _startCooldownTimer();
+    if (widget.sendCodeOnOpen) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _sendOpeningCode());
+    }
   }
 
   @override
@@ -64,6 +71,36 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     });
   }
 
+  Future<void> _sendOpeningCode() async {
+    if (!mounted || widget.email.trim().isEmpty) return;
+
+    try {
+      await _verificationService.requestCode(
+        widget.email,
+        recipientName: widget.name,
+      );
+      if (!mounted) return;
+      _showCodeSentMessage();
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _errorMessage = 'Could not send verification code. Please try again.';
+      });
+    }
+  }
+
+  void _showCodeSentMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: const Color(0xFF111827),
+        content: Text(
+          'Verification code sent to ${widget.email}. Check your inbox and spam folder.',
+        ),
+      ),
+    );
+  }
+
   Future<void> _handleVerify() async {
     final code = _codeController.text.trim();
     if (code.length != 6) {
@@ -84,7 +121,9 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
       );
 
       // 2. Perform Account Registration or Mark User as Verified
-      if (widget.isSignUpFlow && widget.password != null && widget.name != null) {
+      if (widget.isSignUpFlow &&
+          widget.password != null &&
+          widget.name != null) {
         final cred = await _authService.signUpWithEmail(
           widget.email,
           widget.password!,
@@ -96,9 +135,9 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
           await FirebaseFirestore.instance
               .collection('users')
               .doc(cred!.user!.uid)
-              .update({
+              .set({
             'isEmailVerified': true,
-          });
+          }, SetOptions(merge: true));
         }
       } else {
         // Sign in or update current profile
@@ -111,9 +150,9 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
             await FirebaseFirestore.instance
                 .collection('users')
                 .doc(cred.user!.uid)
-                .update({
+                .set({
               'isEmailVerified': true,
-            });
+            }, SetOptions(merge: true));
           }
         }
       }
@@ -122,13 +161,15 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('🎉 Email verified successfully! Welcome to DateDash.'),
+          content: Text('Email verified successfully. Welcome to Snellum.'),
           backgroundColor: Colors.green,
         ),
       );
 
-      // Pop back to root or home screen
-      Navigator.of(context).popUntil((route) => route.isFirst);
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const LandingScreen()),
+        (_) => false,
+      );
     } on EmailVerificationException catch (e) {
       setState(() => _errorMessage = e.message);
     } on FirebaseAuthException catch (e) {
@@ -149,16 +190,14 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     });
 
     try {
-      await _verificationService.requestCode(widget.email);
+      await _verificationService.requestCode(
+        widget.email,
+        recipientName: widget.name,
+      );
       _startCooldownTimer();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Verification code sent to ${widget.email}'),
-            backgroundColor: const Color(0xFFFF4D85),
-          ),
-        );
+        _showCodeSentMessage();
       }
     } catch (e) {
       setState(() => _errorMessage = 'Could not resend code. Please try again.');
@@ -226,9 +265,15 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
-                  style: const TextStyle(color: Colors.white70, fontSize: 14, height: 1.5),
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
                   children: [
-                    const TextSpan(text: 'We sent a 6-digit verification code to\n'),
+                    const TextSpan(
+                      text: 'We sent a 6-digit verification code to\n',
+                    ),
                     TextSpan(
                       text: widget.email,
                       style: const TextStyle(
@@ -240,7 +285,42 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 ),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 18),
+
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF7ED).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
+                  ),
+                ),
+                child: const Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Iconsax.info_circle,
+                      color: Color(0xFFF59E0B),
+                      size: 21,
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'If you do not see the email, check your spam or junk folder.',
+                        style: TextStyle(
+                          color: Color(0xFFFFEDD5),
+                          fontSize: 13,
+                          height: 1.4,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
 
               // Code Input Card
               Container(
