@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'notification_service.dart';
 import 'profile_service.dart';
-import 'email_verification_service.dart';
 import '../models/user_profile_model.dart';
 
 class AuthService {
@@ -14,34 +13,13 @@ class AuthService {
   // Get user state changes
   Stream<User?> get user => _auth.authStateChanges();
 
-  // Sign in with email & password (enforces email verification)
+  // Sign in with email & password. Verification is enforced by app routing.
   Future<UserCredential?> signInWithEmail(String email, String password) async {
     try {
-      UserCredential result = await _auth.signInWithEmailAndPassword(
+      return await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-
-      final user = result.user;
-      if (user != null) {
-        final profile = await _profileService.getUserProfile(user.uid);
-        final isFirestoreVerified = await EmailVerificationService().isEmailVerified(email);
-
-        final bool isVerified = (user.emailVerified) ||
-            (profile?.isEmailVerified == true) ||
-            (profile?.isVerified == true) ||
-            isFirestoreVerified;
-
-        if (!isVerified) {
-          await _auth.signOut();
-          throw FirebaseAuthException(
-            code: 'EMAIL_NOT_VERIFIED',
-            message: 'Your email is not verified yet. Please verify your account before logging in.',
-          );
-        }
-      }
-
-      return result;
     } catch (e) {
       rethrow;
     }
@@ -61,13 +39,13 @@ class AuthService {
       );
 
       if (cred.user != null) {
-        // Initialize user document in Firestore with verified status, name, phone and 50 signup sparks
+        // Initialize user document in Firestore with verified status, name, phone and 100 signup sparks
         await _profileService.saveUserProfile(
           cred.user!.uid,
           UserProfile(
             firstName: name,
             phoneNumber: phoneNumber,
-            sparks: 50,
+            sparks: 100,
             isEmailVerified: true,
             isVerified: true,
             verificationStatus: 'verified',
@@ -80,7 +58,7 @@ class AuthService {
           senderId: 'system',
           senderName: 'Snellum',
           type: 'reward',
-          message: '🎁 Welcome bonus: 50 free sparks added!',
+          message: '🎁 Welcome bonus: 100 free sparks added!',
         );
       }
 
@@ -108,7 +86,7 @@ class AuthService {
         if (profile == null) {
           await _profileService.saveUserProfile(
             cred.user!.uid,
-            UserProfile(firstName: cred.user?.displayName, sparks: 50),
+            UserProfile(firstName: cred.user?.displayName, sparks: 100),
           );
 
           // Log the signup reward
@@ -117,7 +95,7 @@ class AuthService {
             senderId: 'system',
             senderName: 'Snellum',
             type: 'reward',
-            message: '🎁 Welcome bonus: 50 free sparks added!',
+            message: '🎁 Welcome bonus: 100 free sparks added!',
           );
         }
       }
@@ -183,7 +161,7 @@ class AuthService {
             UserProfile(
               firstName: 'User',
               phoneNumber: cred.user?.phoneNumber,
-              sparks: 50,
+              sparks: 100,
             ),
           );
 
@@ -193,7 +171,7 @@ class AuthService {
             senderId: 'system',
             senderName: 'Snellum',
             type: 'reward',
-            message: '🎁 Welcome bonus: 50 free sparks added!',
+            message: '🎁 Welcome bonus: 100 free sparks added!',
           );
         }
       }
