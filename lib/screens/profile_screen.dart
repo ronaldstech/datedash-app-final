@@ -471,18 +471,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ],
                           ),
                           const SizedBox(height: 2),
-                          Text(
-                            isActive
-                                ? (profile.isPlanMonthly
+                          Builder(builder: (context) {
+                            final bool isMonthlyPlan = profile.isPlanMonthly ||
+                                (expiry != null &&
+                                    purchasedAt != null &&
+                                    expiry.difference(purchasedAt).inDays >= 25) ||
+                                (expiry != null &&
+                                    expiry.difference(DateTime.now()).inDays >= 25);
+                            return Text(
+                              isActive
+                                  ? (isMonthlyPlan
                                       ? 'Monthly Membership • $remainingText'
                                       : 'Weekly Membership • $remainingText')
-                                : 'Upgrade to unlock all VIP perks & boosts',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Theme.of(context).hintColor,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
+                                  : 'Upgrade to unlock all VIP perks & boosts',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Theme.of(context).hintColor,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            );
+                          }),
                         ],
                       ),
                     ),
