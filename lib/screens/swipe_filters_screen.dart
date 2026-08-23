@@ -825,18 +825,6 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                       
                       // 2. Advanced Premium filters
                       _buildSectionHeader('Premium Advanced Filters'),
-                      
-                      // Country / Green Card Filter
-                      _buildDropdownCard(
-                        icon: Icons.public_rounded,
-                        title: 'Partner Country (Green Card)',
-                        value: _country,
-                        items: _countryOptions,
-                        onChanged: (val) => setState(() => _country = val),
-                        color: Colors.green,
-                        isPremiumLocked: !isElite,
-                        tierName: 'Elite',
-                      ),
 
                       // Relationship Goal
                       _buildDropdownCard(
@@ -1075,6 +1063,23 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                         onChanged: (val) => setState(() => _loveStyle = val),
                         color: Colors.redAccent,
                         isPremiumLocked: !isPremium,
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // 3. Advanced Elite filters
+                      _buildSectionHeader('Elite Advanced Filters'),
+
+                      // Country / Green Card Filter
+                      _buildDropdownCard(
+                        icon: Icons.public_rounded,
+                        title: 'Partner Country (Green Card)',
+                        value: _country,
+                        items: _countryOptions,
+                        onChanged: (val) => setState(() => _country = val),
+                        color: Colors.green,
+                        isPremiumLocked: !isElite,
+                        tierName: 'Elite',
                       ),
                       
                       const SizedBox(height: 24),

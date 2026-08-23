@@ -4,9 +4,6 @@ import 'package:provider/provider.dart';
 import '../theme/theme_provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/language_provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../services/local_db_service.dart';
 import 'premium_screen.dart';
 import 'verification_screen.dart';
 import 'edit_profile_screen.dart';
@@ -268,7 +265,6 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget _buildPrivacySection(
-
     BuildContext context,
     LanguageProvider languageProvider,
   ) {
