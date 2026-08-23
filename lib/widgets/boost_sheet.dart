@@ -13,20 +13,20 @@ class BoostSheet extends StatefulWidget {
 }
 
 class _BoostSheetState extends State<BoostSheet> {
-  int _selectedWeeks = 1;
+  int _selectedDurationDays = 1;
   bool _isActivating = false;
 
   @override
   Widget build(BuildContext context) {
     final pp = context.watch<ProfileProvider>();
     final profile = pp.userProfile;
-    final isPremium = profile?.isPremium == true;
     final sparks = profile?.sparks ?? 0;
     final isAlreadyBoosted = profile?.isBoosted == true;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final costs = {1: 100, 2: 180, 3: 250};
-    final currentCost = costs[_selectedWeeks] ?? 100;
+    final costs = {1: 200, 7: 500, 21: 1000};
+    final labels = {1: '1 Day', 7: '1 Week', 21: '3 Weeks'};
+    final currentCost = costs[_selectedDurationDays] ?? 200;
 
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -136,14 +136,16 @@ class _BoostSheetState extends State<BoostSheet> {
 
           // Duration options
           Row(
-            children: [1, 2, 3].map((weeks) {
-              final isSelected = _selectedWeeks == weeks;
-              final cost = costs[weeks]!;
+            children: [1, 7, 21].map((durationDays) {
+              final isSelected = _selectedDurationDays == durationDays;
+              final cost = costs[durationDays]!;
+              final label = labels[durationDays]!;
               return Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: GestureDetector(
-                    onTap: () => setState(() => _selectedWeeks = weeks),
+                    onTap: () =>
+                        setState(() => _selectedDurationDays = durationDays),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -179,7 +181,7 @@ class _BoostSheetState extends State<BoostSheet> {
                       ),
                       child: Column(
                         children: [
-                          if (weeks == 3)
+                          if (durationDays == 21)
                             Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 8, vertical: 2),
@@ -198,7 +200,7 @@ class _BoostSheetState extends State<BoostSheet> {
                               ),
                             ),
                           Text(
-                            '$weeks ${weeks == 1 ? 'Week' : 'Weeks'}',
+                            label,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
@@ -218,7 +220,7 @@ class _BoostSheetState extends State<BoostSheet> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                isPremium && weeks == 1 ? 'FREE' : '$cost Sparks',
+                                '$cost Sparks',
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
@@ -302,9 +304,7 @@ class _BoostSheetState extends State<BoostSheet> {
                   : Text(
                       isAlreadyBoosted
                           ? 'Extend Boost ($currentCost Sparks)'
-                          : (isPremium && _selectedWeeks == 1
-                              ? 'Activate Free Boost'
-                              : 'Activate Boost ($currentCost Sparks)'),
+                          : 'Activate Boost ($currentCost Sparks)',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
@@ -320,19 +320,18 @@ class _BoostSheetState extends State<BoostSheet> {
 
   Future<void> _handleActivateBoost() async {
     final pp = context.read<ProfileProvider>();
-    final isPremium = pp.userProfile?.isPremium == true;
-    final useSparks = !(isPremium && _selectedWeeks == 1);
+    const useSparks = true;
 
     setState(() => _isActivating = true);
 
     try {
-      await pp.activateProfileBoost(_selectedWeeks, useSparks: useSparks);
+      await pp.activateProfileBoost(_selectedDurationDays, useSparks: useSparks);
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '⚡ Profile Boost Activated for $_selectedWeeks ${_selectedWeeks == 1 ? 'week' : 'weeks'}!',
+              'Profile Boost Activated for ${_formatDuration(_selectedDurationDays)}!',
             ),
             backgroundColor: const Color(0xFFFF4D85),
           ),
@@ -397,5 +396,11 @@ class _BoostSheetState extends State<BoostSheet> {
   String _formatDate(DateTime? date) {
     if (date == null) return '';
     return '${date.day}/${date.month}/${date.year}';
+  }
+
+  String _formatDuration(int durationDays) {
+    if (durationDays == 1) return '1 day';
+    if (durationDays == 7) return '1 week';
+    return '3 weeks';
   }
 }
