@@ -49,6 +49,14 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
             .listen((profile) {
           _userProfile = profile;
           notifyListeners();
+          // Check if previous subscription expired and a queued one should activate
+          if (profile != null &&
+              profile.queuedSubscriptions.isNotEmpty &&
+              (!profile.isPremium ||
+                  (profile.premiumExpiry != null &&
+                      DateTime.now().isAfter(profile.premiumExpiry!)))) {
+            _profileService.checkAndActivateQueuedSubscription(user.uid);
+          }
         });
 
         _likesCountSubscription?.cancel();
@@ -358,16 +366,17 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
     }
   }
 
-  /// Activates a profile boost for 1, 2, or 3 weeks.
-  /// Deducts sparks if using sparks (1 week = 100, 2 weeks = 180, 3 weeks = 250).
-  Future<bool> activateProfileBoost(int weeks, {bool useSparks = false}) async {
+  /// Activates a profile boost for 1 day, 1 week, or 3 weeks.
+  /// Deducts sparks if using sparks (1 day = 200, 1 week = 500, 3 weeks = 1000).
+  Future<bool> activateProfileBoost(
+    int durationDays, {
+    bool useSparks = false,
+  }) async {
     final uid = _currentUser?.uid;
     if (_userProfile == null || uid == null) return false;
 
-    int cost = 0;
-    if (weeks == 1) { cost = 100; }
-    else if (weeks == 2) { cost = 180; }
-    else if (weeks == 3) { cost = 250; }
+    final costs = {1: 200, 7: 500, 21: 1000};
+    final cost = costs[durationDays] ?? 200;
 
     if (useSparks) {
       if (_userProfile!.sparks < cost) {
@@ -382,7 +391,7 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
         ? currentExpiry
         : now;
 
-    _userProfile!.boostExpiry = baseDate.add(Duration(days: 7 * weeks));
+    _userProfile!.boostExpiry = baseDate.add(Duration(days: durationDays));
     notifyListeners();
 
     try {
