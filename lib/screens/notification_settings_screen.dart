@@ -19,7 +19,6 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
   bool _messagesEnabled = true;
   bool _likesEnabled = true;
   bool _callsEnabled = true;
-  bool _liveInvitesEnabled = true;
   bool _loading = true;
 
   @override
@@ -38,7 +37,6 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       _messagesEnabled = prefs.getBool('notif_messages') ?? true;
       _likesEnabled = prefs.getBool('notif_likes') ?? true;
       _callsEnabled = prefs.getBool('notif_calls') ?? true;
-      _liveInvitesEnabled = prefs.getBool('notif_live_invites') ?? true;
       _loading = false;
     });
   }
@@ -159,17 +157,6 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                           onChanged: (val) {
                             setState(() => _callsEnabled = val);
                             _updatePref('notif_calls', val);
-                          },
-                          activeThumbColor: primaryPink,
-                        ),
-                        _buildSwitchTile(
-                          icon: Iconsax.video_play,
-                          title: languageProvider.currentLanguageCode == 'sw' ? 'Alika Mubashara' : 'Live Stream Invites',
-                          subtitle: languageProvider.currentLanguageCode == 'sw' ? 'Arifiwa unapoalikwa kwenye video ya mubashara' : 'Get notified when invited to co-host live streams',
-                          value: _liveInvitesEnabled,
-                          onChanged: (val) {
-                            setState(() => _liveInvitesEnabled = val);
-                            _updatePref('notif_live_invites', val);
                           },
                           activeThumbColor: primaryPink,
                         ),
