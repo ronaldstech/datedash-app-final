@@ -56,6 +56,7 @@ class _LiveListScreenState extends State<LiveListScreen>
 
   final List<String> _countries = [
     'Any',
+    'Malawi',
     'United States',
     'Kenya',
     'Tanzania',
@@ -142,6 +143,8 @@ class _LiveListScreenState extends State<LiveListScreen>
     final String countryCode = pp.userProfile?.countryCode ?? '';
 
     final Map<String, String> countryMap = {
+      'malawi': 'Malawi',
+      'mw': 'Malawi',
       'kenya': 'Kenya',
       'ke': 'Kenya',
       'tanzania': 'Tanzania',
@@ -225,7 +228,9 @@ class _LiveListScreenState extends State<LiveListScreen>
       final lat = position.latitude;
       final lng = position.longitude;
 
-      if (lat > -5 && lat < 5 && lng > 34 && lng < 42) {
+      if (lat > -17 && lat < -9 && lng > 32 && lng < 36) {
+        deducedCountry = 'Malawi';
+      } else if (lat > -5 && lat < 5 && lng > 34 && lng < 42) {
         deducedCountry = 'Kenya';
       } else if (lat > -12 && lat < -1 && lng > 29 && lng < 41) {
         deducedCountry = 'Tanzania';
@@ -341,10 +346,17 @@ class _LiveListScreenState extends State<LiveListScreen>
     final lp = context.watch<LanguageProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    if ((!_countryInitialized || (pp.userProfile?.isPremium == true && _selectedCountry == 'Any')) &&
-        pp.userProfile != null) {
-      _setDefaultCountryFromGeo(pp);
-      _countryInitialized = true;
+    final userProfile = pp.userProfile;
+    if (userProfile != null) {
+      if (userProfile.isElite) {
+        if (!_countryInitialized || _selectedCountry == 'Any') {
+          _setDefaultCountryFromGeo(pp);
+          _countryInitialized = true;
+        }
+      } else if (_selectedCountry != 'Any') {
+        _selectedCountry = 'Any';
+        _countryInitialized = false;
+      }
     }
 
     return Scaffold(
@@ -1103,6 +1115,8 @@ class _LiveListScreenState extends State<LiveListScreen>
 
   String _getCountryFlag(String country) {
     switch (country) {
+      case 'Malawi':
+        return '🇲🇼';
       case 'United States':
         return '🇺🇸';
       case 'Kenya':
