@@ -117,6 +117,11 @@ class UserProfile {
   String? premiumType; // 'Pro', 'Premium', 'Elite'
   bool get isElite => isPremium && premiumType?.toUpperCase() == 'ELITE';
   DateTime? premiumExpiry;
+  DateTime? premiumPurchasedAt;
+  bool isPlanMonthly;
+  List<Map<String, dynamic>> queuedSubscriptions; // List of queued subscriptions waiting to activate
+  bool get isSubscriptionActive =>
+      isPremium && (premiumExpiry == null || DateTime.now().isBefore(premiumExpiry!));
   DateTime? boostExpiry;
   bool get isBoosted => boostExpiry != null && DateTime.now().isBefore(boostExpiry!);
   int sparks;
@@ -135,6 +140,11 @@ class UserProfile {
   int lastSeenLikesCount;
   List<String> blockedUsers; // List of blocked user UIDs
   String? fcmToken;
+
+  // 🔗 Referral System
+  String? referralCode; // Unique code = uid substring
+  String? referredBy; // UID of the user who invited them
+  int referralRewardCount; // How many referral rewards have been claimed
 
 
   UserProfile({
@@ -209,6 +219,9 @@ class UserProfile {
     this.isPremium = false,
     this.premiumType,
     this.premiumExpiry,
+    this.premiumPurchasedAt,
+    this.isPlanMonthly = false,
+    this.queuedSubscriptions = const [],
     this.boostExpiry,
     this.sparks = 0,
     this.unlockedLikes = const [],
@@ -221,6 +234,9 @@ class UserProfile {
     this.claimedRewards = const [],
     this.lastSeenLikesCount = 0,
     this.blockedUsers = const [],
+    this.referralCode,
+    this.referredBy,
+    this.referralRewardCount = 0,
     this.filterRelationshipStatus = 'Any',
     this.filterReligion = 'Any',
     this.filterSmoking = 'Any',
@@ -411,6 +427,12 @@ class UserProfile {
         isPremium: map['isPremium'] == true,
         premiumType: map['premiumType']?.toString(),
         premiumExpiry: _parseDate(map['premiumExpiry']),
+        premiumPurchasedAt: _parseDate(map['premiumPurchasedAt']),
+        isPlanMonthly: map['isPlanMonthly'] == true,
+        queuedSubscriptions: (map['queuedSubscriptions'] as List<dynamic>?)
+                ?.map((e) => Map<String, dynamic>.from(e as Map))
+                .toList() ??
+            const [],
         boostExpiry: _parseDate(map['boostExpiry']),
         sparks: (map['credits'] as num?)?.toInt() ?? 0,
         unlockedLikes: _parseList(map['unlockedLikes']),
@@ -423,6 +445,9 @@ class UserProfile {
         claimedRewards: _parseList(map['claimedRewards']),
         lastSeenLikesCount: (map['lastSeenLikesCount'] as num?)?.toInt() ?? 0,
         fcmToken: map['fcmToken']?.toString(),
+        referralCode: map['referralCode']?.toString(),
+        referredBy: map['referredBy']?.toString(),
+        referralRewardCount: (map['referralRewardCount'] as num?)?.toInt() ?? 0,
       );
     } catch (e) {
       debugPrint('UserProfile error parsing map: $e');
@@ -548,6 +573,9 @@ class UserProfile {
       'isPremium': isPremium,
       'premiumType': premiumType,
       'premiumExpiry': premiumExpiry != null ? Timestamp.fromDate(premiumExpiry!) : null,
+      'premiumPurchasedAt': premiumPurchasedAt != null ? Timestamp.fromDate(premiumPurchasedAt!) : null,
+      'isPlanMonthly': isPlanMonthly,
+      'queuedSubscriptions': queuedSubscriptions,
       'boostExpiry': boostExpiry != null ? Timestamp.fromDate(boostExpiry!) : null,
       'credits': sparks,
       'unlockedLikes': unlockedLikes,
@@ -559,6 +587,9 @@ class UserProfile {
       'lastMessageResetDate': lastMessageResetDate,
       'claimedRewards': claimedRewards,
       'lastSeenLikesCount': lastSeenLikesCount,
+      'referralCode': referralCode,
+      'referredBy': referredBy,
+      'referralRewardCount': referralRewardCount,
       'lastUpdated': FieldValue.serverTimestamp(),
     };
   }
