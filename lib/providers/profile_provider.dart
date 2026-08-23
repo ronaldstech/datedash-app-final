@@ -172,7 +172,7 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
   }
 
   void navigateToPremium(int subTabIndex) {
-    _currentTabIndex = 4; // Premium Tab
+    _currentTabIndex = 5; // Premium Tab
     _initialPremiumTab = subTabIndex;
     notifyListeners();
   }
