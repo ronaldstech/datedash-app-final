@@ -87,7 +87,9 @@ class _SignInScreenState extends State<SignInScreen> {
                 if (!mounted) return;
                 setSheetState(() => isSending = false);
                 canUpdateSheet = false;
-                Navigator.pop(sheetContext);
+                if (sheetContext.mounted) {
+                  Navigator.pop(sheetContext);
+                }
                 ScaffoldMessenger.of(this.context).showSnackBar(
                   SnackBar(
                     behavior: SnackBarBehavior.floating,

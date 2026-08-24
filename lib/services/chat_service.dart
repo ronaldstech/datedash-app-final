@@ -333,7 +333,7 @@ class ChatService {
     }
   }
 
-  /// Sends a Super Request (priority chat) for 20 sparks
+  /// Sends a Super Request (boosts existing conversation/message to top with glowing highlight)
   Future<void> sendSuperRequest({
     required String chatId,
     required String senderId,
@@ -342,42 +342,85 @@ class ChatService {
   }) async {
     final batch = _firestore.batch();
     final chatRef = _firestore.collection('chats').doc(chatId);
-    final msgRef = chatRef.collection('messages').doc();
 
-    // 1. Mark chat as Super Request
-    batch.update(chatRef, {
-      'isSuperRequest': true,
-      'lastMessage': '🔥 Super Request: $text',
-      'lastMessageTime': FieldValue.serverTimestamp(),
-      'lastMessageSenderId': senderId,
-      'unreadCount.$receiverId': FieldValue.increment(1),
-    });
+    // Fetch existing messages to see if there is an existing last message
+    final messagesSnap = await chatRef
+        .collection('messages')
+        .orderBy('timestamp', descending: true)
+        .limit(1)
+        .get();
 
-    // 2. Add the message
-    batch.set(msgRef, {
-      'senderId': senderId,
-      'text': text,
-      'timestamp': FieldValue.serverTimestamp(),
-      'isRead': false,
-      'isDelivered': true,
-      'messageType': 'text',
-      'isSuperRequest': true, // Optional: flag the message too
-    });
+    if (messagesSnap.docs.isNotEmpty) {
+      // Highlight the existing latest message & refresh its timestamp to now
+      final lastDoc = messagesSnap.docs.first;
+      final lastData = lastDoc.data();
+      final messageText = text.isNotEmpty && text != 'Sent a Super Request! 🔥' 
+          ? text 
+          : (lastData['text'] as String? ?? 'Sent a Super Request! 🔥');
 
-    await batch.commit();
+      batch.update(lastDoc.reference, {
+        'isSuperRequest': true,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
 
-    // Cache locally
-    final localChat = await _localDb.getChatById(chatId);
-    if (localChat != null) {
-      await _localDb.insertOrUpdateChat(Chat(
-        id: localChat.id,
-        participants: localChat.participants,
-        lastMessage: '🔥 Super Request: $text',
-        lastMessageTime: DateTime.now(),
-        lastMessageSenderId: senderId,
-        unreadCount: localChat.unreadCount,
-        isSuperRequest: true,
-      ));
+      batch.update(chatRef, {
+        'isSuperRequest': true,
+        'lastMessage': '🔥 Super Request: $messageText',
+        'lastMessageTime': FieldValue.serverTimestamp(),
+        'lastMessageSenderId': senderId,
+        'unreadCount.$receiverId': FieldValue.increment(1),
+      });
+
+      await batch.commit();
+
+      final localChat = await _localDb.getChatById(chatId);
+      if (localChat != null) {
+        await _localDb.insertOrUpdateChat(Chat(
+          id: localChat.id,
+          participants: localChat.participants,
+          lastMessage: '🔥 Super Request: $messageText',
+          lastMessageTime: DateTime.now(),
+          lastMessageSenderId: senderId,
+          unreadCount: localChat.unreadCount,
+          isSuperRequest: true,
+        ));
+      }
+    } else {
+      // If no message exists yet, create a new super request message
+      final msgRef = chatRef.collection('messages').doc();
+
+      batch.update(chatRef, {
+        'isSuperRequest': true,
+        'lastMessage': '🔥 Super Request: $text',
+        'lastMessageTime': FieldValue.serverTimestamp(),
+        'lastMessageSenderId': senderId,
+        'unreadCount.$receiverId': FieldValue.increment(1),
+      });
+
+      batch.set(msgRef, {
+        'senderId': senderId,
+        'text': text,
+        'timestamp': FieldValue.serverTimestamp(),
+        'isRead': false,
+        'isDelivered': true,
+        'messageType': 'text',
+        'isSuperRequest': true,
+      });
+
+      await batch.commit();
+
+      final localChat = await _localDb.getChatById(chatId);
+      if (localChat != null) {
+        await _localDb.insertOrUpdateChat(Chat(
+          id: localChat.id,
+          participants: localChat.participants,
+          lastMessage: '🔥 Super Request: $text',
+          lastMessageTime: DateTime.now(),
+          lastMessageSenderId: senderId,
+          unreadCount: localChat.unreadCount,
+          isSuperRequest: true,
+        ));
+      }
     }
   }
 

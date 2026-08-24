@@ -35,27 +35,11 @@ class _LiveListScreenState extends State<LiveListScreen>
   // Animation controller for the radar scanning effect
   late AnimationController _radarController;
 
-  final List<String> _languages = [
-    'Any',
-    'English',
-    'Kiswahili',
-    'Español',
-    'Français',
-    'Deutsch',
-    'Português',
-    'Hindi',
-    'Japanese',
-    'Italian',
-    'Chinese',
-    'Korean',
-    'Arabic',
-    'Russian',
-  ];
+  final List<String> _languages = [];
 
   final List<String> _genders = ['Any', 'Male', 'Female'];
 
   final List<String> _countries = [
-    'Any',
     'Malawi',
     'United States',
     'Kenya',
@@ -463,8 +447,8 @@ class _LiveListScreenState extends State<LiveListScreen>
             subtitle: isElite
                 ? 'Tune gender and country for a more focused match.'
                 : (isPremium
-                    ? 'Gender filter unlocked. Country filter requires Elite.'
-                    : 'Upgrade to control gender (Premium) and country (Elite) matching.'),
+                      ? 'Gender filter unlocked. Country filter requires Elite.'
+                      : 'Upgrade to control gender (Premium) and country (Elite) matching.'),
             children: [
               _buildFilterLabel('Desired Gender', Iconsax.user),
               const SizedBox(height: 10),
@@ -493,7 +477,11 @@ class _LiveListScreenState extends State<LiveListScreen>
                 children: [
                   _buildCountryPickerButton(context, isDark),
                   if (!isElite)
-                    _buildPremiumLockedOverlay(context, 'Country', tier: 'Elite'),
+                    _buildPremiumLockedOverlay(
+                      context,
+                      'Country',
+                      tier: 'Elite',
+                    ),
                 ],
               ),
             ],
@@ -747,8 +735,8 @@ class _LiveListScreenState extends State<LiveListScreen>
     final String infoText = isElite
         ? 'Your selected filters will be applied.'
         : (isPremium
-            ? 'Gender filter active. Country set to Any (Elite feature).'
-            : 'Gender and country are set to Any on Basic.');
+              ? 'Gender filter active. Country set to Any (Elite feature).'
+              : 'Gender and country are set to Any on Basic.');
 
     return Container(
       width: double.infinity,

@@ -1,6 +1,6 @@
 <?php
 /**
- * DateDash - Send Email Verification Code via Resend
+ * Snellum - Send Email Verification Code via Resend
  *
  * Uses Resend (https://resend.com) — free tier: 3,000 emails/month.
  * Uses HTTPS API — no SMTP ports needed.
@@ -55,52 +55,41 @@ if (!defined('RESEND_API_KEY') || empty(RESEND_API_KEY) || RESEND_API_KEY === 'Y
 $htmlBody = '<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#0f0f14;font-family:Arial,Helvetica,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0f0f14;padding:40px 15px;">
+<body style="margin:0;padding:0;background:#f4f5f7;font-family:Arial,Helvetica,sans-serif;color:#111827;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f4f5f7;padding:24px 15px;">
     <tr>
       <td align="center">
         <table width="520" cellpadding="0" cellspacing="0" border="0"
-          style="max-width:520px;width:100%;background:#1a1a24;border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);">
-
-          <!-- Header -->
-          <tr>
-            <td align="center" style="padding:32px 24px 24px;background:linear-gradient(135deg,rgba(255,77,133,0.18),rgba(255,77,133,0.04));">
-              <h1 style="margin:0;color:#FF4D85;font-size:30px;font-weight:900;letter-spacing:-0.5px;">' . htmlspecialchars(APP_NAME) . '</h1>
-            </td>
-          </tr>
+          style="max-width:520px;width:100%;background:#ffffff;border:1px solid #e5e7eb;">
 
           <!-- Body -->
           <tr>
-            <td style="padding:32px 36px;">
-              <h2 style="margin:0 0 12px;color:#ffffff;font-size:22px;font-weight:800;text-align:center;">Verify Your Email</h2>
-              <p style="margin:0 0 28px;color:#a0a0b0;font-size:15px;line-height:1.65;text-align:center;">
-                Welcome to ' . htmlspecialchars(APP_NAME) . '! Enter the 6-digit code below to activate your account.
+            <td style="padding:28px 28px 8px;">
+              <p style="margin:0 0 20px;color:#111827;font-size:18px;font-weight:700;">' . htmlspecialchars(APP_NAME) . '</p>
+              <h1 style="margin:0 0 12px;color:#111827;font-size:22px;font-weight:700;">Verify your email address</h1>
+              <p style="margin:0 0 24px;color:#4b5563;font-size:15px;line-height:1.5;">
+                Use the verification code below to finish setting up your ' . htmlspecialchars(APP_NAME) . ' account.
               </p>
+            </td>
+          </tr>
 
-              <!-- OTP Box -->
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <!-- Code -->
+          <tr>
+            <td style="padding:0 28px 24px;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f9fafb;border:1px solid #e5e7eb;">
                 <tr>
-                  <td align="center"
-                    style="background:linear-gradient(135deg,#FF4D85,#FF1A60);border-radius:16px;padding:22px 10px;">
-                    <span style="font-family:\'Courier New\',Courier,monospace;font-size:42px;font-weight:900;
-                      color:#ffffff;letter-spacing:14px;display:inline-block;line-height:1;">' . htmlspecialchars($code) . '</span>
+                  <td align="center" style="padding:18px 16px;">
+                    <span style="font-family:\'Courier New\',Courier,monospace;font-size:32px;font-weight:700;color:#111827;letter-spacing:6px;display:inline-block;line-height:1;">' . htmlspecialchars($code) . '</span>
                   </td>
                 </tr>
               </table>
 
-              <p style="margin:24px 0 0;color:#606075;font-size:13px;text-align:center;line-height:1.6;">
-                This code expires in <strong style="color:#a0a0b0;">15 minutes</strong>.<br>
+              <p style="margin:18px 0 0;color:#4b5563;font-size:14px;line-height:1.5;">
+                This code expires in <strong>15 minutes</strong>.
+              </p>
+              <p style="margin:18px 0 0;padding-top:18px;border-top:1px solid #e5e7eb;color:#6b7280;font-size:13px;line-height:1.5;">
                 If you did not create a ' . htmlspecialchars(APP_NAME) . ' account, you can safely ignore this email.
               </p>
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td align="center"
-              style="padding:18px 24px;background:#13131c;border-top:1px solid rgba(255,255,255,0.05);
-                color:#505065;font-size:12px;line-height:1.5;">
-              &copy; ' . date('Y') . ' ' . htmlspecialchars(APP_NAME) . '. All rights reserved.
             </td>
           </tr>
 

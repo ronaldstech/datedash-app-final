@@ -25,17 +25,29 @@ if (empty($code)) {
 
 $subject = APP_NAME . ' - Your Verification Code: ' . $code;
 
-$htmlBody = '<!DOCTYPE html><html><body style="background:#0f0f14;font-family:Arial,sans-serif;color:#fff;padding:30px;">
-  <div style="max-width:520px;margin:0 auto;background:#1a1a24;border-radius:20px;padding:30px;border:1px solid rgba(255,255,255,0.1);">
-    <h1 style="color:#FF4D85;text-align:center;">' . htmlspecialchars(APP_NAME) . '</h1>
-    <h2 style="text-align:center;">Verify Your Email</h2>
-    <p style="color:#a0a0b0;text-align:center;">Your 6-digit verification code is:</p>
-    <div style="background:linear-gradient(135deg,#FF4D85,#FF1A60);border-radius:16px;padding:20px;text-align:center;margin:20px 0;">
-      <span style="font-size:38px;font-weight:bold;color:#fff;letter-spacing:10px;">' . htmlspecialchars($code) . '</span>
-    </div>
-    <p style="color:#808095;font-size:13px;text-align:center;">Expires in 15 minutes. If you did not request this, ignore it.</p>
-    <p style="color:#606075;font-size:12px;text-align:center;">&copy; ' . date('Y') . ' ' . htmlspecialchars(APP_NAME) . '</p>
-  </div>
+$htmlBody = '<!DOCTYPE html><html><body style="margin:0;padding:24px 16px;background:#f4f5f7;font-family:Arial,Helvetica,sans-serif;color:#111827;">
+  <table align="center" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;background:#ffffff;border:1px solid #e5e7eb;">
+    <tr>
+      <td style="padding:28px 28px 8px;">
+        <p style="margin:0 0 20px;color:#111827;font-size:18px;font-weight:700;">' . htmlspecialchars(APP_NAME) . '</p>
+        <h1 style="margin:0 0 12px;color:#111827;font-size:22px;font-weight:700;">Verify your email address</h1>
+        <p style="margin:0 0 24px;color:#4b5563;font-size:15px;line-height:1.5;">Use the verification code below to finish setting up your ' . htmlspecialchars(APP_NAME) . ' account.</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:0 28px 24px;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f9fafb;border:1px solid #e5e7eb;">
+          <tr>
+            <td align="center" style="padding:18px 16px;">
+              <span style="font-family:\'Courier New\',Courier,monospace;font-size:32px;font-weight:700;color:#111827;letter-spacing:6px;">' . htmlspecialchars($code) . '</span>
+            </td>
+          </tr>
+        </table>
+        <p style="margin:18px 0 0;color:#4b5563;font-size:14px;line-height:1.5;">This code expires in <strong>15 minutes</strong>.</p>
+        <p style="margin:18px 0 0;padding-top:18px;border-top:1px solid #e5e7eb;color:#6b7280;font-size:13px;line-height:1.5;">If you did not create a ' . htmlspecialchars(APP_NAME) . ' account, you can safely ignore this email.</p>
+      </td>
+    </tr>
+  </table>
 </body></html>';
 
 $headers  = "MIME-Version: 1.0\r\n";

@@ -264,12 +264,15 @@ class _ChatScreenState extends State<ChatScreen> {
                   children: [
                     const Icon(Iconsax.wallet_3, color: Colors.amberAccent, size: 20),
                     const SizedBox(width: 8),
-                    Text(
-                      'Cost: 20 Sparks (Your balance: ${user.credits})',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13,
+                    Flexible(
+                      child: Text(
+                        'Cost: 20 Sparks (Your balance: ${user.credits})',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
@@ -1059,10 +1062,12 @@ class _ChatScreenState extends State<ChatScreen> {
                         backgroundImage: widget.otherUserPhoto != null
                             ? NetworkImage(widget.otherUserPhoto!)
                             : null,
-                        onBackgroundImageError: (exception, stackTrace) {
-                          debugPrint(
-                              'Error loading app bar profile image: $exception');
-                        },
+                        onBackgroundImageError: widget.otherUserPhoto != null
+                            ? (exception, stackTrace) {
+                                debugPrint(
+                                    'Error loading app bar profile image: $exception');
+                              }
+                            : null,
                         child: widget.otherUserPhoto == null
                             ? const Icon(Iconsax.user,
                                 size: 16, color: Color(0xFFFF4D85))
@@ -2092,10 +2097,12 @@ class _ChatScreenState extends State<ChatScreen> {
                     backgroundImage: widget.otherUserPhoto != null
                         ? NetworkImage(widget.otherUserPhoto!)
                         : null,
-                    onBackgroundImageError: (exception, stackTrace) {
-                      debugPrint(
-                          'Error loading chat profile image: $exception');
-                    },
+                    onBackgroundImageError: widget.otherUserPhoto != null
+                        ? (exception, stackTrace) {
+                            debugPrint(
+                                'Error loading chat profile image: $exception');
+                          }
+                        : null,
                     child: widget.otherUserPhoto == null
                         ? const Icon(Iconsax.user,
                             size: 10, color: Color(0xFFFF4D85))
@@ -2499,127 +2506,60 @@ class _ChatScreenState extends State<ChatScreen> {
     }
 
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.78),
-      margin: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: isMe
-              ? [const Color(0xFFFF4D85), const Color(0xFFFF8C00)]
-              : [const Color(0xFF1E101D), const Color(0xFF2A1525)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: isMe ? const Color(0xFFFF4D85) : Theme.of(context).cardColor,
         borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(22),
-          topRight: const Radius.circular(22),
-          bottomLeft: Radius.circular(isMe ? 22 : 4),
-          bottomRight: Radius.circular(isMe ? 4 : 22),
+          topLeft: const Radius.circular(20),
+          topRight: const Radius.circular(20),
+          bottomLeft: Radius.circular(isMe ? 20 : 4),
+          bottomRight: Radius.circular(isMe ? 4 : 20),
+        ),
+        border: Border.all(
+          color: const Color(0xFFFF8C00),
+          width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFF8C00).withValues(alpha: 0.35),
-            blurRadius: 16,
-            spreadRadius: 1,
-            offset: const Offset(0, 4),
+            color: const Color(0xFFFF8C00).withValues(alpha: 0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
-        border: Border.all(
-          color: Colors.amberAccent.withValues(alpha: 0.8),
-          width: 1.5,
-        ),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(22),
-          topRight: const Radius.circular(22),
-          bottomLeft: Radius.circular(isMe ? 22 : 4),
-          bottomRight: Radius.circular(isMe ? 4 : 22),
-        ),
-        child: Stack(
-          children: [
-            Positioned(
-              right: -10,
-              bottom: -10,
-              child: Icon(
-                Iconsax.flash5,
-                size: 72,
-                color: Colors.white.withValues(alpha: 0.08),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Iconsax.flash5, size: 12, color: Colors.amberAccent),
+              const SizedBox(width: 4),
+              const Text(
+                'SUPER',
+                style: TextStyle(
+                  color: Colors.amberAccent,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.5,
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.35),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.amberAccent.withValues(alpha: 0.6),
-                            width: 0.8,
-                          ),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Iconsax.flash5, size: 12, color: Colors.amberAccent),
-                            SizedBox(width: 4),
-                            Text(
-                              'SUPER REQUEST',
-                              style: TextStyle(
-                                color: Colors.amberAccent,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 0.8,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Spacer(),
-                      const Icon(
-                        Iconsax.verify5,
-                        color: Colors.amberAccent,
-                        size: 16,
-                      ),
-                    ],
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  displayText,
+                  style: TextStyle(
+                    color: isMe ? Colors.white : null,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    height: 1.3,
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    displayText,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      height: 1.35,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        isMe ? '⚡ Priority Request Sent' : '⚡ Priority Message',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.85),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }

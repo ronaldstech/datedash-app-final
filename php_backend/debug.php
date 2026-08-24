@@ -1,13 +1,13 @@
 <?php
 /**
- * DateDash - SMTP Debug Tool
+ * Snellum - SMTP Debug Tool
  * Open in browser to diagnose SMTP connection.
  * DELETE THIS FILE after debugging!
  */
 require_once __DIR__ . '/config.php';
 
 echo '<pre style="font-family:monospace;background:#111;color:#0f0;padding:20px;font-size:14px;">';
-echo "=== DateDash SMTP Debug ===\n\n";
+echo "=== Snellum SMTP Debug ===\n\n";
 
 echo "PHP Version: " . phpversion() . "\n";
 echo "Server:      " . ($_SERVER['SERVER_SOFTWARE'] ?? 'unknown') . "\n\n";
@@ -61,7 +61,7 @@ if ($workingConfig) {
 
 // Quick send test using PHP mail()
 echo "\n--- PHP mail() Test ---\n";
-$testSent = @mail(FROM_EMAIL, 'DateDash Debug Test', 'Test from debug.php', 'From: ' . FROM_EMAIL);
+$testSent = @mail(FROM_EMAIL, 'Snellum Debug Test', 'Test from debug.php', 'From: ' . FROM_EMAIL);
 echo "mail() returned: " . ($testSent ? "✅ true (check your inbox at " . FROM_EMAIL . ")" : "❌ false") . "\n";
 
 echo "\n=== End Debug ===\n";

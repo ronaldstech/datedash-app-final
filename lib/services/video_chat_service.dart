@@ -10,6 +10,32 @@ class VideoChatService {
   CollectionReference get _waitingCollection =>
       _firestore.collection('video_chat_waiting');
 
+  Stream<List<String>> getConfiguredCountriesStream() {
+    return _firestore
+        .collection('app_settings')
+        .doc('video_chat')
+        .snapshots()
+        .map((doc) {
+      if (!doc.exists || doc.data() == null) return <String>[];
+      final data = doc.data() as Map<String, dynamic>;
+      final list = List<dynamic>.from(data['countries'] ?? []);
+      return list.map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList();
+    });
+  }
+
+  Stream<List<String>> getConfiguredLanguagesStream() {
+    return _firestore
+        .collection('app_settings')
+        .doc('video_chat')
+        .snapshots()
+        .map((doc) {
+      if (!doc.exists || doc.data() == null) return <String>[];
+      final data = doc.data() as Map<String, dynamic>;
+      final list = List<dynamic>.from(data['languages'] ?? []);
+      return list.map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList();
+    });
+  }
+
   Future<Map<String, dynamic>?> startMatching({
     required UserProfile currentUser,
     required String filterLanguage,

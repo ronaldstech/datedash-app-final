@@ -144,6 +144,141 @@ class _SnellumAppState extends State<SnellumApp> with WidgetsBindingObserver {
     return _gateCodeSentEmails.add(cleanEmail);
   }
 
+  void _checkSystemThemePrompt(BuildContext context) {
+    final themeProvider = context.read<ThemeProvider>();
+    if (themeProvider.hasPromptedSystemTheme) return;
+
+    final systemBrightness = MediaQuery.of(context).platformBrightness;
+    final systemMode = systemBrightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!themeProvider.hasPromptedSystemTheme && mounted) {
+        final navState = _navigatorKey.currentState;
+        final navContext = _navigatorKey.currentContext;
+        if (navState != null && navContext != null) {
+          _showThemeConfirmationDialog(navContext, systemMode);
+        }
+      }
+    });
+  }
+
+  void _showThemeConfirmationDialog(BuildContext context, ThemeMode systemMode) {
+    final themeProvider = context.read<ThemeProvider>();
+    final isSystemDark = systemMode == ThemeMode.dark;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        backgroundColor: isSystemDark ? const Color(0xFF1E101D) : Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: isSystemDark
+                        ? [const Color(0xFFFF4D85), const Color(0xFF9C27B0)]
+                        : [const Color(0xFFFF8C00), const Color(0xFFFF4D85)],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFF4D85).withValues(alpha: 0.4),
+                      blurRadius: 20,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  isSystemDark ? Icons.dark_mode_rounded : Icons.wb_sunny_rounded,
+                  color: Colors.white,
+                  size: 36,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Theme Preference',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900,
+                  color: isSystemDark ? Colors.white : Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'We detected that your phone is using ${isSystemDark ? "Dark" : "Light"} Mode. Would you like Snellum to match your phone\'s theme?',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  height: 1.4,
+                  color: isSystemDark ? Colors.white70 : Colors.black54,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        themeProvider.markThemePrompted();
+                        Navigator.pop(ctx);
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        side: BorderSide(
+                          color: isSystemDark ? Colors.white30 : Colors.black26,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Text(
+                        'Keep Current',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isSystemDark ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        themeProvider.setThemeMode(systemMode);
+                        themeProvider.markThemePrompted();
+                        Navigator.pop(ctx);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF4D85),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 4,
+                      ),
+                      child: Text(
+                        'Use ${isSystemDark ? "Dark" : "Light"}',
+                        style: const TextStyle(fontWeight: FontWeight.w900),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
@@ -223,6 +358,7 @@ class _SnellumAppState extends State<SnellumApp> with WidgetsBindingObserver {
                     if (updateSnapshot.data != null) {
                       return UpdateScreen(info: updateSnapshot.data!);
                     }
+                    _checkSystemThemePrompt(context);
                     return const LandingScreen();
                   },
                 );

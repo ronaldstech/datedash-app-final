@@ -1,6 +1,6 @@
 <?php
 /**
- * DateDash - Email Verification Backend Configuration
+ * Snellum - Email Verification Backend Configuration
  */
 
 // Allow CORS for Flutter Web / Mobile apps
@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // ─── App Settings ────────────────────────────────────────────────────────────
-define('APP_NAME', 'DateDash');
+define('APP_NAME', 'Snellum');
 
 // ─── SMTP Settings ───────────────────────────────────────────────────────────
 // cPanel shared hosting: use 'localhost' as host with port 25 (no auth needed)
@@ -50,7 +50,7 @@ define('RESEND_API_KEY', 'YOUR_RESEND_API_KEY_HERE'); // ← Paste your key here
 // For testing: 'onboarding@resend.dev'
 // For production: 'no-reply@apexspacemw.com' (after verifying domain in Resend)
 define('FROM_EMAIL', 'onboarding@resend.dev');
-define('FROM_NAME',  'DateDash Team');
+define('FROM_NAME',  'Snellum');
 
 // ─── Optional App API Key Security ───────────────────────────────────────────
 define('API_SECRET_KEY', '');
