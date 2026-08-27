@@ -57,6 +57,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   StreamSubscription<DocumentSnapshot>? _callSessionSubscription;
   int _callDuration = 0;
   bool _callLifecycleReady = false;
+  bool _isChatManuallyLocked = false;
+  String? _chatLockedBy;
 
   @override
   void initState() {
@@ -147,6 +149,16 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           final data = snapshot.data() as Map<String, dynamic>?;
           final status = data?['status'] as String?;
           final endedBy = data?['endedBy'] as String?;
+          final isLocked = data?['isChatLocked'] == true;
+          final lockedBy = data?['chatLockedBy'] as String?;
+
+          if (mounted && (isLocked != _isChatManuallyLocked || lockedBy != _chatLockedBy)) {
+            setState(() {
+              _isChatManuallyLocked = isLocked;
+              _chatLockedBy = lockedBy;
+            });
+          }
+
           if (status == 'ended' && endedBy != currentUserId) {
             if (currentUserId != null) {
               _videoChatService.cleanupOwnTicket(currentUserId);
@@ -154,6 +166,15 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
             _handlePartnerEndedCall();
           }
         });
+  }
+
+  Future<void> _toggleChatLock() async {
+    final currentUserId = context.read<ProfileProvider>().userProfile?.uid;
+    if (currentUserId == null) return;
+
+    // If chat is locked by partner, only partner or either user can toggle? Either user can lock/unlock.
+    final newLockedState = !_isChatManuallyLocked;
+    await _videoChatService.setChatLocked(widget.channelId, newLockedState, currentUserId);
   }
 
   void _handlePartnerEndedCall() {
@@ -193,7 +214,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   }
 
   Future<void> _sendMessage() async {
-    if (_callDuration < 120) return;
+    if (_callDuration < 120 || _isChatManuallyLocked) return;
     final messageText = _messageController.text.trim();
     if (messageText.isEmpty) return;
 
@@ -623,7 +644,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       builder: (modalContext) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            final bool isUnlocked = _callDuration >= 120;
+            final myUid = context.read<ProfileProvider>().userProfile?.uid;
+            final bool isTimeUnlocked = _callDuration >= 120;
+            final bool isChatEnabled = isTimeUnlocked && !_isChatManuallyLocked;
+            final bool isLockedByMe = _isChatManuallyLocked && _chatLockedBy == myUid;
 
             return Container(
               height: MediaQuery.of(context).size.height * 0.7,
@@ -682,21 +706,68 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                                 fontSize: 16,
                               ),
                             ),
-                            Text(
-                              isUnlocked
-                                  ? '🔓 Messages save directly to Inbox'
-                                  : '🔒 Unlocks in ${120 - _callDuration}s...',
-                              style: TextStyle(
-                                color: isUnlocked
-                                    ? const Color(0xFF00E676)
-                                    : const Color(0xFFFF8C00),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
+                            if (!isTimeUnlocked)
+                              Text(
+                                '🔒 Unlocks in ${120 - _callDuration}s...',
+                                style: const TextStyle(
+                                  color: Color(0xFFFF8C00),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              )
+                            else if (_isChatManuallyLocked)
+                              Text(
+                                isLockedByMe
+                                    ? '🔒 Chat locked by you'
+                                    : '🔒 Chat locked by ${widget.partnerName}',
+                                style: const TextStyle(
+                                  color: Colors.redAccent,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              )
+                            else
+                              const Text(
+                                '🔓 Messages save directly to Inbox',
+                                style: TextStyle(
+                                  color: Color(0xFF00E676),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
-                            ),
                           ],
                         ),
                       ),
+                      // Lock/Unlock Action Button in Header
+                      if (isTimeUnlocked)
+                        IconButton(
+                          onPressed: () async {
+                            await _toggleChatLock();
+                            setModalState(() {});
+                          },
+                          tooltip: _isChatManuallyLocked ? 'Unlock Chat' : 'Lock Chat',
+                          icon: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: _isChatManuallyLocked
+                                  ? Colors.redAccent.withValues(alpha: 0.2)
+                                  : Colors.white.withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: _isChatManuallyLocked
+                                    ? Colors.redAccent.withValues(alpha: 0.6)
+                                    : Colors.white24,
+                              ),
+                            ),
+                            child: Icon(
+                              _isChatManuallyLocked ? Iconsax.lock5 : Iconsax.unlock,
+                              color: _isChatManuallyLocked
+                                  ? Colors.redAccent
+                                  : Colors.white70,
+                              size: 18,
+                            ),
+                          ),
+                        ),
                       IconButton(
                         onPressed: () => Navigator.pop(modalContext),
                         icon: const Icon(
@@ -734,15 +805,21 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  Iconsax.message_text,
+                                  _isChatManuallyLocked
+                                      ? Iconsax.lock
+                                      : Iconsax.message_text,
                                   color: Colors.white.withValues(alpha: 0.2),
                                   size: 48,
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  isUnlocked
-                                      ? 'Say hi to ${widget.partnerName}!'
-                                      : 'Chat unlocks after 2 minutes (120s) of call',
+                                  !isTimeUnlocked
+                                      ? 'Chat unlocks after 2 minutes (120s) of call'
+                                      : _isChatManuallyLocked
+                                          ? (isLockedByMe
+                                              ? 'You have locked the chat'
+                                              : '${widget.partnerName} has locked the chat')
+                                          : 'Say hi to ${widget.partnerName}!',
                                   style: TextStyle(
                                     color: Colors.white.withValues(alpha: 0.5),
                                     fontSize: 13,
@@ -860,7 +937,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   // Input Box with Gifting Button
                   Row(
                     children: [
-                      if (isUnlocked)
+                      if (isChatEnabled)
                         IconButton(
                           onPressed: _showGifts,
                           icon: Container(
@@ -883,14 +960,18 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       Expanded(
                         child: TextField(
                           controller: _messageController,
-                          enabled: isUnlocked,
+                          enabled: isChatEnabled,
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
-                            hintText: isUnlocked
-                                ? 'Type a message (saves to Inbox)...'
-                                : 'Chat unlocks in ${60 - _callDuration}s...',
+                            hintText: !isTimeUnlocked
+                                ? 'Chat unlocks in ${120 - _callDuration}s...'
+                                : _isChatManuallyLocked
+                                    ? (isLockedByMe
+                                        ? 'Chat locked by you (tap lock icon to unlock)'
+                                        : 'Chat locked by ${widget.partnerName}')
+                                    : 'Type a message (saves to Inbox)...',
                             hintStyle: TextStyle(
-                              color: isUnlocked
+                              color: isChatEnabled
                                   ? Colors.white54
                                   : Colors.white.withValues(alpha: 0.35),
                             ),
@@ -903,7 +984,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(24),
                               borderSide: BorderSide(
-                                color: isUnlocked
+                                color: isChatEnabled
                                     ? const Color(0xFFFF4D85)
                                     : Colors.white12,
                               ),
@@ -911,7 +992,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(24),
                               borderSide: BorderSide(
-                                color: isUnlocked
+                                color: isChatEnabled
                                     ? const Color(
                                         0xFFFF4D85,
                                       ).withValues(alpha: 0.6)
@@ -926,7 +1007,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                               ),
                             ),
                             suffixIcon: IconButton(
-                              onPressed: isUnlocked
+                              onPressed: isChatEnabled
                                   ? () {
                                       _sendMessage();
                                       setModalState(() {});
@@ -934,14 +1015,14 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                                   : null,
                               icon: Icon(
                                 Iconsax.send_15,
-                                color: isUnlocked
+                                color: isChatEnabled
                                     ? const Color(0xFFFF4D85)
                                     : Colors.white24,
                               ),
                             ),
                           ),
                           onSubmitted: (_) {
-                            if (isUnlocked) {
+                            if (isChatEnabled) {
                               _sendMessage();
                               setModalState(() {});
                             }
@@ -1244,7 +1325,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
 
   Widget _buildControls() {
     final double progress = (_callDuration / 120.0).clamp(0.0, 1.0);
-    final bool isUnlocked = _callDuration >= 120;
+    final bool isTimeUnlocked = _callDuration >= 120;
+    final bool isChatEnabled = isTimeUnlocked && !_isChatManuallyLocked;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -1292,9 +1374,11 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                     strokeWidth: 3,
                     backgroundColor: Colors.white.withValues(alpha: 0.15),
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      isUnlocked
+                      isChatEnabled
                           ? const Color(0xFF00E676)
-                          : const Color(0xFFFF4D85),
+                          : (_isChatManuallyLocked
+                              ? Colors.redAccent
+                              : const Color(0xFFFF4D85)),
                     ),
                   ),
                 ),
@@ -1304,25 +1388,33 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   height: 48,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: isUnlocked
+                    color: isChatEnabled
                         ? const Color(0xFF00E676).withValues(alpha: 0.25)
-                        : Colors.white.withValues(alpha: 0.15),
+                        : (_isChatManuallyLocked
+                            ? Colors.redAccent.withValues(alpha: 0.2)
+                            : Colors.white.withValues(alpha: 0.15)),
                     border: Border.all(
-                      color: isUnlocked
+                      color: isChatEnabled
                           ? const Color(0xFF00E676).withValues(alpha: 0.6)
-                          : const Color(0xFFFF4D85).withValues(alpha: 0.4),
+                          : (_isChatManuallyLocked
+                              ? Colors.redAccent.withValues(alpha: 0.7)
+                              : const Color(0xFFFF4D85).withValues(alpha: 0.4)),
                     ),
                   ),
                   child: Icon(
-                    isUnlocked ? Iconsax.message_text : Iconsax.lock_1,
-                    color: isUnlocked
+                    isChatEnabled
+                        ? Iconsax.message_text
+                        : (_isChatManuallyLocked ? Iconsax.lock5 : Iconsax.lock_1),
+                    color: isChatEnabled
                         ? const Color(0xFF00E676)
-                        : const Color(0xFFFF4D85),
+                        : (_isChatManuallyLocked
+                            ? Colors.redAccent
+                            : const Color(0xFFFF4D85)),
                     size: 22,
                   ),
                 ),
-                // Timer tag badge when locked
-                if (!isUnlocked)
+                // Timer tag badge when locked by time
+                if (!isTimeUnlocked)
                   Positioned(
                     bottom: 0,
                     child: Container(
@@ -1343,6 +1435,32 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 9,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  )
+                else if (_isChatManuallyLocked)
+                  Positioned(
+                    bottom: 0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.9),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.redAccent.withValues(alpha: 0.8),
+                          width: 1,
+                        ),
+                      ),
+                      child: const Text(
+                        'LOCKED',
+                        style: TextStyle(
+                          color: Colors.redAccent,
+                          fontSize: 8,
                           fontWeight: FontWeight.w900,
                         ),
                       ),

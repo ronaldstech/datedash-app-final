@@ -5,28 +5,13 @@ import 'package:flutter/foundation.dart';
 class PushNotificationService {
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
 
-  // Initialize notifications
+  // Initialize notifications (handlers only — permission is requested via onboarding modal)
   Future<void> initialize() async {
     try {
-      // 1. Request Permission (especially for iOS and Android 13+)
-      NotificationSettings settings = await _fcm.requestPermission(
-        alert: true,
-        announcement: false,
-        badge: true,
-        carPlay: false,
-        criticalAlert: false,
-        provisional: false,
-        sound: true,
-      );
-
-      if (kDebugMode) {
-        print('User granted permission: ${settings.authorizationStatus}');
-      }
-
-      // 2. Setup background messaging handler
+      // 1. Setup background messaging handler
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-      // 3. Foreground message listener (just log or notify custom wrapper)
+      // 2. Foreground message listener (just log or notify custom wrapper)
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         if (kDebugMode) {
           print('Got a message whilst in the foreground!');

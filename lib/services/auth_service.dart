@@ -8,7 +8,7 @@ import '../models/user_profile_model.dart';
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final ProfileService _profileService = ProfileService();
-  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  // google_sign_in v7 uses a singleton — always access via GoogleSignIn.instance
 
   // Get user state changes
   Stream<User?> get user => _auth.authStateChanges();
@@ -68,12 +68,13 @@ class AuthService {
     }
   }
 
-  // Sign in with Google
+  // Sign in with Google (google_sign_in v7 — uses Android Credential Manager)
   Future<UserCredential?> signInWithGoogle() async {
     try {
-      final googleUser = await _googleSignIn.authenticate();
+      final googleUser = await GoogleSignIn.instance.authenticate();
 
-      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
       );
@@ -81,7 +82,7 @@ class AuthService {
       final cred = await _auth.signInWithCredential(credential);
 
       if (cred.user != null) {
-        // Check if profile exists, if not initialize it
+        // Check if profile exists; if not, initialise it
         final profile = await _profileService.getUserProfile(cred.user!.uid);
         if (profile == null) {
           await _profileService.saveUserProfile(
@@ -101,10 +102,40 @@ class AuthService {
       }
 
       return cred;
+    } on GoogleSignInException catch (e) {
+      // google_sign_in v7 throws GoogleSignInException for all Credential
+      // Manager failures (user cancelled, no account found, reauth failed…).
+      // We surface only actionable errors to the caller.
+      switch (e.code) {
+        case GoogleSignInExceptionCode.canceled:
+          // User dismissed the picker — not an error, just return null.
+          return null;
+        case GoogleSignInExceptionCode.interrupted:
+          // Flow was interrupted (background switch etc.) — treat as cancel.
+          return null;
+        default:
+          // Any other code (reauth failed, network, config) — rethrow a
+          // FirebaseAuthException so the UI can display a clean message.
+          throw FirebaseAuthException(
+            code: 'google-sign-in-failed',
+            message:
+                'Google Sign-In failed. Please make sure your Google account is set up on this device and try again.',
+          );
+      }
     } catch (e) {
-      rethrow;
+      // Catch raw PlatformException / unexpected errors and normalise them.
+      final msg = e.toString().toLowerCase();
+      if (msg.contains('cancel') || msg.contains('canceled')) {
+        return null;
+      }
+      throw FirebaseAuthException(
+        code: 'google-sign-in-failed',
+        message:
+            'Could not sign in with Google. Please try again or use email/password instead.',
+      );
     }
   }
+
 
   // Sign out
   Future<void> signOut() async {
@@ -117,7 +148,7 @@ class AuthService {
 
     try {
       // Attempt Google sign out in background with a timeout so it never blocks the app
-      await _googleSignIn.signOut().timeout(const Duration(seconds: 1));
+      await GoogleSignIn.instance.signOut().timeout(const Duration(seconds: 1));
     } catch (e) {
       debugPrint('Google Sign-In signOut error: $e');
     }

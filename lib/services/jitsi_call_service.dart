@@ -24,7 +24,7 @@ class JitsiCallService {
       if (!await canLaunchUrl(uri)) {
         return false;
       }
-      return launchUrl(uri, mode: LaunchMode.externalApplication);
+      return await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (error) {
       debugPrint('Error launching Jitsi room: $error');
       return false;

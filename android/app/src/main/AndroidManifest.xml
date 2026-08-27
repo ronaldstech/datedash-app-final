@@ -34,6 +34,17 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!--
+          Disables the new Android Credential Manager flow for Google Sign-In.
+          This is a workaround for "unable to reauth" errors thrown by
+          google_sign_in v7 on devices where Credential Manager is misconfigured
+          or the SHA fingerprint is not yet registered in the Firebase console.
+          Remove this entry once your SHA-1/SHA-256 fingerprints are confirmed
+          correct in the Firebase console and the error no longer occurs.
+        -->
+        <meta-data
+            android:name="com.google.android.gms.credentials.API_ENABLED"
+            android:value="false" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

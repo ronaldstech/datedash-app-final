@@ -12,7 +12,8 @@ class AppLockScreen extends StatefulWidget {
   State<AppLockScreen> createState() => _AppLockScreenState();
 }
 
-class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateMixin {
+class _AppLockScreenState extends State<AppLockScreen>
+    with TickerProviderStateMixin {
   final List<String> _enteredPin = [];
   String? _savedPin;
   bool _isBiometricEnabled = false;
@@ -85,7 +86,7 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
 
   Future<void> _authenticateWithDeviceBiometrics() async {
     if (_biometricSuccess) return;
-    
+
     setState(() {
       _isHolding = true;
       _scanStatusText = 'Verifying identity...';
@@ -170,7 +171,7 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
   Future<void> _verifyPin() async {
     await Future.delayed(const Duration(milliseconds: 150));
     if (!mounted) return;
-    
+
     if (_enteredPin.join() == _savedPin) {
       widget.onUnlock();
     } else {
@@ -184,12 +185,20 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
             children: [
               Icon(Icons.error_outline, color: Colors.white),
               SizedBox(width: 12),
-              Text('Incorrect PIN. Please try again.', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              Text(
+                'Incorrect PIN. Please try again.',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           backgroundColor: Colors.redAccent,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           margin: const EdgeInsets.all(24),
           duration: const Duration(seconds: 2),
         ),
@@ -211,10 +220,7 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF0F0F12),
-                    Color(0xFF1E0B16),
-                  ],
+                  colors: [Color(0xFF0F0F12), Color(0xFF1E0B16)],
                 ),
               ),
             ),
@@ -229,7 +235,7 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
               height: 300,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: _primaryColor.withValues(alpha: 	0.08),
+                color: _primaryColor.withValues(alpha: 0.08),
               ),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
@@ -245,7 +251,7 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
               height: 250,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: _primaryColor.withValues(alpha: 	0.05),
+                color: _primaryColor.withValues(alpha: 0.05),
               ),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 60, sigmaY: 60),
@@ -256,7 +262,10 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
 
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 20),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 32.0,
+                vertical: 20,
+              ),
               child: Column(
                 children: [
                   const Spacer(flex: 2),
@@ -269,8 +278,11 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
                       height: 80,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withValues(alpha: 	0.03),
-                        border: Border.all(color: Colors.white.withValues(alpha: 	0.08), width: 1.5),
+                        color: Colors.white.withValues(alpha: 0.03),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.08),
+                          width: 1.5,
+                        ),
                       ),
                       padding: const EdgeInsets.all(16),
                       child: Image.asset(
@@ -294,7 +306,7 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
                     'Enter PIN to unlock Snellum',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white.withValues(alpha: 	0.6),
+                      color: Colors.white.withValues(alpha: 0.6),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -314,14 +326,16 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
                           shape: BoxShape.circle,
                           color: isActive ? _primaryColor : Colors.transparent,
                           border: Border.all(
-                            color: isActive ? _primaryColor : Colors.white.withValues(alpha: 	0.2),
+                            color: isActive
+                                ? _primaryColor
+                                : Colors.white.withValues(alpha: 0.2),
                             width: 2,
                           ),
                         ),
                       );
                     }),
                   ),
-                  
+
                   const Spacer(flex: 2),
 
                   // Numeric Keypad
@@ -330,10 +344,11 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
                     height: MediaQuery.of(context).size.height * 0.45,
                     child: GridView.builder(
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        childAspectRatio: 1.3,
-                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            childAspectRatio: 1.3,
+                          ),
                       itemCount: 12,
                       itemBuilder: (context, index) {
                         // Position 9: Biometric / Cancel
@@ -349,9 +364,13 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
                                     height: 56,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: _primaryColor.withValues(alpha: 	0.1),
+                                      color: _primaryColor.withValues(
+                                        alpha: 0.1,
+                                      ),
                                       border: Border.all(
-                                        color: _primaryColor.withValues(alpha: 	0.4),
+                                        color: _primaryColor.withValues(
+                                          alpha: 0.4,
+                                        ),
                                         width: 1.5,
                                       ),
                                     ),
@@ -359,7 +378,9 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
                                       _biometricSuccess
                                           ? Icons.verified_user_rounded
                                           : Iconsax.finger_scan,
-                                      color: _biometricSuccess ? Colors.greenAccent : _primaryColor,
+                                      color: _biometricSuccess
+                                          ? Colors.greenAccent
+                                          : _primaryColor,
                                       size: 28,
                                     ),
                                   ),
@@ -373,7 +394,11 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
                         if (index == 11) {
                           return Center(
                             child: IconButton(
-                              icon: Icon(Icons.backspace_outlined, color: Colors.white.withValues(alpha: 	0.7), size: 22),
+                              icon: Icon(
+                                Icons.backspace_outlined,
+                                color: Colors.white.withValues(alpha: 0.7),
+                                size: 22,
+                              ),
                               onPressed: _onBackspace,
                             ),
                           );
@@ -389,8 +414,11 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
                               height: 64,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.white.withValues(alpha: 	0.02),
-                                border: Border.all(color: Colors.white.withValues(alpha: 	0.05), width: 1),
+                                color: Colors.white.withValues(alpha: 0.02),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.05),
+                                  width: 1,
+                                ),
                               ),
                               child: Center(
                                 child: Text(
@@ -421,7 +449,7 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                 child: Container(
-                  color: Colors.black.withValues(alpha: 	0.75),
+                  color: Colors.black.withValues(alpha: 0.75),
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -438,15 +466,20 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
                                 height: 160,
                                 child: AnimatedBuilder(
                                   animation: _scanProgressController,
-                                  builder: (context, _) => CircularProgressIndicator(
-                                    value: _scanProgress,
-                                    strokeWidth: 4,
-                                    backgroundColor: Colors.white.withValues(alpha: 	0.08),
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      _biometricSuccess ? Colors.greenAccent : _primaryColor,
-                                    ),
-                                    strokeCap: StrokeCap.round,
-                                  ),
+                                  builder: (context, _) =>
+                                      CircularProgressIndicator(
+                                        value: _scanProgress,
+                                        strokeWidth: 4,
+                                        backgroundColor: Colors.white
+                                            .withValues(alpha: 0.08),
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              _biometricSuccess
+                                                  ? Colors.greenAccent
+                                                  : _primaryColor,
+                                            ),
+                                        strokeCap: StrokeCap.round,
+                                      ),
                                 ),
                               ),
                               // Inner fingerprint icon
@@ -456,16 +489,20 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: _isHolding
-                                      ? _primaryColor.withValues(alpha: 	0.25)
+                                      ? _primaryColor.withValues(alpha: 0.25)
                                       : _biometricSuccess
-                                          ? Colors.greenAccent.withValues(alpha: 	0.15)
-                                          : _primaryColor.withValues(alpha: 	0.1),
+                                      ? Colors.greenAccent.withValues(
+                                          alpha: 0.15,
+                                        )
+                                      : _primaryColor.withValues(alpha: 0.1),
                                   border: Border.all(
                                     color: _isHolding
-                                        ? _primaryColor.withValues(alpha: 	0.6)
+                                        ? _primaryColor.withValues(alpha: 0.6)
                                         : _biometricSuccess
-                                            ? Colors.greenAccent.withValues(alpha: 	0.5)
-                                            : _primaryColor.withValues(alpha: 	0.25),
+                                        ? Colors.greenAccent.withValues(
+                                            alpha: 0.5,
+                                          )
+                                        : _primaryColor.withValues(alpha: 0.25),
                                     width: 2,
                                   ),
                                 ),
@@ -477,8 +514,8 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
                                   color: _biometricSuccess
                                       ? Colors.greenAccent
                                       : _isHolding
-                                          ? _primaryColor
-                                          : _primaryColor.withValues(alpha: 	0.7),
+                                      ? _primaryColor
+                                      : _primaryColor.withValues(alpha: 0.7),
                                 ),
                               ),
                             ],
@@ -488,10 +525,16 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
                         AnimatedSwitcher(
                           duration: const Duration(milliseconds: 300),
                           child: Text(
-                            _biometricSuccess ? 'Verified Successfully! ✓' : _scanStatusText,
-                            key: ValueKey(_scanStatusText + _biometricSuccess.toString()),
+                            _biometricSuccess
+                                ? 'Verified Successfully! ✓'
+                                : _scanStatusText,
+                            key: ValueKey(
+                              _scanStatusText + _biometricSuccess.toString(),
+                            ),
                             style: TextStyle(
-                              color: _biometricSuccess ? Colors.greenAccent : Colors.white,
+                              color: _biometricSuccess
+                                  ? Colors.greenAccent
+                                  : Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
                             ),
@@ -499,9 +542,11 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          _isHolding ? 'Authenticating using device...' : 'Tap the icon above to unlock',
+                          _isHolding
+                              ? 'Authenticating using device...'
+                              : 'Tap the icon above to unlock',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 	0.5),
+                            color: Colors.white.withValues(alpha: 0.5),
                             fontSize: 13,
                           ),
                         ),
@@ -514,16 +559,19 @@ class _AppLockScreenState extends State<AppLockScreen> with TickerProviderStateM
                               _scanProgress = 0.0;
                               _isHolding = false;
                               _scanProgressController.reset();
-                              _scanStatusText = 'Tap sensor to scan fingerprint';
+                              _scanStatusText =
+                                  'Tap sensor to scan fingerprint';
                             });
                           },
                           child: Text(
                             'Use PIN instead',
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 	0.5),
+                              color: Colors.white.withValues(alpha: 0.5),
                               fontSize: 14,
                               decoration: TextDecoration.underline,
-                              decorationColor: Colors.white.withValues(alpha: 	0.3),
+                              decorationColor: Colors.white.withValues(
+                                alpha: 0.3,
+                              ),
                             ),
                           ),
                         ),

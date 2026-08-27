@@ -443,6 +443,18 @@ class VideoChatService {
     } catch (_) {}
   }
 
+  Future<void> setChatLocked(String channelId, bool isLocked, String lockedByUserId) async {
+    try {
+      await _firestore.collection('video_chat_calls').doc(channelId).set({
+        'isChatLocked': isLocked,
+        'chatLockedBy': isLocked ? lockedByUserId : null,
+        'chatLockUpdatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('Error updating chat lock state: $e');
+    }
+  }
+
   Future<void> cleanupOwnTicket(String userId) async {
     try {
       await _waitingCollection.doc(userId).delete();

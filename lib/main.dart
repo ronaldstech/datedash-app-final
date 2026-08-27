@@ -22,6 +22,7 @@ import 'screens/update_screen.dart';
 import 'services/push_notification_service.dart';
 import 'services/email_verification_service.dart';
 import 'services/profile_service.dart';
+import 'widgets/permission_onboarding_modal.dart';
 
 /// Bypasses SSL certificate errors in debug mode.
 /// Root cause: emulator/device clock skew makes server cert appear invalid.
@@ -159,6 +160,16 @@ class _SnellumAppState extends State<SnellumApp> with WidgetsBindingObserver {
           _showThemeConfirmationDialog(navContext, systemMode);
         }
       }
+    });
+  }
+
+  /// Shows the permission onboarding modal on first launch.
+  /// Must be called after the widget tree is fully built (use addPostFrameCallback).
+  void _checkPermissionOnboarding(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final navContext = _navigatorKey.currentContext;
+      if (navContext == null || !navContext.mounted) return;
+      await maybeShowPermissionOnboarding(navContext);
     });
   }
 
@@ -358,6 +369,7 @@ class _SnellumAppState extends State<SnellumApp> with WidgetsBindingObserver {
                     if (updateSnapshot.data != null) {
                       return UpdateScreen(info: updateSnapshot.data!);
                     }
+                    _checkPermissionOnboarding(context);
                     _checkSystemThemePrompt(context);
                     return const LandingScreen();
                   },
