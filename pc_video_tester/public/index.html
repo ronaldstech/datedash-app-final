@@ -886,36 +886,30 @@
           // Check if candidate matches my filters
           const genderMatch = myProfile.filterGender === 'Any' || normalizeGender(data.gender) === normalizeGender(myProfile.filterGender);
           const ageMatch = data.age >= myProfile.filterMinAge && data.age <= myProfile.filterMaxAge;
-          
-          let countryMatch = myProfile.filterCountry === 'Any' || 
-            (data.country || '').toLowerCase().includes(myProfile.filterCountry.toLowerCase()) || 
-            myProfile.filterCountry.toLowerCase().includes((data.country || '').toLowerCase());
-            
-          let languageMatch = myProfile.filterLanguage === 'Any' || 
+          const countryMatch = isCountryMatch(data.country, myProfile.filterCountry);
+          const languageMatch = myProfile.filterLanguage === 'Any' || 
+            (data.languages || []).length === 0 ||
             (data.languages || []).some(lang => textMatches(lang, myProfile.filterLanguage));
 
-          log(`Checking candidate ${data.name}: genderMatch=${genderMatch} (${data.gender} vs ${myProfile.filterGender}), ageMatch=${ageMatch} (${data.age} vs ${myProfile.filterMinAge}-${myProfile.filterMaxAge}), countryMatch=${countryMatch}, languageMatch=${languageMatch}`, 'Debug');
+          log(`Checking candidate ${data.name}: genderMatch=${genderMatch}, ageMatch=${ageMatch}, countryMatch=${countryMatch} [candidate country="${data.country || ''}" vs my filter="${myProfile.filterCountry}"], languageMatch=${languageMatch}`, 'Debug');
 
           if (!genderMatch || !ageMatch || !countryMatch || !languageMatch) continue;
 
           // Check if I match candidate's filters
           const candFilterGender = data.filterGender || 'Any';
           const candFilterMinAge = data.filterMinAge || 18;
-          const candFilterMaxAge = data.filterMaxAge || 80;
+          const candFilterMaxAge = data.filterMaxAge || 99;
           const candFilterCountry = data.filterCountry || 'Any';
           const candFilterLanguage = data.filterLanguage || 'Any';
 
           const candGenderMatch = candFilterGender === 'Any' || normalizeGender(myProfile.gender) === normalizeGender(candFilterGender);
           const candAgeMatch = myProfile.age >= candFilterMinAge && myProfile.age <= candFilterMaxAge;
-
-          let candCountryMatch = candFilterCountry === 'Any' || 
-            (myProfile.country || '').toLowerCase().includes(candFilterCountry.toLowerCase()) || 
-            candFilterCountry.toLowerCase().includes((myProfile.country || '').toLowerCase());
-
-          let candLanguageMatch = candFilterLanguage === 'Any' || 
+          const candCountryMatch = isCountryMatch(myProfile.country, candFilterCountry);
+          const candLanguageMatch = candFilterLanguage === 'Any' || 
+            (myProfile.languages || []).length === 0 ||
             (myProfile.languages || []).some(lang => textMatches(lang, candFilterLanguage));
 
-          log(`Candidate ${data.name}'s filters: candGenderMatch=${candGenderMatch} (${myProfile.gender} vs ${candFilterGender}), candAgeMatch=${candAgeMatch} (${myProfile.age} vs ${candFilterMinAge}-${candFilterMaxAge}), candCountryMatch=${candCountryMatch}, candLanguageMatch=${candLanguageMatch}`, 'Debug');
+          log(`Candidate ${data.name}'s filters: candGenderMatch=${candGenderMatch} (${myProfile.gender} vs ${candFilterGender}), candAgeMatch=${candAgeMatch} (${myProfile.age} vs ${candFilterMinAge}-${candFilterMaxAge}), candCountryMatch=${candCountryMatch} (${myProfile.country} vs ${candFilterCountry}), candLanguageMatch=${candLanguageMatch}`, 'Debug');
 
           if (!candGenderMatch || !candAgeMatch || !candCountryMatch || !candLanguageMatch) continue;
 
@@ -1195,6 +1189,41 @@
       if (normalized === 'women' || normalized === 'woman' || normalized === 'female') return 'female';
       if (normalized === 'any') return 'any';
       return normalized;
+    }
+
+    function isCountryMatch(userCountryOrLocation, filterCountry) {
+      if (!filterCountry || !filterCountry.trim() || filterCountry.trim().toLowerCase() === 'any') {
+        return true;
+      }
+      if (!userCountryOrLocation || !userCountryOrLocation.trim() || userCountryOrLocation.trim().toLowerCase() === 'unknown') {
+        return true;
+      }
+
+      const loc = userCountryOrLocation.trim().toLowerCase();
+      const filter = filterCountry.trim().toLowerCase();
+
+      if (loc === filter || loc.includes(filter) || filter.includes(loc)) {
+        return true;
+      }
+
+      const countryAliases = {
+        'malawi': ['mw', 'malawi', 'lilongwe', 'blantyre', 'mzuzu', 'zomba'],
+        'united states': ['us', 'usa', 'united states', 'america'],
+        'kenya': ['ke', 'kenya', 'nairobi', 'mombasa'],
+        'tanzania': ['tz', 'tanzania', 'dar es salaam', 'dodoma'],
+        'united kingdom': ['uk', 'gb', 'united kingdom', 'england', 'britain', 'london'],
+        'south africa': ['za', 'south africa', 'johannesburg', 'cape town'],
+        'nigeria': ['ng', 'nigeria', 'lagos', 'abuja'],
+        'canada': ['ca', 'canada', 'toronto', 'vancouver'],
+      };
+
+      for (const [key, aliases] of Object.entries(countryAliases)) {
+        const filterMatches = filter === key || aliases.includes(filter);
+        const locMatches = loc === key || aliases.some(alias => loc === alias || loc.includes(alias));
+        if (filterMatches && locMatches) return true;
+      }
+
+      return false;
     }
 
     function textMatches(left, right) {

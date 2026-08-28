@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
 import 'dart:ui';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +16,7 @@ import '../screens/edit_profile_screen.dart';
 import '../providers/language_provider.dart';
 import 'gift_selection_sheet.dart';
 import 'meetup_sheet.dart';
+import 'boost_sheet.dart';
 import '../services/chat_service.dart';
 import '../screens/premium_screen.dart';
 
@@ -44,6 +46,14 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
   late Animation<Offset> _swipeAnimation;
   bool _isAnimating = false;
 
+  // Floating Boost Pop-up State
+  late AnimationController _boostPopupController;
+  late Animation<double> _boostScaleAnimation;
+  late Animation<double> _boostPulseAnimation;
+  late AnimationController _boostPulseController;
+  Timer? _boostPopupTimer;
+  bool _showBoostPopup = false;
+
   @override
   void initState() {
     super.initState();
@@ -57,11 +67,82 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
     ).animate(
         CurvedAnimation(parent: _swipeController, curve: Curves.easeOutBack));
 
+    // Boost Pop-up Animation Controllers
+    _boostPopupController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _boostScaleAnimation = CurvedAnimation(
+      parent: _boostPopupController,
+      curve: Curves.elasticOut,
+      reverseCurve: Curves.easeInBack,
+    );
+
+    _boostPulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat(reverse: true);
+    _boostPulseAnimation = Tween<double>(begin: 0.98, end: 1.02).animate(
+      CurvedAnimation(
+        parent: _boostPulseController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    _startBoostPopupCycle();
     _loadProfiles();
+  }
+
+  void _startBoostPopupCycle() {
+    _boostPopupTimer?.cancel();
+    // Appear after 3 seconds, stay for 8 seconds, disappear, repeat every 25 seconds
+    _boostPopupTimer = Timer.periodic(const Duration(seconds: 25), (_) {
+      _triggerBoostPopup();
+    });
+
+    // Initial trigger after 3.5 seconds
+    Future.delayed(const Duration(milliseconds: 3500), () {
+      if (mounted) _triggerBoostPopup();
+    });
+  }
+
+  void _triggerBoostPopup() {
+    if (!mounted) return;
+    setState(() => _showBoostPopup = true);
+    _boostPopupController.forward();
+
+    // Auto-hide after 8 seconds
+    Future.delayed(const Duration(seconds: 8), () {
+      if (mounted && _showBoostPopup) {
+        _boostPopupController.reverse().then((_) {
+          if (mounted) setState(() => _showBoostPopup = false);
+        });
+      }
+    });
+  }
+
+  void _dismissBoostPopup() {
+    if (!_showBoostPopup) return;
+    _boostPopupController.reverse().then((_) {
+      if (mounted) setState(() => _showBoostPopup = false);
+    });
+  }
+
+  void _openBoostSheet() {
+    _dismissBoostPopup();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const BoostSheet(),
+    );
   }
 
   @override
   void dispose() {
+    _boostPopupTimer?.cancel();
+    _boostPopupController.dispose();
+    _boostPulseController.dispose();
     _swipeController.dispose();
     super.dispose();
   }
@@ -585,6 +666,10 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
                           Positioned.fill(
                             child: _buildLockedOverlay(languageProvider),
                           ),
+
+                        // ⚡ Floating Boost Pop-up (Appears, pulses, and disappears periodically)
+                        if (_showBoostPopup && !isLockedOut)
+                          _buildBoostFloatingPopup(),
                       ],
                     );
                   },
@@ -594,6 +679,178 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
           ),
           SizedBox(height: 16 + MediaQuery.of(context).padding.bottom),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBoostFloatingPopup() {
+    final pp = context.watch<ProfileProvider>();
+    final isAlreadyBoosted = pp.userProfile?.isBoosted == true;
+
+    return Positioned(
+      top: 10,
+      left: 12,
+      right: 12,
+      child: ScaleTransition(
+        scale: _boostScaleAnimation,
+        child: FadeTransition(
+          opacity: _boostPopupController,
+          child: AnimatedBuilder(
+            animation: _boostPulseAnimation,
+            builder: (context, child) {
+              return Transform.scale(
+                scale: _boostPulseAnimation.value,
+                child: child,
+              );
+            },
+            child: GestureDetector(
+              onTap: _openBoostSheet,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFFF9E00),
+                      Color(0xFFFF4D85),
+                      Color(0xFFFF0055),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFF4D85).withValues(alpha: 0.45),
+                      blurRadius: 14,
+                      spreadRadius: 1,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.6),
+                    width: 1.2,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.25),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Iconsax.flash_15,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  isAlreadyBoosted
+                                      ? 'Boost Active ⚡'
+                                      : 'Boost Profile ⚡',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 13,
+                                    letterSpacing: -0.2,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 5,
+                                  vertical: 1.5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.black26,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Text(
+                                  '10x',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 9.5,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 1.5),
+                          Text(
+                            isAlreadyBoosted
+                                ? 'Tap to extend visibility'
+                                : 'Get seen first in your area!',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.92),
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.15),
+                            blurRadius: 3,
+                            offset: const Offset(0, 1.5),
+                          ),
+                        ],
+                      ),
+                      child: const Text(
+                        'Boost',
+                        style: TextStyle(
+                          color: Color(0xFFFF0055),
+                          fontWeight: FontWeight.w900,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 2),
+                    GestureDetector(
+                      onTap: _dismissBoostPopup,
+                      behavior: HitTestBehavior.opaque,
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Icon(
+                          Icons.close,
+                          color: Colors.white.withValues(alpha: 0.8),
+                          size: 15,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

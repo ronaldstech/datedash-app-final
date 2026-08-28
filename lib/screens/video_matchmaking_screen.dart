@@ -40,7 +40,7 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
   Timer? _searchRetryTimer;
   late AnimationController _pulseController;
   Timer? _countdownTimer;
-  int _countdownSeconds = 10;
+  int _countdownSeconds = 15;
   late AnimationController _countdownController;
 
   CameraController? _cameraController;
@@ -63,7 +63,7 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
     )..repeat(reverse: true);
     _countdownController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 10),
+      duration: const Duration(seconds: 15),
     );
     _initCamera();
     _listenToTicket();
@@ -154,7 +154,7 @@ class _VideoMatchmakingScreenState extends State<VideoMatchmakingScreen>
     _countdownController.stop();
     _countdownController.reset();
     setState(() {
-      _countdownSeconds = 10;
+      _countdownSeconds = 15;
     });
     _countdownController.forward(from: 0);
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {

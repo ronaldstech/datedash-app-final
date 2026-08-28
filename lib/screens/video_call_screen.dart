@@ -60,6 +60,13 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   bool _isChatManuallyLocked = false;
   String? _chatLockedBy;
 
+  // Floating popup overlay (message/gift sent)
+  Timer? _popupTimer;
+  String _popupText = '';
+  String _popupIcon = '';
+  bool _popupIsGift = false;
+  bool _popupVisible = false;
+
   @override
   void initState() {
     super.initState();
@@ -82,6 +89,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     _cameraController?.dispose();
     _messageController.dispose();
     _scrollController.dispose();
+    _popupTimer?.cancel();
     super.dispose();
   }
 
@@ -276,6 +284,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           'timestamp': FieldValue.serverTimestamp(),
         });
 
+    _showSentPopup(messageText, isGift: false, icon: '💬');
     _scrollToBottom();
   }
 
@@ -288,6 +297,20 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           curve: Curves.easeOut,
         );
       }
+    });
+  }
+
+  void _showSentPopup(String text, {bool isGift = false, String icon = ''}) {
+    _popupTimer?.cancel();
+    if (!mounted) return;
+    setState(() {
+      _popupText = text;
+      _popupIcon = icon;
+      _popupIsGift = isGift;
+      _popupVisible = true;
+    });
+    _popupTimer = Timer(const Duration(seconds: 5), () {
+      if (mounted) setState(() => _popupVisible = false);
     });
   }
 
@@ -582,6 +605,12 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           'giftCost': gift.cost,
           'timestamp': FieldValue.serverTimestamp(),
         });
+
+    _showSentPopup(
+      'You sent ${gift.name}!',
+      isGift: true,
+      icon: gift.icon,
+    );
   }
 
   Future<void> _switchCamera() async {
@@ -1108,6 +1137,69 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   right: 16,
                   child: _buildControls(),
                 ),
+
+                // Floating sent popup (message or gift)
+                if (_popupVisible)
+                  Positioned(
+                    bottom: 180,
+                    left: 24,
+                    right: 24,
+                    child: AnimatedOpacity(
+                      opacity: _popupVisible ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _popupIsGift
+                                ? const Color(0xFFFF4D85).withValues(alpha: 0.92)
+                                : Colors.black.withValues(alpha: 0.78),
+                            borderRadius: BorderRadius.circular(32),
+                            border: Border.all(
+                              color: _popupIsGift
+                                  ? const Color(0xFFFF4D85)
+                                  : Colors.white24,
+                              width: 1.2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: _popupIsGift
+                                    ? const Color(0xFFFF4D85).withValues(alpha: 0.4)
+                                    : Colors.black45,
+                                blurRadius: 16,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                _popupIcon,
+                                style: const TextStyle(fontSize: 22),
+                              ),
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                  _popupText,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: _popupIsGift ? 16 : 14,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             );
           },

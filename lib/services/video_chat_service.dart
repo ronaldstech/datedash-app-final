@@ -96,6 +96,19 @@ class VideoChatService {
     };
 
     try {
+      final docSnap = await _waitingCollection.doc(currentUserId).get();
+      final currentDocData = docSnap.data() as Map<String, dynamic>?;
+      final currentStatus = currentDocData?['status'] as String?;
+
+      // If we were already proposed or matched by another user, don't reset to waiting!
+      if (currentStatus == 'proposed' || currentStatus == 'matched') {
+        final partnerId = currentDocData?['matchedWith'] as String?;
+        final channelId = currentDocData?['channelId'] as String?;
+        if (partnerId != null && channelId != null) {
+          return _callDataFromTicket(currentDocData!, partnerId, channelId);
+        }
+      }
+
       await _waitingCollection
           .doc(currentUserId)
           .set(myTicket, SetOptions(merge: true));
@@ -123,64 +136,65 @@ class VideoChatService {
         final candidateCountry = (data['country'] as String?) ?? '';
         final candidateLanguages = List<String>.from(data['languages'] ?? []);
 
+        // 1. My filter against candidate
         final bool genderMatch =
             filterGender == 'Any' ||
-            _normalizeGender(candidateGender) == _normalizeGender(filterGender);
+            filterGender.isEmpty ||
+            _normalizeGender(candidateGender) == _normalizeGender(filterGender) ||
+            _normalizeGender(candidateGender) == 'other' ||
+            _normalizeGender(filterGender) == 'any';
 
         final bool ageMatch =
             candidateAge >= filterMinAge && candidateAge <= filterMaxAge;
 
         final bool countryMatch =
-            filterCountry == 'Any' ||
-            candidateCountry.toLowerCase().contains(
-              filterCountry.toLowerCase(),
-            ) ||
-            filterCountry.toLowerCase().contains(
-              candidateCountry.toLowerCase(),
-            );
+            _isCountryMatch(candidateCountry, filterCountry);
 
         final bool languageMatch =
             filterLanguage == 'Any' ||
+            filterLanguage.isEmpty ||
             candidateLanguages.isEmpty ||
             candidateLanguages.any(
-              (lang) =>
-                  _textMatches(lang, filterLanguage),
+              (lang) => _textMatches(lang, filterLanguage),
             );
 
         if (!genderMatch || !ageMatch || !countryMatch || !languageMatch) {
           continue;
         }
 
+        // 2. Candidate filter against me
         final candFilterGender = (data['filterGender'] as String?) ?? 'Any';
         final candFilterMinAge = (data['filterMinAge'] as num?)?.toInt() ?? 18;
-        final candFilterMaxAge = (data['filterMaxAge'] as num?)?.toInt() ?? 80;
+        final candFilterMaxAge = (data['filterMaxAge'] as num?)?.toInt() ?? 99;
         final candFilterCountry = (data['filterCountry'] as String?) ?? 'Any';
         final candFilterLanguage = (data['filterLanguage'] as String?) ?? 'Any';
 
         final myGender = currentUser.gender ?? 'Other';
         final myAge = currentUser.age ?? 25;
-        final myCountry = currentUser.location ?? 'Unknown';
+        final myCountry = currentUser.countryCode ?? currentUser.location ?? 'Unknown';
         final myLanguages = currentUser.languages.isNotEmpty
             ? currentUser.languages
             : ['English'];
 
         final bool candGenderMatch =
             candFilterGender == 'Any' ||
-            _normalizeGender(myGender) == _normalizeGender(candFilterGender);
+            candFilterGender.isEmpty ||
+            _normalizeGender(myGender) == _normalizeGender(candFilterGender) ||
+            _normalizeGender(myGender) == 'other' ||
+            _normalizeGender(candFilterGender) == 'any';
 
         final bool candAgeMatch =
             myAge >= candFilterMinAge && myAge <= candFilterMaxAge;
 
         final bool candCountryMatch =
-            candFilterCountry == 'Any' ||
-            myCountry.toLowerCase().contains(candFilterCountry.toLowerCase()) ||
-            candFilterCountry.toLowerCase().contains(myCountry.toLowerCase());
+            _isCountryMatch(myCountry, candFilterCountry);
 
         final bool candLanguageMatch =
             candFilterLanguage == 'Any' ||
+            candFilterLanguage.isEmpty ||
+            myLanguages.isEmpty ||
             myLanguages.any(
-              (lang) =>
-                  _textMatches(lang, candFilterLanguage),
+              (lang) => _textMatches(lang, candFilterLanguage),
             );
 
         if (!candGenderMatch ||
@@ -496,16 +510,62 @@ class VideoChatService {
     };
   }
 
-  String _normalizeGender(String value) {
+  String _normalizeGender(String? value) {
+    if (value == null) return 'other';
     final normalized = value.trim().toLowerCase();
-    if (normalized == 'men' || normalized == 'man') return 'male';
-    if (normalized == 'women' || normalized == 'woman') return 'female';
+    if (normalized.isEmpty || normalized == 'any' || normalized == 'everyone' || normalized == 'all') return 'any';
+    if (normalized == 'men' || normalized == 'man' || normalized == 'male' || normalized == 'guy' || normalized == 'boy') return 'male';
+    if (normalized == 'women' || normalized == 'woman' || normalized == 'female' || normalized == 'girl' || normalized == 'lady') return 'female';
     return normalized;
   }
 
-  bool _textMatches(String left, String right) {
+  bool _textMatches(String? left, String? right) {
+    if (left == null || right == null) return false;
     final a = left.trim().toLowerCase();
     final b = right.trim().toLowerCase();
+    if (a.isEmpty || b.isEmpty || a == 'any' || b == 'any') return true;
     return a == b || a.contains(b) || b.contains(a);
+  }
+
+  bool _isCountryMatch(String? userCountryOrLocation, String? filterCountry) {
+    if (filterCountry == null || filterCountry.trim().isEmpty || filterCountry.trim().toLowerCase() == 'any') {
+      return true;
+    }
+    if (userCountryOrLocation == null || userCountryOrLocation.trim().isEmpty || userCountryOrLocation.trim().toLowerCase() == 'unknown') {
+      return true;
+    }
+
+    final loc = userCountryOrLocation.trim().toLowerCase();
+    final filter = filterCountry.trim().toLowerCase();
+
+    if (loc == filter || loc.contains(filter) || filter.contains(loc)) {
+      return true;
+    }
+
+    // Common ISO-2 Code to Name Mappings
+    final Map<String, List<String>> countryAliases = {
+      'malawi': ['mw', 'malawi', 'lilongwe', 'blantyre', 'mzuzu', 'zomba'],
+      'united states': ['us', 'usa', 'united states', 'america'],
+      'kenya': ['ke', 'kenya', 'nairobi', 'mombasa'],
+      'tanzania': ['tz', 'tanzania', 'dar es salaam', 'dodoma'],
+      'united kingdom': ['uk', 'gb', 'united kingdom', 'england', 'britain', 'london'],
+      'south africa': ['za', 'south africa', 'johannesburg', 'cape town'],
+      'nigeria': ['ng', 'nigeria', 'lagos', 'abuja'],
+      'canada': ['ca', 'canada', 'toronto', 'vancouver'],
+    };
+
+    for (final entry in countryAliases.entries) {
+      final key = entry.key;
+      final aliases = entry.value;
+
+      final bool filterMatchesKeyOrAlias = filter == key || aliases.contains(filter);
+      final bool locMatchesKeyOrAlias = loc == key || aliases.any((alias) => loc == alias || loc.contains(alias));
+
+      if (filterMatchesKeyOrAlias && locMatchesKeyOrAlias) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

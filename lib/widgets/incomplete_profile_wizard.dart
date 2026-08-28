@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import '../models/user_profile_model.dart';
@@ -35,9 +36,54 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
 
   late TextEditingController _firstNameController;
   late TextEditingController _bioController;
-  late TextEditingController _locationController;
 
   static const String _askMeOption = 'Ask me';
+
+  String? _selectedCountry;
+  bool _isDetectingLocation = false;
+
+  final List<String> _countries = [
+    'Malawi',
+    'United States',
+    'Kenya',
+    'Tanzania',
+    'United Kingdom',
+    'Spain',
+    'France',
+    'Germany',
+    'Brazil',
+    'Canada',
+    'Australia',
+    'India',
+    'Japan',
+    'Italy',
+    'Mexico',
+    'South Africa',
+    'Nigeria',
+    'South Korea',
+    'China',
+    'Zambia',
+    'Zimbabwe',
+    'Uganda',
+    'Rwanda',
+    'Ghana',
+    'Ethiopia',
+    'Egypt',
+    'Argentina',
+    'Colombia',
+    'Netherlands',
+    'Sweden',
+    'Switzerland',
+    'United Arab Emirates',
+    'Saudi Arabia',
+    'Philippines',
+    'Indonesia',
+    'Pakistan',
+    'Bangladesh',
+    'Portugal',
+    'Ireland',
+    'New Zealand',
+  ];
 
   DateTime? _selectedDob;
   String? _selectedGender;
@@ -68,9 +114,11 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
       text: widget.profile.firstName ?? '',
     );
     _bioController = TextEditingController(text: widget.profile.bio ?? '');
-    _locationController = TextEditingController(
-      text: widget.profile.location ?? '',
-    );
+
+    _selectedCountry = (widget.profile.location != null &&
+            widget.profile.location!.trim().isNotEmpty)
+        ? widget.profile.location
+        : null;
 
     _selectedDob = widget.profile.dob;
     _selectedGender = widget.profile.gender;
@@ -87,6 +135,424 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
     _selectedZodiac = widget.profile.zodiac;
     _selectedHeight = widget.profile.height;
     _selectedOccupation = widget.profile.occupation;
+
+    if (_selectedCountry == null || _selectedCountry!.isEmpty) {
+      _autoDetectCountry();
+    }
+  }
+
+  Future<void> _autoDetectCountry() async {
+    if (_isDetectingLocation) return;
+    setState(() {
+      _isDetectingLocation = true;
+    });
+
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (serviceEnabled) {
+        LocationPermission permission = await Geolocator.checkPermission();
+        if (permission == LocationPermission.denied) {
+          permission = await Geolocator.requestPermission();
+        }
+
+        if (permission == LocationPermission.whileInUse ||
+            permission == LocationPermission.always) {
+          Position position = await Geolocator.getCurrentPosition(
+            locationSettings: const LocationSettings(
+              accuracy: LocationAccuracy.medium,
+              timeLimit: Duration(seconds: 8),
+            ),
+          );
+
+          widget.profile.latitude = position.latitude;
+          widget.profile.longitude = position.longitude;
+
+          final lat = position.latitude;
+          final lng = position.longitude;
+          String? detected;
+
+          if (lat > -17 && lat < -9 && lng > 32 && lng < 36) {
+            detected = 'Malawi';
+          } else if (lat > -5 && lat < 5 && lng > 34 && lng < 42) {
+            detected = 'Kenya';
+          } else if (lat > -12 && lat < -1 && lng > 29 && lng < 41) {
+            detected = 'Tanzania';
+          } else if (lat > -18 && lat < -8 && lng > 22 && lng < 34) {
+            detected = 'Zambia';
+          } else if (lat > -22 && lat < -15 && lng > 25 && lng < 33) {
+            detected = 'Zimbabwe';
+          } else if (lat > -35 && lat < -22 && lng > 16 && lng < 33) {
+            detected = 'South Africa';
+          } else if (lat > 4 && lat < 14 && lng > 2 && lng < 15) {
+            detected = 'Nigeria';
+          } else if (lat > 4 && lat < 12 && lng > -4 && lng < 2) {
+            detected = 'Ghana';
+          } else if (lat > -2 && lat < 5 && lng > 29 && lng < 35) {
+            detected = 'Uganda';
+          } else if (lat > -3 && lat < -1 && lng > 28 && lng < 31) {
+            detected = 'Rwanda';
+          } else if (lat > 24 && lat < 49 && lng > -125 && lng < -66) {
+            detected = 'United States';
+          } else if (lat > 49 && lat < 70 && lng > -141 && lng < -52) {
+            detected = 'Canada';
+          } else if (lat > 49 && lat < 61 && lng > -9 && lng < 2) {
+            detected = 'United Kingdom';
+          } else if (lat > 36 && lat < 44 && lng > -9 && lng < 4) {
+            detected = 'Spain';
+          } else if (lat > 42 && lat < 51 && lng > -5 && lng < 9) {
+            detected = 'France';
+          } else if (lat > 47 && lat < 55 && lng > 5 && lng < 15) {
+            detected = 'Germany';
+          } else if (lat > 35 && lat < 47 && lng > 6 && lng < 19) {
+            detected = 'Italy';
+          } else if (lat > -34 && lat < 6 && lng > -74 && lng < -34) {
+            detected = 'Brazil';
+          } else if (lat > 8 && lat < 37 && lng > 68 && lng < 97) {
+            detected = 'India';
+          } else if (lat > -44 && lat < -10 && lng > 113 && lng < 154) {
+            detected = 'Australia';
+          } else if (lat > 30 && lat < 46 && lng > 128 && lng < 146) {
+            detected = 'Japan';
+          } else if (lat > 33 && lat < 39 && lng > 124 && lng < 131) {
+            detected = 'South Korea';
+          } else if (lat > 14 && lat < 33 && lng > -118 && lng < -86) {
+            detected = 'Mexico';
+          }
+
+          if (detected != null) {
+            if (mounted) {
+              setState(() {
+                _selectedCountry = detected;
+              });
+            }
+            return;
+          }
+        }
+      }
+
+      // Fallback: IP-based Country Geolocation (Simple & Fast)
+      final response = await http
+          .get(Uri.parse('https://ipapi.co/json/'))
+          .timeout(const Duration(seconds: 4));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final countryName = data['country_name']?.toString();
+        if (countryName != null && countryName.isNotEmpty) {
+          if (mounted) {
+            setState(() {
+              _selectedCountry = countryName;
+            });
+          }
+          return;
+        }
+      }
+    } catch (_) {
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDetectingLocation = false;
+        });
+      }
+    }
+  }
+
+  String _getCountryFlag(String? country) {
+    if (country == null) return '🌐';
+    switch (country) {
+      case 'Malawi':
+        return '🇲🇼';
+      case 'United States':
+        return '🇺🇸';
+      case 'Kenya':
+        return '🇰🇪';
+      case 'Tanzania':
+        return '🇹🇿';
+      case 'United Kingdom':
+        return '🇬🇧';
+      case 'Spain':
+        return '🇪🇸';
+      case 'France':
+        return '🇫🇷';
+      case 'Germany':
+        return '🇩🇪';
+      case 'Brazil':
+        return '🇧🇷';
+      case 'Canada':
+        return '🇨🇦';
+      case 'Australia':
+        return '🇦🇺';
+      case 'India':
+        return '🇮🇳';
+      case 'Japan':
+        return '🇯🇵';
+      case 'Italy':
+        return '🇮🇹';
+      case 'Mexico':
+        return '🇲🇽';
+      case 'South Africa':
+        return '🇿🇦';
+      case 'Nigeria':
+        return '🇳🇬';
+      case 'South Korea':
+        return '🇰🇷';
+      case 'China':
+        return '🇨🇳';
+      case 'Zambia':
+        return '🇿🇲';
+      case 'Zimbabwe':
+        return '🇿🇼';
+      case 'Uganda':
+        return '🇺🇬';
+      case 'Rwanda':
+        return '🇷🇼';
+      case 'Ghana':
+        return '🇬🇭';
+      case 'Ethiopia':
+        return '🇪🇹';
+      case 'Egypt':
+        return '🇪🇬';
+      case 'Argentina':
+        return '🇦🇷';
+      case 'Colombia':
+        return '🇨🇴';
+      case 'Netherlands':
+        return '🇳🇱';
+      case 'Sweden':
+        return '🇸🇪';
+      case 'Switzerland':
+        return '🇨🇭';
+      case 'United Arab Emirates':
+        return '🇦🇪';
+      case 'Saudi Arabia':
+        return '🇸🇦';
+      case 'Philippines':
+        return '🇵🇭';
+      case 'Indonesia':
+        return '🇮🇩';
+      case 'Pakistan':
+        return '🇵🇰';
+      case 'Bangladesh':
+        return '🇧🇩';
+      case 'Portugal':
+        return '🇵🇹';
+      case 'Ireland':
+        return '🇮🇪';
+      case 'New Zealand':
+        return '🇳🇿';
+      default:
+        return '📍';
+    }
+  }
+
+  void _showCountryPicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        String searchQuery = '';
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final filteredCountries = _countries
+                .where(
+                  (c) => c.toLowerCase().contains(searchQuery.toLowerCase()),
+                )
+                .toList();
+
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.65,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(28),
+                ),
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 40,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.black12,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Select Your Country',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: TextField(
+                      onChanged: (val) {
+                        setModalState(() {
+                          searchQuery = val;
+                        });
+                      },
+                      style: const TextStyle(fontSize: 14),
+                      decoration: InputDecoration(
+                        hintText: 'Search country...',
+                        hintStyle: const TextStyle(color: Colors.black38),
+                        prefixIcon: const Icon(Iconsax.search_normal, size: 18),
+                        filled: true,
+                        fillColor: Colors.black.withValues(alpha: 0.04),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: filteredCountries.length,
+                      itemBuilder: (context, index) {
+                        final country = filteredCountries[index];
+                        final isSelected = _selectedCountry == country;
+                        return ListTile(
+                          leading: Text(
+                            _getCountryFlag(country),
+                            style: const TextStyle(fontSize: 22),
+                          ),
+                          title: Text(
+                            country,
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: isSelected
+                                  ? FontWeight.w900
+                                  : FontWeight.w600,
+                              color: isSelected ? _primaryColor : Colors.black87,
+                            ),
+                          ),
+                          trailing: isSelected
+                              ? Icon(
+                                  Iconsax.tick_circle,
+                                  color: _primaryColor,
+                                  size: 20,
+                                )
+                              : null,
+                          onTap: () {
+                            setState(() {
+                              _selectedCountry = country;
+                            });
+                            Navigator.pop(context);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildCountrySelector() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Your Location / Country',
+              style: TextStyle(
+                color: Colors.black.withValues(alpha: 0.8),
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            InkWell(
+              onTap: _isDetectingLocation ? null : _autoDetectCountry,
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (_isDetectingLocation)
+                      SizedBox(
+                        width: 12,
+                        height: 12,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: _primaryColor,
+                        ),
+                      )
+                    else
+                      Icon(Iconsax.gps, size: 14, color: _primaryColor),
+                    const SizedBox(width: 4),
+                    Text(
+                      _isDetectingLocation ? 'Detecting...' : 'Auto-detect',
+                      style: TextStyle(
+                        color: _primaryColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: () => _showCountryPicker(context),
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.04),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Colors.black.withValues(alpha: 0.12),
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                Text(
+                  _getCountryFlag(_selectedCountry),
+                  style: const TextStyle(fontSize: 22),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    _selectedCountry ?? 'Select your country',
+                    style: TextStyle(
+                      color: _selectedCountry != null
+                          ? Colors.black87
+                          : Colors.black.withValues(alpha: 0.4),
+                      fontWeight: _selectedCountry != null
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                const Icon(Iconsax.arrow_down_1, size: 18, color: Colors.black45),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -94,7 +560,6 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
     _pageController.dispose();
     _firstNameController.dispose();
     _bioController.dispose();
-    _locationController.dispose();
     super.dispose();
   }
 
@@ -118,7 +583,10 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
     // Update local object
     profile.firstName = _firstNameController.text.trim();
     profile.bio = _bioController.text.trim();
-    profile.location = _locationController.text.trim();
+    if (_selectedCountry != null && _selectedCountry!.isNotEmpty) {
+      profile.location = _selectedCountry!.trim();
+      profile.countryCode = _selectedCountry!.trim();
+    }
 
     if (_selectedHeight != null) profile.height = _selectedHeight;
     if (_selectedOccupation != null) profile.occupation = _selectedOccupation;
@@ -1691,14 +2159,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                                 subtitle:
                                     'Where do you live and what is your story?',
                                 children: [
-                                  _buildTextInput(
-                                    label: languageProvider.getString(
-                                      'location_title',
-                                    ),
-                                    controller: _locationController,
-                                    hint: 'e.g. London, UK',
-                                    icon: Iconsax.location,
-                                  ),
+                                  _buildCountrySelector(),
                                   const SizedBox(height: 24),
                                   _buildSelectableTextField(
                                     label: languageProvider.getString(
