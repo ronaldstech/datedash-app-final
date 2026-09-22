@@ -699,7 +699,7 @@ class _PremiumScreenState extends State<PremiumScreen>
     bool isDark,
   ) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
           Icon(
@@ -804,7 +804,7 @@ class _PremiumScreenState extends State<PremiumScreen>
               ),
 
             Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -847,13 +847,13 @@ class _PremiumScreenState extends State<PremiumScreen>
                         ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
                   Row(
                     children: [
                       Text(
                         title,
                         style: TextStyle(
-                          fontSize: 28,
+                          fontSize: 22,
                           fontWeight: FontWeight.w900,
                           color: isPopular
                               ? Colors.white
@@ -908,7 +908,7 @@ class _PremiumScreenState extends State<PremiumScreen>
                       Text(
                         price.toString(),
                         style: TextStyle(
-                          fontSize: 32,
+                          fontSize: 26,
                           fontWeight: FontWeight.w900,
                           color: isPopular
                               ? Colors.white
@@ -928,10 +928,10 @@ class _PremiumScreenState extends State<PremiumScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   // Feature Summary List (limit to 3)
                   Column(
-                    children: features.take(3).map((feature) {
+                    children: features.take(2).map((feature) {
                       return _buildFeatureRow(
                         feature,
                         isPopular,
@@ -987,11 +987,10 @@ class _PremiumScreenState extends State<PremiumScreen>
                       ),
                     ),
                   ),
-                  const Spacer(),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 6),
                   SizedBox(
                     width: double.infinity,
-                    height: 56,
+                    height: 50,
                     child: ElevatedButton(
                       onPressed: () => _showPaymentSheet(
                         context,

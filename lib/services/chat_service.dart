@@ -10,6 +10,7 @@ import 'profile_service.dart';
 
 class ChatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   final LocalDbService _localDb = LocalDbService();
 
   // Change this to your actual PHP server endpoint
@@ -721,14 +722,16 @@ class ChatService {
     }
   }
 
-  /// Stream of all chats for a user
   Stream<List<Chat>> getChatsStream(String uid) {
     return _firestore
         .collection('chats')
         .where('participants', arrayContains: uid)
         .snapshots()
         .map((snap) {
-      final chats = snap.docs.map(Chat.fromDoc).toList();
+      final chats = snap.docs
+          .map(Chat.fromDoc)
+          .where((chat) => !chat.deletedBy.contains(uid))
+          .toList();
       // Cache chats to local DB
       for (final chat in chats) {
         _localDb.insertOrUpdateChat(chat);
@@ -750,6 +753,20 @@ class ChatService {
       // Return cached chats on error
       return _localDb.getChatsForUser(uid);
     });
+  }
+
+  /// Deletes a chat for the specific user (soft delete on server + remove from local DB)
+  Future<void> deleteChatForUser(String chatId, String userId) async {
+    try {
+      final chatRef = _firestore.collection('chats').doc(chatId);
+      await chatRef.update({
+        'deletedBy': FieldValue.arrayUnion([userId]),
+      });
+      await _localDb.deleteChat(chatId);
+    } catch (e) {
+      debugPrint('Error deleting chat for user: $e');
+      rethrow;
+    }
   }
 
   /// Mark message as read

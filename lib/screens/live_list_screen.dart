@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import '../providers/profile_provider.dart';
 import '../providers/language_provider.dart';
+import '../models/user_profile_model.dart';
 import '../services/video_chat_service.dart';
 import 'video_matchmaking_screen.dart';
 import 'premium_screen.dart';
@@ -35,7 +36,22 @@ class _LiveListScreenState extends State<LiveListScreen>
   // Animation controller for the radar scanning effect
   late AnimationController _radarController;
 
-  final List<String> _languages = [];
+  final List<String> _languages = [
+    'Any',
+    'English',
+    'Kiswahili',
+    'Español',
+    'Français',
+    'Deutsch',
+    'Português',
+    'Hindi',
+    'Japanese',
+    'Italian',
+    'Chinese',
+    'Korean',
+    'Arabic',
+    'Russian',
+  ];
 
   final List<String> _genders = ['Any', 'Male', 'Female'];
 
@@ -403,7 +419,7 @@ class _LiveListScreenState extends State<LiveListScreen>
           ),
           _buildHeroPanel(pp),
           const SizedBox(height: 18),
-          _buildQuickStats(isDark, isPremium),
+          _buildQuickStats(isDark, pp.userProfile),
           const SizedBox(height: 22),
           _buildFilterPanel(
             isDark: isDark,
@@ -596,7 +612,22 @@ class _LiveListScreenState extends State<LiveListScreen>
     );
   }
 
-  Widget _buildQuickStats(bool isDark, bool isPremium) {
+  Widget _buildQuickStats(bool isDark, UserProfile? profile) {
+    final bool isPremium = profile?.isPremium == true;
+    String membershipName = 'Basic';
+    IconData membershipIcon = Iconsax.lock;
+
+    if (isPremium) {
+      final rawType = profile?.premiumType?.trim();
+      if (rawType != null && rawType.isNotEmpty) {
+        // Capitalize nicely e.g. "Pro", "Elite", "Premium"
+        membershipName = rawType[0].toUpperCase() + rawType.substring(1).toLowerCase();
+      } else {
+        membershipName = 'Premium';
+      }
+      membershipIcon = profile?.isElite == true ? Iconsax.crown1 : Iconsax.crown5;
+    }
+
     return Row(
       children: [
         Expanded(
@@ -616,8 +647,8 @@ class _LiveListScreenState extends State<LiveListScreen>
         Expanded(
           child: _buildStatTile(
             isDark,
-            isPremium ? Iconsax.crown5 : Iconsax.lock,
-            isPremium ? 'Premium' : 'Basic',
+            membershipIcon,
+            membershipName,
             isPremium ? 'filters on' : 'filters limited',
           ),
         ),

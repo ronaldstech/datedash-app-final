@@ -308,6 +308,12 @@ class LocalDbService {
     );
   }
 
+  Future<void> deleteChat(String chatId) async {
+    final db = await database;
+    await db.delete('chats', where: 'id = ?', whereArgs: [chatId]);
+    await db.delete('messages', where: 'chatId = ?', whereArgs: [chatId]);
+  }
+
   Future<void> deleteAllChats() async {
     final db = await database;
     await db.delete('chats');

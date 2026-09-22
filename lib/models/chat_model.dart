@@ -121,6 +121,7 @@ class Chat {
   final bool isSuperRequest;
   final String? requestStatus;
   final String? requestSenderId;
+  final List<String> deletedBy;
 
   Chat({
     required this.id,
@@ -132,6 +133,7 @@ class Chat {
     this.isSuperRequest = false,
     this.requestStatus,
     this.requestSenderId,
+    this.deletedBy = const [],
   });
 
   factory Chat.fromDoc(DocumentSnapshot doc) {
@@ -151,6 +153,7 @@ class Chat {
       isSuperRequest: data['isSuperRequest'] ?? false,
       requestStatus: data['requestStatus'],
       requestSenderId: data['requestSenderId'],
+      deletedBy: List<String>.from(data['deletedBy'] ?? []),
     );
   }
 

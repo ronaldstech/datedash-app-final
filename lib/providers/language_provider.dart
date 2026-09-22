@@ -415,6 +415,11 @@ class LanguageProvider with ChangeNotifier {
       'locked_profile': 'Locked Profile',
       'edit': 'Edit',
       'delete': 'Delete',
+      'delete_chat': 'Delete Chat',
+      'delete_chat_title': 'Delete Conversation',
+      'delete_chat_confirm':
+          'Are you sure you want to delete this chat with {name}? This will remove it from your messages list.',
+      'chat_deleted_snack': 'Chat deleted',
       'delete_message_title': 'Delete Message',
       'delete_message_confirm': 'Are you sure you want to delete this message?',
       'message_deleted': 'This message was deleted',
@@ -819,6 +824,11 @@ class LanguageProvider with ChangeNotifier {
       'locked_profile': 'Wasifu Umefungwa',
       'edit': 'Hariri',
       'delete': 'Futa',
+      'delete_chat': 'Futa Mazungumzo',
+      'delete_chat_title': 'Futa Mazungumzo',
+      'delete_chat_confirm':
+          'Je, una uhakika unataka kufuta mazungumzo haya na {name}? Hii itaondoa mazungumzo haya kwenye orodha ya ujumbe wako.',
+      'chat_deleted_snack': 'Mazungumzo yamefutwa',
       'delete_message_title': 'Futa Ujumbe',
       'delete_message_confirm': 'Je, una uhakika unataka kufuta ujumbe huu?',
       'message_deleted': 'Ujumbe huu ulifutwa',

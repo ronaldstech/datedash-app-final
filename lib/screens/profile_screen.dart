@@ -27,6 +27,201 @@ class _ProfileScreenState extends State<ProfileScreen> {
   UserProfile _profile = UserProfile.empty();
   final Color _primaryColor = const Color(0xFFFF4D85);
   final User? _user = FirebaseAuth.instance.currentUser;
+  int? _activatingPlanIndex;
+
+  Future<void> _activateQueuedPlan(
+    UserProfile currentProfile,
+    Map<String, dynamic> selectedPlan,
+    int index,
+  ) async {
+    final uid = _user?.uid;
+    if (uid == null) return;
+
+    final newPlanName = selectedPlan['plan']?.toString() ?? 'Premium';
+    final currentPlanName = currentProfile.premiumType ?? 'Premium';
+
+    // Show confirmation dialog before swapping
+    final shouldProceed = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (modalCtx) {
+        final isDarkMode = Theme.of(modalCtx).brightness == Brightness.dark;
+        return Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF4D85).withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Iconsax.crown,
+                  color: Color(0xFFFF4D85),
+                  size: 32,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Activate $newPlanName Membership',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'This will make $newPlanName your active membership. Your current $currentPlanName plan will be safely queued with its remaining time preserved.',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Theme.of(modalCtx).hintColor,
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(modalCtx, false),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        side: BorderSide(
+                          color: isDarkMode ? Colors.white24 : Colors.black12,
+                        ),
+                      ),
+                      child: const Text('Cancel'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(modalCtx, true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF4D85),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: const Text(
+                        'Activate Now',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (shouldProceed != true) return;
+
+    setState(() => _activatingPlanIndex = index);
+
+    try {
+      final now = DateTime.now();
+
+      // 1. Calculate remaining days/duration on the current active plan to preserve in queued list
+      final currentExpiry = currentProfile.premiumExpiry;
+      int remainingDays = 0;
+      if (currentExpiry != null && currentExpiry.isAfter(now)) {
+        remainingDays = currentExpiry.difference(now).inDays;
+        if (remainingDays < 1) remainingDays = 1;
+      } else {
+        remainingDays = (currentProfile.isPlanMonthly == true) ? 30 : 7;
+      }
+
+      final demotedPlan = <String, dynamic>{
+        'plan': currentProfile.premiumType ?? 'Premium',
+        'isMonthly': currentProfile.isPlanMonthly == true,
+        'days': remainingDays,
+        'purchasedAt': currentProfile.premiumPurchasedAt != null
+            ? Timestamp.fromDate(currentProfile.premiumPurchasedAt!)
+            : Timestamp.fromDate(now),
+      };
+
+      // 2. Prepare new active plan info
+      final isNewMonthly = selectedPlan['isMonthly'] == true;
+      final newDays = (selectedPlan['days'] as num?)?.toInt() ?? (isNewMonthly ? 30 : 7);
+      final newExpiry = now.add(Duration(days: newDays));
+
+      // 3. New queued subscriptions = (old queue minus selected item) + demotedPlan
+      final updatedQueue = List<Map<String, dynamic>>.from(
+        currentProfile.queuedSubscriptions.map((e) => Map<String, dynamic>.from(e)),
+      );
+      if (index >= 0 && index < updatedQueue.length) {
+        updatedQueue.removeAt(index);
+      }
+      updatedQueue.add(demotedPlan);
+
+      // 4. Update Firestore directly
+      final updates = <String, dynamic>{
+        'isPremium': true,
+        'premiumType': newPlanName,
+        'premiumExpiry': Timestamp.fromDate(newExpiry),
+        'premiumPurchasedAt': selectedPlan['purchasedAt'] ?? Timestamp.fromDate(now),
+        'isPlanMonthly': isNewMonthly,
+        'queuedSubscriptions': updatedQueue,
+      };
+
+      await FirebaseFirestore.instance.collection('users').doc(uid).update(updates);
+
+      // Reload local profile
+      await _loadProfile();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Text('$newPlanName membership is now active!'),
+              ],
+            ),
+            backgroundColor: const Color(0xFF4CAF50),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error activating queued plan: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to switch membership: $e'),
+            backgroundColor: Colors.redAccent,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _activatingPlanIndex = null);
+    }
+  }
 
   @override
   void initState() {
@@ -613,7 +808,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 12),
               ],
 
-              // Queued Subscriptions (Waiting to activate when current expires)
+              // My Memberships (Manage / Switch Active Membership)
               if (profile.queuedSubscriptions.isNotEmpty) ...[
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -630,33 +825,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Icon(
-                              Iconsax.clock,
-                              size: 14,
-                              color: Color(0xFF29B6F6),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Iconsax.crown,
+                                  size: 14,
+                                  color: Color(0xFF29B6F6),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'My Memberships (${profile.queuedSubscriptions.length + (isActive ? 1 : 0)})',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF29B6F6),
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 6),
                             Text(
-                              'Queued Subscriptions (${profile.queuedSubscriptions.length})',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                                color: Color(0xFF29B6F6),
+                              'Tap Activate to switch',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).hintColor,
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 8),
-                        ...profile.queuedSubscriptions.map((q) {
+                        ...profile.queuedSubscriptions.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final q = entry.value;
                           final qPlan = q['plan']?.toString() ?? 'Premium';
                           final qMonthly = q['isMonthly'] == true;
                           final qDays =
                               (q['days'] as num?)?.toInt() ??
                               (qMonthly ? 30 : 7);
-                          if (q['purchasedAt'] is Timestamp) {
-                            (q['purchasedAt'] as Timestamp).toDate();
-                          }
+                          final isActivatingThis = _activatingPlanIndex == index;
+
                           return Container(
                             margin: const EdgeInsets.only(bottom: 6),
                             padding: const EdgeInsets.symmetric(
@@ -675,49 +884,89 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${qPlan.toUpperCase()} (${qMonthly ? "1 Month" : "$qDays Days"})',
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w800,
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${qPlan.toUpperCase()} (${qMonthly ? "1 Month" : "$qDays Days"})',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w800,
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      'Activates automatically upon expiry',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: Theme.of(context).hintColor,
-                                        fontWeight: FontWeight.w500,
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        'Preserved in queue • $qDays days remaining',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Theme.of(context).hintColor,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 3,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(
-                                      0xFF29B6F6,
-                                    ).withValues(alpha: 0.12),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: const Text(
-                                    'QUEUED',
-                                    style: TextStyle(
-                                      color: Color(0xFF29B6F6),
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.w900,
-                                      letterSpacing: 0.5,
-                                    ),
+                                    ],
                                   ),
                                 ),
+                                const SizedBox(width: 8),
+                                if (isActivatingThis)
+                                  const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Color(0xFFFF4D85),
+                                    ),
+                                  )
+                                else
+                                  InkWell(
+                                    onTap: _activatingPlanIndex != null
+                                        ? null
+                                        : () => _activateQueuedPlan(profile, q, index),
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 5,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(
+                                          colors: [
+                                            Color(0xFFFF4D85),
+                                            Color(0xFFFF8DA1),
+                                          ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(8),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(0xFFFF4D85).withValues(alpha: 0.25),
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: const Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            Iconsax.flash_1,
+                                            size: 11,
+                                            color: Colors.white,
+                                          ),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            'Activate',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w800,
+                                              letterSpacing: 0.2,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                               ],
                             ),
                           );

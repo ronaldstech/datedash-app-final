@@ -154,54 +154,56 @@ class _PermissionOnboardingModalState
     const cardBg = Color(0xFF140C12);
     const surfaceBg = Color(0xFF1E1320);
 
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(32),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: cardBg,
-                borderRadius: BorderRadius.circular(32),
-                border: Border.all(
-                  color: const Color(0xFFFF4D85).withValues(alpha: 0.25),
-                  width: 1.2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFFFF4D85).withValues(alpha: 0.15),
-                    blurRadius: 60,
-                    spreadRadius: -10,
-                    offset: const Offset(0, 10),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: cardBg,
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(
+                    color: const Color(0xFFFF4D85).withValues(alpha: 0.25),
+                    width: 1.2,
                   ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // --- Header gradient bar ---
-                  Container(
-                    height: 4,
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Color(0xFFFF4D85),
-                          Color(0xFF7B5EA7),
-                          Color(0xFF00BFA5),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(32),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFF4D85).withValues(alpha: 0.15),
+                      blurRadius: 60,
+                      spreadRadius: -10,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // --- Header gradient bar ---
+                    Container(
+                      height: 4,
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFFFF4D85),
+                            Color(0xFF7B5EA7),
+                            Color(0xFF00BFA5),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(28),
+                        ),
                       ),
                     ),
-                  ),
 
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(28, 32, 28, 28),
-                    child: Column(
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 24, 16, 20),
+                      child: Column(
                       children: [
                         _buildHeroIcon(),
                         const SizedBox(height: 24),
@@ -275,6 +277,7 @@ class _PermissionOnboardingModalState
             ),
           ),
         ),
+      ),
       ),
     );
   }
@@ -396,7 +399,7 @@ class _PermissionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
       decoration: BoxDecoration(
         border: isLast
             ? null

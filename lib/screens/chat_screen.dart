@@ -1123,8 +1123,12 @@ class _ChatScreenState extends State<ChatScreen> {
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 elevation: 0,
                 surfaceTintColor: Colors.transparent,
+                titleSpacing: 0,
+                leadingWidth: 40,
                 leading: IconButton(
                   icon: const Icon(Iconsax.arrow_left_2),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
                   onPressed: () => Navigator.pop(context, true),
                 ),
                 title: GestureDetector(
@@ -1132,7 +1136,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: Row(
                     children: [
                       CircleAvatar(
-                        radius: 16,
+                        radius: 17,
                         backgroundColor: const Color(
                           0xFFFF4D85,
                         ).withValues(alpha: 0.2),
@@ -1149,12 +1153,12 @@ class _ChatScreenState extends State<ChatScreen> {
                         child: widget.otherUserPhoto == null
                             ? const Icon(
                                 Iconsax.user,
-                                size: 16,
+                                size: 17,
                                 color: Color(0xFFFF4D85),
                               )
                             : null,
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1188,6 +1192,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 actions: [
                   IconButton(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    constraints: const BoxConstraints(),
                     icon: Icon(
                       Iconsax.call,
                       color:
@@ -1206,76 +1212,65 @@ class _ChatScreenState extends State<ChatScreen> {
                             _messagesFromOtherCount >= 3)
                         ? _showVoiceCall
                         : _showCallLockedSnack,
-                    iconSize: 17,
+                    iconSize: 20,
                   ),
+                  const SizedBox(width: 4),
                   IconButton(
-                    icon: Icon(
-                      Iconsax.video,
-                      color:
-                          (_messagesFromMeCount >= 3 &&
-                              _messagesFromOtherCount >= 3)
-                          ? null
-                          : Theme.of(context).disabledColor,
-                    ),
-                    tooltip:
-                        (_messagesFromMeCount >= 3 &&
-                            _messagesFromOtherCount >= 3)
-                        ? languageProvider.getString('video_call_tooltip')
-                        : 'Send at least 3 messages each to unlock calls',
-                    onPressed:
-                        (_messagesFromMeCount >= 3 &&
-                            _messagesFromOtherCount >= 3)
-                        ? _showVideoCall
-                        : _showCallLockedSnack,
-                    iconSize: 17,
-                  ),
-                  if (_otherUserAllowsMeetup)
-                    IconButton(
-                      icon: const Icon(
-                        Iconsax.calendar_add,
-                        color: Color(0xFFFF4D85),
-                      ),
-                      tooltip: 'Plan a Date',
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) => MeetupSheet(
-                            otherUserId: widget.otherUserId,
-                            otherUserName: widget.otherUserName,
-                            chatId: _chatId,
-                            myUid: _myUid,
-                          ),
-                        );
-                      },
-                      iconSize: 17,
-                    ),
-                  IconButton(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    constraints: const BoxConstraints(),
                     icon: const Icon(
                       Iconsax.warning_2,
                       color: Colors.orangeAccent,
                     ),
                     tooltip: 'Report User',
                     onPressed: _showReportUserDialog,
-                    iconSize: 17,
+                    iconSize: 20,
                   ),
+                  const SizedBox(width: 4),
                   IconButton(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    constraints: const BoxConstraints(),
                     icon: const Icon(
                       Iconsax.user_remove,
                       color: Colors.redAccent,
                     ),
                     tooltip: 'Block User',
                     onPressed: _showBlockUserConfirm,
-                    iconSize: 17,
+                    iconSize: 20,
                   ),
+                  const SizedBox(width: 2),
                   PopupMenuButton<String>(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    constraints: const BoxConstraints(),
                     icon: const Icon(Icons.more_vert),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                     onSelected: (value) async {
                       switch (value) {
+                        case 'video_call':
+                          if (_messagesFromMeCount >= 3 &&
+                              _messagesFromOtherCount >= 3) {
+                            _showVideoCall();
+                          } else {
+                            _showCallLockedSnack();
+                          }
+                          break;
+
+                        case 'meetup':
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => MeetupSheet(
+                              otherUserId: widget.otherUserId,
+                              otherUserName: widget.otherUserName,
+                              chatId: _chatId,
+                              myUid: _myUid,
+                            ),
+                          );
+                          break;
+
                         case 'search':
                           setState(() {
                             _showSearch = !_showSearch;
@@ -1287,23 +1282,62 @@ class _ChatScreenState extends State<ChatScreen> {
                           break;
 
                         case 'profile':
-                          // handled inline / navigate to profile
+                          _showUserProfile();
                           break;
 
                         case 'clear':
                           _clearChatConfirm();
                           break;
-
-                        case 'report':
-                          _showReportUserDialog();
-                          break;
-
-                        case 'block':
-                          _showBlockUserConfirm();
-                          break;
                       }
                     },
                     itemBuilder: (_) => [
+                      PopupMenuItem(
+                        value: 'video_call',
+                        child: Row(
+                          children: [
+                            Icon(
+                              Iconsax.video,
+                              size: 20,
+                              color: (_messagesFromMeCount >= 3 &&
+                                      _messagesFromOtherCount >= 3)
+                                  ? const Color(0xFFFF4D85)
+                                  : Theme.of(context).disabledColor,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              languageProvider.getString('video_call_tooltip'),
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: (_messagesFromMeCount >= 3 &&
+                                        _messagesFromOtherCount >= 3)
+                                    ? null
+                                    : Theme.of(context).disabledColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (_otherUserAllowsMeetup)
+                        const PopupMenuItem(
+                          value: 'meetup',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Iconsax.calendar_add,
+                                size: 20,
+                                color: Color(0xFFFF4D85),
+                              ),
+                              SizedBox(width: 12),
+                              Text(
+                                'Plan a Date',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      const PopupMenuDivider(),
                       PopupMenuItem(
                         value: 'search',
                         child: Row(
@@ -1328,47 +1362,6 @@ class _ChatScreenState extends State<ChatScreen> {
                             Text(
                               languageProvider.getString('view_profile'),
                               style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuDivider(),
-                      PopupMenuItem(
-                        value: 'report',
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Iconsax.warning_2,
-                              size: 20,
-                              color: Colors.orangeAccent,
-                            ),
-                            const SizedBox(width: 12),
-                            const Text(
-                              'Report User',
-                              style: TextStyle(
-                                color: Colors.orangeAccent,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'block',
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Iconsax.user_remove,
-                              size: 20,
-                              color: Colors.redAccent,
-                            ),
-                            const SizedBox(width: 12),
-                            const Text(
-                              'Block User',
-                              style: TextStyle(
-                                color: Colors.redAccent,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../theme/theme_provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/language_provider.dart';
@@ -9,9 +11,18 @@ import 'verification_screen.dart';
 import 'edit_profile_screen.dart';
 import 'security_settings_screen.dart';
 import 'notification_settings_screen.dart';
+import 'auth/sign_in_screen.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+
+  bool _isDeletingAccount = false;
 
   @override
   Widget build(BuildContext context) {
@@ -241,7 +252,16 @@ class SettingsScreen extends StatelessWidget {
                 color: Colors.red,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Iconsax.trash, color: Colors.white, size: 20),
+              child: _isDeletingAccount
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Icon(Iconsax.trash, color: Colors.white, size: 20),
             ),
             title: Text(
               languageProvider.getString('delete_account'),
@@ -255,13 +275,319 @@ class SettingsScreen extends StatelessWidget {
               languageProvider.getString('delete_account_sub'),
               style: const TextStyle(color: Colors.redAccent, fontSize: 11),
             ),
-            onTap: () {
-              // Show confirmation dialog
-            },
+            onTap: _isDeletingAccount
+                ? null
+                : () => _showDeleteAccountDialog(context, languageProvider),
           ),
         ),
       ],
     );
+  }
+
+  void _showDeleteAccountDialog(
+    BuildContext context,
+    LanguageProvider lp,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Theme.of(context).cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Iconsax.trash, color: Colors.red, size: 24),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                lp.getString('delete_account'),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 18,
+                  color: Colors.red,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'This will permanently delete your account, profile, photos, matches, and all messages. This action cannot be undone.',
+              style: TextStyle(
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.85),
+                fontSize: 14,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.07),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.red.withValues(alpha: 0.15)),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.warning_amber_rounded, color: Colors.red, size: 18),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Are you absolutely sure?',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              lp.getString('cancel'),
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            ),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _executeDeleteAccount(context, lp);
+            },
+            child: const Text(
+              'Delete My Account',
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _executeDeleteAccount(
+    BuildContext context,
+    LanguageProvider lp,
+  ) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    setState(() => _isDeletingAccount = true);
+
+    try {
+      final uid = user.uid;
+
+      // Step 1: Try to delete Firebase Auth account directly
+      // (succeeds if user signed in recently)
+      try {
+        await user.delete();
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'requires-recent-login') {
+          // Need to re-authenticate first
+          if (!mounted) return;
+          final reauthed = await _showReauthDialog(user);
+          if (!reauthed) {
+            setState(() => _isDeletingAccount = false);
+            return;
+          }
+          // Try delete again after re-auth
+          await FirebaseAuth.instance.currentUser?.delete();
+        } else {
+          rethrow;
+        }
+      }
+
+      // Step 2: Delete Firestore user document (best-effort)
+      try {
+        await FirebaseFirestore.instance.collection('users').doc(uid).delete();
+      } catch (_) {
+        // Non-fatal: auth is already deleted
+      }
+
+      // Step 3: Navigate to sign-in screen
+      if (!mounted) return;
+      Navigator.of(this.context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const SignInScreen()),
+        (route) => false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isDeletingAccount = false);
+      ScaffoldMessenger.of(this.context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to delete account: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  Future<bool> _showReauthDialog(User user) async {
+    // Check sign-in providers to show appropriate re-auth UI
+    final providers = user.providerData.map((p) => p.providerId).toList();
+    final isEmailUser = providers.contains('password');
+
+    if (!isEmailUser) {
+      // Google or other provider — just show info and fail gracefully
+      if (!mounted) return false;
+      await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: Theme.of(context).cardColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text(
+            'Re-authentication Required',
+            style: TextStyle(fontWeight: FontWeight.w800),
+          ),
+          content: const Text(
+            'Please sign out and sign in again before deleting your account. This is a security requirement.',
+            style: TextStyle(fontSize: 14, height: 1.5),
+          ),
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF4D85),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return false;
+    }
+
+    // Email/Password user — show password input
+    final passwordCtrl = TextEditingController();
+    bool? confirmed;
+
+    if (!mounted) return false;
+    confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        bool obscure = true;
+        return StatefulBuilder(
+          builder: (context, setDialogState) => AlertDialog(
+            backgroundColor: Theme.of(context).cardColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: const Text(
+              'Confirm Password',
+              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Enter your password to confirm account deletion.',
+                  style: TextStyle(fontSize: 13, height: 1.5),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: passwordCtrl,
+                  obscureText: obscure,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    prefixIcon: const Icon(Iconsax.lock),
+                    suffixIcon: IconButton(
+                      icon: Icon(obscure ? Iconsax.eye_slash : Iconsax.eye),
+                      onPressed: () =>
+                          setDialogState(() => obscure = !obscure),
+                    ),
+                    filled: true,
+                    fillColor: Theme.of(context).scaffoldBackgroundColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(color: Theme.of(context).hintColor),
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: const Text(
+                  'Confirm',
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (confirmed != true || passwordCtrl.text.isEmpty) {
+      passwordCtrl.dispose();
+      return false;
+    }
+
+    // Re-authenticate
+    try {
+      final email = user.email!;
+      final credential = EmailAuthProvider.credential(
+        email: email,
+        password: passwordCtrl.text,
+      );
+      await FirebaseAuth.instance.currentUser
+          ?.reauthenticateWithCredential(credential);
+      passwordCtrl.dispose();
+      return true;
+    } on FirebaseAuthException {
+      passwordCtrl.dispose();
+      if (!mounted) return false;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Incorrect password. Please try again.'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return false;
+    }
   }
 
   Widget _buildPrivacySection(

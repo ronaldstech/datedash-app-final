@@ -368,6 +368,221 @@ class _ChatListScreenState extends State<ChatListScreen> {
     );
   }
 
+  Future<bool?> _confirmDeleteChat(
+    BuildContext context,
+    String otherUserName,
+    LanguageProvider lp,
+  ) {
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Theme.of(context).cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Iconsax.trash, color: Colors.red, size: 22),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                lp.getString('delete_chat_title'),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          lp.getString('delete_chat_confirm').replaceAll('{name}', otherUserName),
+          style: TextStyle(
+            color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
+            fontSize: 14,
+            height: 1.45,
+          ),
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(
+              lp.getString('cancel'),
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+            ),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(
+              lp.getString('delete'),
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showChatActionOptions(
+    BuildContext context,
+    Chat chat,
+    String otherUid,
+    String otherUserName,
+    String? otherUserPhoto,
+    String myUid,
+    LanguageProvider lp,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.08),
+            width: 1,
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle bar
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 18),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              // User preview header
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 22,
+                      backgroundColor: Colors.grey[200],
+                      backgroundImage: otherUserPhoto != null
+                          ? NetworkImage(otherUserPhoto)
+                          : null,
+                      child: otherUserPhoto == null
+                          ? const Icon(Iconsax.user, color: Colors.grey, size: 20)
+                          : null,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        otherUserName,
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Divider(height: 1, thickness: 0.5),
+              const SizedBox(height: 8),
+              // Delete Chat Tile
+              ListTile(
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                leading: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Iconsax.trash, color: Colors.red, size: 22),
+                ),
+                title: Text(
+                  lp.getString('delete_chat'),
+                  style: const TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
+                ),
+                subtitle: Text(
+                  lp.getString('delete_chat_confirm')
+                      .replaceAll('{name}', otherUserName),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Theme.of(context).hintColor,
+                    fontSize: 12,
+                  ),
+                ),
+                onTap: () async {
+                  Navigator.of(ctx).pop();
+                  final confirmed = await _confirmDeleteChat(context, otherUserName, lp);
+                  if (confirmed == true) {
+                    await _executeDeleteChat(chat.id, myUid, lp);
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _executeDeleteChat(String chatId, String myUid, LanguageProvider lp) async {
+    try {
+      await _chatService.deleteChatForUser(chatId, myUid);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(lp.getString('chat_deleted_snack')),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: const Color(0xFF1E1320),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to delete: $e'),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   Widget _buildChatTile(BuildContext context, Chat chat, String myUid, LanguageProvider lp) {
     final otherUid = chat.otherUserId(myUid);
     final unread = chat.unreadCount[myUid] ?? 0;
@@ -379,137 +594,191 @@ class _ChatListScreenState extends State<ChatListScreen> {
         final name = profile?.firstName ?? lp.getString('user_fallback');
         final photo = profile?.photos.isNotEmpty == true ? profile!.photos.first : null;
 
-        return InkWell(
-          onTap: () async {
-            final result = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ChatScreen(
-                  otherUserId: otherUid,
-                  otherUserName: name,
-                  otherUserPhoto: photo,
-                ),
-              ),
-            );
-            if (result == true && mounted) setState(() {});
+        return Dismissible(
+          key: ValueKey('chat_${chat.id}'),
+          direction: DismissDirection.endToStart,
+          confirmDismiss: (direction) async {
+            return await _confirmDeleteChat(context, name, lp);
           },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            child: Row(
+          onDismissed: (direction) {
+            _executeDeleteChat(chat.id, myUid, lp);
+          },
+          background: Container(
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.only(right: 28),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.red.withValues(alpha: 0.1),
+                  Colors.red.withValues(alpha: 0.9),
+                ],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Stack(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: unread > 0 ? const Color(0xFFFF4D85) : Colors.transparent, width: 2),
-                      ),
-                      child: CircleAvatar(
-                        radius: 30,
-                        backgroundColor: Colors.grey[200],
-                        backgroundImage: photo != null ? NetworkImage(photo) : null,
-                        child: photo == null ? const Icon(Iconsax.user, color: Colors.grey) : null,
-                      ),
-                    ),
-                    if (profile?.isOnline == true)
-                      Positioned(
-                        right: 4,
-                        bottom: 4,
-                        child: Container(
-                          width: 14,
-                          height: 14,
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Theme.of(context).scaffoldBackgroundColor, width: 2),
-                          ),
-                        ),
-                      ),
-                  ],
+                Icon(
+                  Iconsax.trash,
+                  color: Colors.white,
+                  size: 26,
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    name,
-                                    style: TextStyle(
-                                      fontWeight: unread > 0 ? FontWeight.w900 : FontWeight.w700,
-                                      fontSize: 16,
-                                      letterSpacing: -0.2,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                if (chat.isSuperRequest)
-                                  Container(
-                                    margin: const EdgeInsets.only(left: 8),
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(colors: [Colors.orange, Colors.deepOrange]),
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: const Text('SUPER', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w900)),
-                                  ),
-                              ],
-                            ),
-                          ),
-                          Text(
-                            chat.lastMessageTime != null ? DateFormatter.format(chat.lastMessageTime!, lp) : '',
-                            style: TextStyle(
-                              color: unread > 0 ? const Color(0xFFFF4D85) : Theme.of(context).hintColor,
-                              fontSize: 12,
-                              fontWeight: unread > 0 ? FontWeight.w700 : FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              chat.lastMessage.isEmpty
-                                  ? lp.getString('say_hello')
-                                  : (chat.lastMessageSenderId == myUid ? '${lp.getString('you_prefix')} ${chat.lastMessage}' : chat.lastMessage),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: unread > 0 ? Theme.of(context).textTheme.bodyLarge?.color : Theme.of(context).hintColor,
-                                fontWeight: unread > 0 ? FontWeight.w600 : FontWeight.w500,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                          if (unread > 0)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFF4D85),
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [BoxShadow(color: const Color(0xFFFF4D85).withValues(alpha: 	0.3), blurRadius: 8, offset: const Offset(0, 2))],
-                              ),
-                              child: Text(
-                                unread > 99 ? '99+' : '$unread',
-                                style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ],
+                SizedBox(width: 8),
+                Text(
+                  'Delete',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 15,
                   ),
                 ),
               ],
+            ),
+          ),
+          child: InkWell(
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ChatScreen(
+                    otherUserId: otherUid,
+                    otherUserName: name,
+                    otherUserPhoto: photo,
+                  ),
+                ),
+              );
+              if (result == true && mounted) setState(() {});
+            },
+            onLongPress: () {
+              _showChatActionOptions(
+                context,
+                chat,
+                otherUid,
+                name,
+                photo,
+                myUid,
+                lp,
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              child: Row(
+                children: [
+                  Stack(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: unread > 0 ? const Color(0xFFFF4D85) : Colors.transparent, width: 2),
+                        ),
+                        child: CircleAvatar(
+                          radius: 30,
+                          backgroundColor: Colors.grey[200],
+                          backgroundImage: photo != null ? NetworkImage(photo) : null,
+                          child: photo == null ? const Icon(Iconsax.user, color: Colors.grey) : null,
+                        ),
+                      ),
+                      if (profile?.isOnline == true)
+                        Positioned(
+                          right: 4,
+                          bottom: 4,
+                          child: Container(
+                            width: 14,
+                            height: 14,
+                            decoration: BoxDecoration(
+                              color: Colors.green,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Theme.of(context).scaffoldBackgroundColor, width: 2),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      name,
+                                      style: TextStyle(
+                                        fontWeight: unread > 0 ? FontWeight.w900 : FontWeight.w700,
+                                        fontSize: 16,
+                                        letterSpacing: -0.2,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  if (chat.isSuperRequest)
+                                    Container(
+                                      margin: const EdgeInsets.only(left: 8),
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(colors: [Colors.orange, Colors.deepOrange]),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: const Text('SUPER', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w900)),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            Text(
+                              chat.lastMessageTime != null ? DateFormatter.format(chat.lastMessageTime!, lp) : '',
+                              style: TextStyle(
+                                color: unread > 0 ? const Color(0xFFFF4D85) : Theme.of(context).hintColor,
+                                fontSize: 12,
+                                fontWeight: unread > 0 ? FontWeight.w700 : FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                chat.lastMessage.isEmpty
+                                    ? lp.getString('say_hello')
+                                    : (chat.lastMessageSenderId == myUid ? '${lp.getString('you_prefix')} ${chat.lastMessage}' : chat.lastMessage),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: unread > 0 ? Theme.of(context).textTheme.bodyLarge?.color : Theme.of(context).hintColor,
+                                  fontWeight: unread > 0 ? FontWeight.w600 : FontWeight.w500,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            if (unread > 0)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFF4D85),
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [BoxShadow(color: const Color(0xFFFF4D85).withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 2))],
+                                ),
+                                child: Text(
+                                  unread > 99 ? '99+' : '$unread',
+                                  style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );

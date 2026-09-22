@@ -42,6 +42,49 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
   String? _selectedCountry;
   bool _isDetectingLocation = false;
 
+  static const Map<String, String> _countryCodeToName = {
+    'MW': 'Malawi',
+    'US': 'United States',
+    'KE': 'Kenya',
+    'TZ': 'Tanzania',
+    'GB': 'United Kingdom',
+    'ES': 'Spain',
+    'FR': 'France',
+    'DE': 'Germany',
+    'BR': 'Brazil',
+    'CA': 'Canada',
+    'AU': 'Australia',
+    'IN': 'India',
+    'JP': 'Japan',
+    'IT': 'Italy',
+    'MX': 'Mexico',
+    'ZA': 'South Africa',
+    'NG': 'Nigeria',
+    'KR': 'South Korea',
+    'CN': 'China',
+    'ZM': 'Zambia',
+    'ZW': 'Zimbabwe',
+    'UG': 'Uganda',
+    'RW': 'Rwanda',
+    'GH': 'Ghana',
+    'ET': 'Ethiopia',
+    'EG': 'Egypt',
+    'AR': 'Argentina',
+    'CO': 'Colombia',
+    'NL': 'Netherlands',
+    'SE': 'Sweden',
+    'CH': 'Switzerland',
+    'AE': 'United Arab Emirates',
+    'SA': 'Saudi Arabia',
+    'PH': 'Philippines',
+    'ID': 'Indonesia',
+    'PK': 'Pakistan',
+    'BD': 'Bangladesh',
+    'PT': 'Portugal',
+    'IE': 'Ireland',
+    'NZ': 'New Zealand',
+  };
+
   final List<String> _countries = [
     'Malawi',
     'United States',
@@ -143,24 +186,76 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
 
   Future<void> _autoDetectCountry() async {
     if (_isDetectingLocation) return;
-    setState(() {
-      _isDetectingLocation = true;
-    });
+    _isDetectingLocation = true;
 
+    String? detected;
+
+    // 1. Fast, reliable system locale check (like MandatoryPhoneSheet)
+    try {
+      final String? localeCode =
+          WidgetsBinding.instance.platformDispatcher.locale.countryCode;
+      if (localeCode != null && localeCode.length == 2) {
+        final match = _countryCodeToName[localeCode.toUpperCase()];
+        if (match != null && match.isNotEmpty) {
+          detected = match;
+          _applyDetectedCountry(detected);
+        }
+      }
+    } catch (e) {
+      debugPrint('Error getting locale country: $e');
+    }
+
+    // 2. IP-based lookup (fast & non-intrusive, like MandatoryPhoneSheet)
+    try {
+      final response = await http.get(
+        Uri.parse('http://ip-api.com/json'),
+        headers: {'User-Agent': 'Snellum/1.0.0'},
+      ).timeout(const Duration(seconds: 3));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final String? cName = data['country'];
+        final String? cCode = data['countryCode'];
+        if (cName != null && cName.isNotEmpty) {
+          detected = cName;
+        } else if (cCode != null && _countryCodeToName.containsKey(cCode.toUpperCase())) {
+          detected = _countryCodeToName[cCode.toUpperCase()];
+        }
+        if (detected != null) {
+          _applyDetectedCountry(detected);
+          _isDetectingLocation = false;
+          return;
+        }
+      }
+    } catch (_) {}
+
+    // 3. Fallback: Secondary IP check
+    try {
+      final response = await http
+          .get(Uri.parse('https://ipapi.co/json/'))
+          .timeout(const Duration(seconds: 3));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final countryName = data['country_name']?.toString();
+        if (countryName != null && countryName.isNotEmpty) {
+          detected = countryName;
+          _applyDetectedCountry(detected);
+          _isDetectingLocation = false;
+          return;
+        }
+      }
+    } catch (_) {}
+
+    // 4. GPS Location check if permission already granted or available
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (serviceEnabled) {
         LocationPermission permission = await Geolocator.checkPermission();
-        if (permission == LocationPermission.denied) {
-          permission = await Geolocator.requestPermission();
-        }
-
         if (permission == LocationPermission.whileInUse ||
             permission == LocationPermission.always) {
           Position position = await Geolocator.getCurrentPosition(
             locationSettings: const LocationSettings(
               accuracy: LocationAccuracy.medium,
-              timeLimit: Duration(seconds: 8),
+              timeLimit: Duration(seconds: 5),
             ),
           );
 
@@ -169,7 +264,6 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
 
           final lat = position.latitude;
           final lng = position.longitude;
-          String? detected;
 
           if (lat > -17 && lat < -9 && lng > 32 && lng < 36) {
             detected = 'Malawi';
@@ -197,63 +291,31 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
             detected = 'Canada';
           } else if (lat > 49 && lat < 61 && lng > -9 && lng < 2) {
             detected = 'United Kingdom';
-          } else if (lat > 36 && lat < 44 && lng > -9 && lng < 4) {
-            detected = 'Spain';
-          } else if (lat > 42 && lat < 51 && lng > -5 && lng < 9) {
-            detected = 'France';
-          } else if (lat > 47 && lat < 55 && lng > 5 && lng < 15) {
-            detected = 'Germany';
-          } else if (lat > 35 && lat < 47 && lng > 6 && lng < 19) {
-            detected = 'Italy';
-          } else if (lat > -34 && lat < 6 && lng > -74 && lng < -34) {
-            detected = 'Brazil';
-          } else if (lat > 8 && lat < 37 && lng > 68 && lng < 97) {
-            detected = 'India';
-          } else if (lat > -44 && lat < -10 && lng > 113 && lng < 154) {
-            detected = 'Australia';
-          } else if (lat > 30 && lat < 46 && lng > 128 && lng < 146) {
-            detected = 'Japan';
-          } else if (lat > 33 && lat < 39 && lng > 124 && lng < 131) {
-            detected = 'South Korea';
-          } else if (lat > 14 && lat < 33 && lng > -118 && lng < -86) {
-            detected = 'Mexico';
           }
 
           if (detected != null) {
-            if (mounted) {
-              setState(() {
-                _selectedCountry = detected;
-              });
-            }
+            _applyDetectedCountry(detected);
+            _isDetectingLocation = false;
             return;
           }
         }
       }
+    } catch (_) {}
 
-      // Fallback: IP-based Country Geolocation (Simple & Fast)
-      final response = await http
-          .get(Uri.parse('https://ipapi.co/json/'))
-          .timeout(const Duration(seconds: 4));
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final countryName = data['country_name']?.toString();
-        if (countryName != null && countryName.isNotEmpty) {
-          if (mounted) {
-            setState(() {
-              _selectedCountry = countryName;
-            });
-          }
-          return;
-        }
+    _isDetectingLocation = false;
+  }
+
+  void _applyDetectedCountry(String country) {
+    if (!mounted) return;
+    setState(() {
+      _selectedCountry = country;
+      if (!_countries.contains(country)) {
+        _countries.insert(0, country);
+      } else {
+        _countries.remove(country);
+        _countries.insert(0, country);
       }
-    } catch (_) {
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isDetectingLocation = false;
-        });
-      }
-    }
+    });
   }
 
   String _getCountryFlag(String? country) {
@@ -466,50 +528,13 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Your Location / Country',
-              style: TextStyle(
-                color: Colors.black.withValues(alpha: 0.8),
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            InkWell(
-              onTap: _isDetectingLocation ? null : _autoDetectCountry,
-              borderRadius: BorderRadius.circular(12),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (_isDetectingLocation)
-                      SizedBox(
-                        width: 12,
-                        height: 12,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: _primaryColor,
-                        ),
-                      )
-                    else
-                      Icon(Iconsax.gps, size: 14, color: _primaryColor),
-                    const SizedBox(width: 4),
-                    Text(
-                      _isDetectingLocation ? 'Detecting...' : 'Auto-detect',
-                      style: TextStyle(
-                        color: _primaryColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+        Text(
+          'Your Location / Country',
+          style: TextStyle(
+            color: Colors.black.withValues(alpha: 0.8),
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 8),
         InkWell(
