@@ -638,7 +638,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           ),
           child: InkWell(
             onTap: () async {
-              final result = await Navigator.push(
+              await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (_) => ChatScreen(
@@ -648,7 +648,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                   ),
                 ),
               );
-              if (result == true && mounted) setState(() {});
+              if (mounted) setState(() {});
             },
             onLongPress: () {
               _showChatActionOptions(

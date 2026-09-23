@@ -870,7 +870,7 @@ class ChatService {
     });
   }
 
-  /// Marks all messages as read when opening a chat
+  /// Marks all messages as read when opening a chat and expires any active super request
   Future<void> markAsRead(String chatId, String myUid) async {
     try {
       final chatRef = _firestore.collection('chats').doc(chatId);
@@ -878,19 +878,37 @@ class ChatService {
 
       if (chatDoc.exists) {
         final data = chatDoc.data()!;
-        final lastSenderId = data['lastMessageSenderId'] as String?;
         final isSuper = data['isSuperRequest'] as bool? ?? false;
 
         Map<String, dynamic> updateData = {
           'unreadCount.$myUid': 0,
         };
 
-        // If the viewer is the recipient and it's a super request, clear the flag
-        if (isSuper && lastSenderId != myUid) {
+        // When the chat is opened, the super request status expires
+        if (isSuper) {
           updateData['isSuperRequest'] = false;
         }
 
         await chatRef.update(updateData);
+
+        // Update local SQLite cache immediately
+        final localChat = await _localDb.getChatById(chatId);
+        if (localChat != null) {
+          final updatedUnread = Map<String, int>.from(localChat.unreadCount);
+          updatedUnread[myUid] = 0;
+          await _localDb.insertOrUpdateChat(Chat(
+            id: localChat.id,
+            participants: localChat.participants,
+            lastMessage: localChat.lastMessage,
+            lastMessageTime: localChat.lastMessageTime,
+            lastMessageSenderId: localChat.lastMessageSenderId,
+            unreadCount: updatedUnread,
+            isSuperRequest: false,
+            requestStatus: localChat.requestStatus,
+            requestSenderId: localChat.requestSenderId,
+            deletedBy: localChat.deletedBy,
+          ));
+        }
       }
 
       // Mark all unread messages as read
@@ -910,6 +928,32 @@ class ChatService {
       await batch.commit();
     } catch (e) {
       debugPrint('Error marking as read: $e');
+    }
+  }
+
+  /// Expires a super request on a chat so it immediately drops priority and badge
+  Future<void> expireSuperRequest(String chatId) async {
+    try {
+      final chatRef = _firestore.collection('chats').doc(chatId);
+      await chatRef.update({'isSuperRequest': false});
+
+      final localChat = await _localDb.getChatById(chatId);
+      if (localChat != null) {
+        await _localDb.insertOrUpdateChat(Chat(
+          id: localChat.id,
+          participants: localChat.participants,
+          lastMessage: localChat.lastMessage,
+          lastMessageTime: localChat.lastMessageTime,
+          lastMessageSenderId: localChat.lastMessageSenderId,
+          unreadCount: localChat.unreadCount,
+          isSuperRequest: false,
+          requestStatus: localChat.requestStatus,
+          requestSenderId: localChat.requestSenderId,
+          deletedBy: localChat.deletedBy,
+        ));
+      }
+    } catch (e) {
+      debugPrint('Error expiring super request: $e');
     }
   }
 

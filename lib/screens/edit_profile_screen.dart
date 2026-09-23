@@ -28,7 +28,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   double _uploadProgress = 0.0;
   final _profileService = ProfileService();
   final ImagePicker _picker = ImagePicker();
-  final String _uploadUrl = 'https://unimarket-mw.com/snellum/api/upload.php';
+  final String _uploadUrl =
+      'https://lynxtechmedia.com/ronaldstech/snellum/api/upload.php';
 
   late PageController _pageController;
   int _currentPage = 0;
@@ -1402,12 +1403,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 18,
-        bottom: 104,
-      ),
+      padding: const EdgeInsets.only(left: 24, right: 24, top: 18, bottom: 104),
       child: Container(
         padding: const EdgeInsets.fromLTRB(18, 18, 18, 8),
         decoration: BoxDecoration(
@@ -1514,10 +1510,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-            ),
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
           TextFormField(
@@ -1576,7 +1569,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }) {
     final optionItems = _withAskMe(options);
     final normalizedValue = value?.trim();
-    final hasCustomValue = normalizedValue != null &&
+    final hasCustomValue =
+        normalizedValue != null &&
         normalizedValue.isNotEmpty &&
         !optionItems.contains(normalizedValue);
 
@@ -1738,10 +1732,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-            ),
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
           Wrap(
@@ -1805,10 +1796,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-            ),
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
           Wrap(
@@ -1914,10 +1902,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-            ),
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
           InkWell(
