@@ -357,10 +357,13 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
     required ValueChanged<bool> onChanged,
     required Color activeColor,
     bool isPremiumLocked = false,
+    String tierName = 'Premium',
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
-      onTap: isPremiumLocked ? _showPremiumUpgradePrompt : null,
+      onTap: isPremiumLocked
+          ? () => _showPremiumUpgradePrompt(tierName: tierName)
+          : null,
       behavior: HitTestBehavior.opaque,
       child: AbsorbPointer(
         absorbing: isPremiumLocked,
@@ -892,18 +895,6 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                         isPremiumLocked: !isPremium,
                       ),
                       
-                      // Verified Only
-                      _buildGroupCard(
-                        child: _buildToggleRow(
-                          title: 'Verified Profiles Only',
-                          subtitle: 'Only show users who have verified their identity.',
-                          value: _verifiedOnly,
-                          activeColor: const Color(0xFFFF4D85),
-                          onChanged: (val) => setState(() => _verifiedOnly = val),
-                          isPremiumLocked: !isPremium,
-                        ),
-                      ),
-                      
                       // Online Status Only
                       _buildGroupCard(
                         child: _buildToggleRow(
@@ -1069,6 +1060,19 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
 
                       // 3. Advanced Elite filters
                       _buildSectionHeader('Elite Advanced Filters'),
+
+                      // Verified Profiles Only
+                      _buildGroupCard(
+                        child: _buildToggleRow(
+                          title: 'Verified Profiles Only',
+                          subtitle: 'Only show users who have verified their identity.',
+                          value: _verifiedOnly,
+                          activeColor: const Color(0xFFFF4D85),
+                          onChanged: (val) => setState(() => _verifiedOnly = val),
+                          isPremiumLocked: !isElite,
+                          tierName: 'Elite',
+                        ),
+                      ),
 
                       // Country / Green Card Filter
                       _buildDropdownCard(

@@ -80,7 +80,8 @@ class ProfileService {
     final filterZodiac = currentUserProfile.filterZodiac ?? 'Any';
     final filterEducationLevel =
         currentUserProfile.filterEducationLevel ?? 'Any';
-    final filterVerifiedOnly = currentUserProfile.filterVerifiedOnly;
+    final filterVerifiedOnly =
+        currentUserProfile.isElite && currentUserProfile.filterVerifiedOnly;
     final filterOnlineOnly = currentUserProfile.filterOnlineOnly;
     final filterKids = currentUserProfile.filterKids ?? 'Any';
     final filterPets = currentUserProfile.filterPets ?? 'Any';
@@ -773,6 +774,26 @@ class ProfileService {
       }
     } catch (e) {
       debugPrint('Error checking queued subscription: $e');
+    }
+  }
+
+  /// Reverts an expired (or otherwise inactive) membership back to free tier.
+  /// Used when a subscription expires and no queued subscription is available.
+  Future<void> resetExpiredMembership(String uid) async {
+    try {
+      final updates = <String, dynamic>{
+        'isPremium': false,
+        'premiumType': null,
+        'premiumExpiry': null,
+        'premiumPurchasedAt': null,
+        'isPlanMonthly': false,
+      };
+
+      await _usersCollection.doc(uid).update(updates);
+      debugPrint(
+          'ProfileService: Reverted expired membership to free tier for $uid');
+    } catch (e) {
+      debugPrint('ProfileService: Error resetting expired membership: $e');
     }
   }
 

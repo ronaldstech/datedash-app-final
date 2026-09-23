@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -667,7 +667,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
                             child: _buildLockedOverlay(languageProvider),
                           ),
 
-                        // ⚡ Floating Boost Pop-up (Appears, pulses, and disappears periodically)
+                        // âš¡ Floating Boost Pop-up (Appears, pulses, and disappears periodically)
                         if (_showBoostPopup && !isLockedOut)
                           _buildBoostFloatingPopup(),
                       ],
@@ -757,8 +757,8 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
                               Flexible(
                                 child: Text(
                                   isAlreadyBoosted
-                                      ? 'Boost Active ⚡'
-                                      : 'Boost Profile ⚡',
+                                      ? 'Boost Active âš¡'
+                                      : 'Boost Profile âš¡',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
@@ -885,7 +885,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                // Dark background – always visible, prevents back card bleed-through during photo loads
+                // Dark background â€“ always visible, prevents back card bleed-through during photo loads
                 const ColoredBox(color: Color(0xFF1A1A2E)),
 
                 // Profile photo with crossfade transition between photos
@@ -959,7 +959,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
                     ),
                   ),
 
-                // Photo indicators — Positioned MUST be direct child of Stack
+                // Photo indicators â€” Positioned MUST be direct child of Stack
                 Positioned(
                   top: 14,
                   left: 14,
@@ -994,7 +994,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
                   ),
                 ),
 
-                // "Looking For" goal tag — replaces common interests for clarity
+                // "Looking For" goal tag â€” replaces common interests for clarity
                 if (profile.lookingFor.isNotEmpty)
                   Positioned(
                     top: 32,
@@ -1099,7 +1099,9 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
   Widget _buildActionRow(LanguageProvider languageProvider) {
     final profileProvider = context.watch<ProfileProvider>();
     final canRewind =
-        profileProvider.lastSwipedUserId != null && _currentIndex > 0;
+        profileProvider.userProfile?.isPremiumOrElite == true &&
+            profileProvider.lastSwipedUserId != null &&
+            _currentIndex > 0;
     final currentProfile =
         _profiles.isNotEmpty ? _profiles[_currentIndex] : null;
     final myUid = FirebaseAuth.instance.currentUser?.uid;
@@ -1221,428 +1223,59 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
   }
 
   Future<void> _handleRewind() async {
-    final languageProvider = context.read<LanguageProvider>();
     final profileProvider = context.read<ProfileProvider>();
     final lastId = profileProvider.lastSwipedUserId;
 
     if (lastId == null || _currentIndex <= 0) return;
 
-    // Premium users rewind for free
-    if (profileProvider.userProfile?.isPremium == true) {
+    // Rewind is exclusive to Premium and Elite members
+    if (profileProvider.userProfile?.isPremiumOrElite == true) {
       _executeRewind();
-      return;
-    }
-
-    // Non-premium users must use 100 credits
-    final userCredits = profileProvider.userProfile?.credits ?? 0;
-    if (userCredits >= 100) {
-      _showRewindConfirmationDialog(languageProvider, profileProvider);
     } else {
-      _showInsufficientCreditsDialog(languageProvider);
+      _showRewindUpgradeDialog();
     }
   }
 
-  void _showRewindConfirmationDialog(
-      LanguageProvider languageProvider, ProfileProvider profileProvider) {
-    bool isRewinding = false;
-
+  void _showRewindUpgradeDialog() {
     showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => Dialog(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          child: Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(
-                  color: const Color(0xFF2196F3).withValues(alpha: 0.1), width: 1),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF2196F3).withValues(alpha: 0.15),
-                  blurRadius: 24,
-                  spreadRadius: 0,
-                  offset: const Offset(0, 12),
-                ),
-              ],
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Text(
+          'Unlock Rewind',
+          style: TextStyle(fontWeight: FontWeight.w900),
+        ),
+        content: const Text(
+          'Rewind is exclusive to Premium and Elite members. Upgrade your plan to revisit the last profile you swiped.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Maybe Later'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.read<ProfileProvider>().navigateToPremium(0);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFF4D85),
+              foregroundColor: Colors.white,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Premium Header with Icon
-                Container(
-                  height: 140,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        const Color(0xFF2196F3).withValues(alpha: 0.2),
-                        const Color(0xFF2196F3).withValues(alpha: 0.02),
-                      ],
-                    ),
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(28)),
-                  ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Decorative circles
-                      Positioned(
-                        top: -20,
-                        right: -20,
-                        child: Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: const Color(0xFF2196F3).withValues(alpha: 0.05),
-                          ),
-                        ),
-                      ),
-                      const Icon(
-                        Iconsax.refresh,
-                        size: 64,
-                        color: Color(0xFF2196F3),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  languageProvider.getString('rewind_confirm_title'),
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
-                  child: Text(
-                    languageProvider.getString('rewind_confirm_message'),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Theme.of(context).hintColor,
-                      height: 1.5,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 32),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextButton(
-                              onPressed: isRewinding
-                                  ? null
-                                  : () => Navigator.pop(context),
-                              style: TextButton.styleFrom(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                              child: Text(
-                                languageProvider.getString('cancel'),
-                                style: TextStyle(
-                                  color: Theme.of(context).hintColor,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: isRewinding
-                                  ? null
-                                  : () async {
-                                      setDialogState(() => isRewinding = true);
-                                      try {
-                                        await _executeRewind(useCredits: 100);
-                                        if (context.mounted) {
-                                          Navigator.pop(context);
-                                        }
-                                      } catch (e) {
-                                        if (context.mounted) {
-                                          setDialogState(
-                                              () => isRewinding = false);
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                                content: Text('Error: $e')),
-                                          );
-                                        }
-                                      }
-                                    },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF2196F3),
-                                foregroundColor: Colors.white,
-                                elevation: 8,
-                                shadowColor:
-                                    const Color(0xFF2196F3).withValues(alpha: 0.4),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                              child: isRewinding
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : Text(
-                                      languageProvider
-                                          .getString('confirm_button'),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w900,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton(
-                          onPressed: isRewinding
-                              ? null
-                              : () {
-                                  Navigator.pop(context);
-                                  profileProvider.navigateToPremium(0);
-                                },
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            side: const BorderSide(
-                                color: Color(0xFFFF4D85), width: 1.5),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                          child: Text(
-                            languageProvider.getString('go_premium'),
-                            style: const TextStyle(
-                              color: Color(0xFFFF4D85),
-                              fontWeight: FontWeight.w800,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            child: const Text(
+              'Upgrade',
+              style: TextStyle(fontWeight: FontWeight.w800),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  void _showInsufficientCreditsDialog(LanguageProvider languageProvider) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        child: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(
-                color: const Color(0xFFFFB300).withValues(alpha: 0.1), width: 1),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFFFFB300).withValues(alpha: 0.15),
-                blurRadius: 24,
-                spreadRadius: 0,
-                offset: const Offset(0, 12),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Premium Header with Icon
-              Container(
-                height: 140,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      const Color(0xFFFFB300).withValues(alpha: 0.2),
-                      const Color(0xFFFFB300).withValues(alpha: 0.02),
-                    ],
-                  ),
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(28)),
-                ),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Decorative circles
-                    Positioned(
-                      top: -20,
-                      right: -20,
-                      child: Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: const Color(0xFFFFB300).withValues(alpha: 0.05),
-                        ),
-                      ),
-                    ),
-                    const Icon(
-                      Iconsax.coin,
-                      size: 64,
-                      color: Color(0xFFFFB300),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                languageProvider.getString('insufficient_credits_title'),
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: Text(
-                  languageProvider.getString('insufficient_credits_message'),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Theme.of(context).hintColor,
-                    height: 1.5,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 32),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                            child: Text(
-                              languageProvider.getString('cancel'),
-                              style: TextStyle(
-                                color: Theme.of(context).hintColor,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              context
-                                  .read<ProfileProvider>()
-                                  .navigateToPremium(1);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFFB300),
-                              foregroundColor: Colors.white,
-                              elevation: 8,
-                              shadowColor:
-                                  const Color(0xFFFFB300).withValues(alpha: 0.4),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                            child: Text(
-                              languageProvider.getString('get_credits_button'),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          context.read<ProfileProvider>().navigateToPremium(0);
-                        },
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          side: const BorderSide(
-                              color: Color(0xFFFF4D85), width: 1.5),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: Text(
-                          languageProvider.getString('go_premium'),
-                          style: const TextStyle(
-                            color: Color(0xFFFF4D85),
-                            fontWeight: FontWeight.w800,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _executeRewind({int? useCredits}) async {
+  Future<void> _executeRewind() async {
     final profileProvider = context.read<ProfileProvider>();
     try {
-      if (useCredits != null) {
-        await profileProvider.useCredits(useCredits);
-      }
-
       await profileProvider.rewindSwipe();
       setState(() {
         _currentIndex--;
@@ -1679,7 +1312,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // ── Name, Age & Prominent Gift Button ────────────────────────
+          // â”€â”€ Name, Age & Prominent Gift Button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -1715,7 +1348,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
               ],
               const SizedBox(width: 10),
 
-              // 🎁 Prominent Gift Button below/next to the user's name
+              // ðŸŽ Prominent Gift Button below/next to the user's name
               GestureDetector(
                 onTap: () {
                   if (profile.uid != null) {
@@ -1769,7 +1402,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
           ),
           const SizedBox(height: 6),
 
-          // ── Bio Status Box ─────────────────────────────────────────
+          // â”€â”€ Bio Status Box â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           if (bio != null && bio.trim().isNotEmpty) ...[
             Container(
               width: double.infinity,
@@ -1834,7 +1467,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
 
           const SizedBox(height: 4),
 
-          // ── Hobbies / Interests (Horizontal Scroll) ─────────────────
+          // â”€â”€ Hobbies / Interests (Horizontal Scroll) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           if (hobbies.isNotEmpty)
             SizedBox(
               height: 24,
@@ -2347,7 +1980,8 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
   }
 
   void _showMissedMatchDialog() {
-    final isPremium = context.read<ProfileProvider>().userProfile?.isPremium == true;
+    final isPremium =
+        context.read<ProfileProvider>().userProfile?.isPremiumOrElite == true;
     showDialog(
       context: context,
       barrierDismissible: true,

@@ -31,6 +31,7 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
   String? _lastSwipedUserId;
   String? _selectedExploreCategory;
   int _exploreSwipesVersion = 0;
+  Timer? _expiryTimer;
 
   // Usage tracking
   DateTime? _sessionStartTime;
@@ -38,6 +39,8 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
   ProfileProvider() {
     WidgetsBinding.instance.addObserver(this);
     _sessionStartTime = DateTime.now();
+    _expiryTimer =
+        Timer.periodic(const Duration(minutes: 1), (_) => _checkMembershipExpiry());
 
     _userSubscription = FirebaseAuth.instance.userChanges().listen((user) {
       _currentUser = user;
@@ -48,15 +51,10 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
             .getUserProfileStream(user.uid)
             .listen((profile) {
           _userProfile = profile;
-          notifyListeners();
-          // Check if previous subscription expired and a queued one should activate
-          if (profile != null &&
-              profile.queuedSubscriptions.isNotEmpty &&
-              (!profile.isPremium ||
-                  (profile.premiumExpiry != null &&
-                      DateTime.now().isAfter(profile.premiumExpiry!)))) {
-            _profileService.checkAndActivateQueuedSubscription(user.uid);
+          if (profile != null) {
+            _enforceMembershipExpiry(profile, user.uid);
           }
+          notifyListeners();
         });
 
         _likesCountSubscription?.cancel();
@@ -428,6 +426,7 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
 
   @override
   void dispose() {
+    _expiryTimer?.cancel();
     _userSubscription?.cancel();
     _profileSubscription?.cancel();
     _likesCountSubscription?.cancel();
@@ -443,11 +442,46 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       _sessionStartTime = DateTime.now();
+      _checkMembershipExpiry();
     } else if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive ||
         state == AppLifecycleState.detached) {
       _syncUsage();
     }
+  }
+
+  /// Detects an expired subscription and either activates the next queued plan
+  /// or reverts the user to free membership. Returns true when the plan changed.
+  bool _enforceMembershipExpiry(UserProfile profile, String uid) {
+    if (!profile.isPremium) return false;
+
+    final isExpired = profile.premiumExpiry != null &&
+        DateTime.now().isAfter(profile.premiumExpiry!);
+    if (!isExpired) return false;
+
+    if (profile.queuedSubscriptions.isNotEmpty) {
+      // Previous subscription expired -> activate the next queued one
+      _profileService.checkAndActivateQueuedSubscription(uid);
+    } else {
+      // Expired with no queued subscription -> revert to free membership now
+      profile.isPremium = false;
+      profile.premiumType = null;
+      profile.premiumExpiry = null;
+      profile.premiumPurchasedAt = null;
+      profile.isPlanMonthly = false;
+      _profileService.resetExpiredMembership(uid);
+    }
+    return true;
+  }
+
+  /// Periodically checks (and re-checks) whether the active membership expired.
+  void _checkMembershipExpiry() {
+    final uid = _currentUser?.uid;
+    final profile = _userProfile;
+    if (uid == null || profile == null) return;
+
+    final changed = _enforceMembershipExpiry(profile, uid);
+    if (changed) notifyListeners();
   }
 
   Future<void> _syncUsage() async {

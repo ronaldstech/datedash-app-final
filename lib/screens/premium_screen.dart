@@ -168,7 +168,6 @@ class _PremiumScreenState extends State<PremiumScreen>
     'Extended Filter',
     'Looking For',
     'See everyone\'s online status',
-    'Rewind',
     '2x more profile views',
     'Unlimited likes',
     'See all your matches',
