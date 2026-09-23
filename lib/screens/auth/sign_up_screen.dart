@@ -10,6 +10,7 @@ import '../../services/email_verification_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
+import '../../config/app_config.dart';
 
 import 'verify_email_screen.dart';
 
@@ -64,7 +65,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     try {
       // Using ip-api.com as it's often more accessible than ipapi.co
       final response = await http.get(
-        Uri.parse('http://ip-api.com/json'),
+        Uri.parse(AppConfig.ipApiUrl),
         headers: {'User-Agent': 'Snellum/1.0.0'},
       );
       if (response.statusCode == 200) {

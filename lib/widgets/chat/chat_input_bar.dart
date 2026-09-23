@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import '../../data/chat_emoji_data.dart';
 import '../../models/chat_model.dart';
 import '../../providers/language_provider.dart';
+import 'emoji_sticker_panel.dart';
 
 class ChatInputBar extends StatefulWidget {
   final TextEditingController messageController;
@@ -22,6 +23,7 @@ class ChatInputBar extends StatefulWidget {
   final VoidCallback onCancelReply;
   final VoidCallback onCancelEdit;
   final ValueChanged<String> onChanged;
+  final ValueChanged<ChatSticker> onSendSticker;
 
   const ChatInputBar({
     super.key,
@@ -42,6 +44,7 @@ class ChatInputBar extends StatefulWidget {
     required this.onCancelReply,
     required this.onCancelEdit,
     required this.onChanged,
+    required this.onSendSticker,
   });
 
   @override
@@ -154,13 +157,17 @@ class _ChatInputBarState extends State<ChatInputBar> {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (widget.isRecording) _buildRecordingBar(),
-        if (_showEmojiPicker)
+if (_showEmojiPicker)
           SizedBox(
-            height: 250,
-            child: EmojiPicker(
-              onEmojiSelected: (category, emoji) {
-                widget.messageController.text += emoji.emoji;
+            height: 300,
+            child: EmojiStickerPanel(
+              onEmojiSelected: (emoji) {
+                widget.messageController.text += emoji;
                 widget.onChanged(widget.messageController.text);
+              },
+              onStickerSelected: (sticker) {
+                setState(() => _showEmojiPicker = false);
+                widget.onSendSticker(sticker);
               },
             ),
           ),

@@ -1,14 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:snellum/config/app_config.dart';
 import 'package:snellum/models/payment_operator_model.dart';
 
 class PaymentService {
-  static const String _operatorsEndpoint =
-      'https://lynxtechmedia.com/ronaldstech/snellum/api/paychangu/get_operators.php';
-  static const String _initEndpoint =
-      'https://lynxtechmedia.com/ronaldstech/snellum/api/paychangu/initialize_payment.php';
-  static const String _verifyEndpoint =
-      'https://lynxtechmedia.com/ronaldstech/snellum/api/paychangu/verify_payment.php';
+  static const String _operatorsEndpoint = AppConfig.payChanguOperatorsUrl;
+  static const String _initEndpoint = AppConfig.payChanguInitializeUrl;
+  static const String _verifyEndpoint = AppConfig.payChanguVerifyUrl;
 
   /// Fetches the supported mobile money operators from the remote backend.
   Future<List<PaymentOperator>> getMobileOperators() async {

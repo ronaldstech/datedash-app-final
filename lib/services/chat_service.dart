@@ -7,6 +7,7 @@ import 'dart:convert';
 import '../models/chat_model.dart';
 import 'local_db_service.dart';
 import 'profile_service.dart';
+import '../config/app_config.dart';
 
 class ChatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -14,8 +15,7 @@ class ChatService {
   final LocalDbService _localDb = LocalDbService();
 
   // Change this to your actual PHP server endpoint
-  static const String _uploadEndpoint =
-      'https://unimarket-mw.com/snellum/api/upload2.php';
+  static const String _uploadEndpoint = AppConfig.chatMediaUploadUrl;
 
   /// Deterministic chat ID — sorted UIDs joined by underscore
   String getChatId(String uid1, String uid2) {

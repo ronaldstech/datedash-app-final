@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import '../config/app_config.dart';
 
 class EmailVerificationService {
   /// Brevo API Key (configurable via --dart-define=BREVO_API_KEY=your_key)
@@ -29,13 +30,12 @@ class EmailVerificationService {
   /// PHP email API endpoint (fallback / hosting server)
   static String phpApiUrl = const String.fromEnvironment(
     'PHP_EMAIL_API_URL',
-    defaultValue:
-        'https://apexspacemw.com/rt/php_backend/send_verification_code.php',
+    defaultValue: AppConfig.emailVerificationPhpUrl,
   );
 
   static const String _baseUrl = String.fromEnvironment(
     'EMAIL_VERIFICATION_API_BASE_URL',
-    defaultValue: 'https://us-central1-snellum.cloudfunctions.net',
+    defaultValue: AppConfig.snellumCloudFunctionsUrl,
   );
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -53,7 +53,7 @@ class EmailVerificationService {
       return false;
     }
 
-    final url = Uri.parse('https://api.brevo.com/v3/smtp/email');
+    final url = Uri.parse(AppConfig.brevoApiUrl);
     final htmlContent =
         '''
 <!DOCTYPE html>

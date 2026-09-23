@@ -25,6 +25,7 @@ import '../widgets/chat/gift_picker_sheet.dart';
 import '../widgets/chat/request_action_card.dart';
 import '../widgets/chat/message_bubble.dart';
 import '../widgets/chat/chat_input_bar.dart';
+import '../data/chat_emoji_data.dart';
 import '../widgets/meetup_sheet.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -289,6 +290,41 @@ class _ChatScreenState extends State<ChatScreen> {
           _isSending = false;
           _replyingMessage = null;
         });
+      }
+      _scrollToBottom();
+    }
+  }
+
+  void _sendSticker(ChatSticker sticker) async {
+    if (!_chatReady) return;
+
+    final languageProvider = context.read<LanguageProvider>();
+
+    if (await _checkAndConsumeCredits()) {
+      try {
+        await _chatService.sendMessage(
+          chatId: _chatId,
+          senderId: _myUid,
+          receiverId: widget.otherUserId,
+          text: sticker.emoji,
+          messageType: MessageType.sticker,
+        );
+        if (mounted) {
+          setState(() {
+            _replyingMessage = null;
+            _editingMessage = null;
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${languageProvider.getString('chat_error_sending')}: $e',
+              ),
+            ),
+          );
+        }
       }
       _scrollToBottom();
     }
@@ -1804,6 +1840,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               setState(() {});
                               _updateTypingStatus(val.isNotEmpty);
                             },
+                            onSendSticker: _sendSticker,
                           ),
                       ],
                     ),

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import '../config/app_config.dart';
 
 class AppUpdateInfo {
   final String latestVersion;
@@ -17,8 +18,7 @@ class AppUpdateInfo {
 }
 
 class UpdateService {
-  static const String _defaultDownloadUrl =
-      'https://unimarket-mw.com/snellum/snellum.apk';
+  static const String _defaultDownloadUrl = AppConfig.appApkDownloadUrl;
 
   /// Returns [AppUpdateInfo] if an update is available, otherwise null.
   Future<AppUpdateInfo?> checkForUpdate() async {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
+import 'package:snellum/config/app_config.dart';
 import 'package:snellum/providers/profile_provider.dart';
 import '../widgets/bordered_search_bar.dart';
 
@@ -72,8 +73,7 @@ class ExploreScreen extends StatelessWidget {
         'subtitle': languageProvider.getString('cat_marriage_sub'),
         'key': 'Marriage',
         'icon': Iconsax.heart_add,
-        'photo':
-            'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=600&q=80',
+        'photo': AppConfig.exploreCategoryPhotos[0],
         'accent': const Color(0xFFD4AF37), // Gold accent for marriage
       },
       {
@@ -81,8 +81,7 @@ class ExploreScreen extends StatelessWidget {
         'subtitle': languageProvider.getString('cat_long_term_sub'),
         'key': 'Long Term Relationship',
         'icon': Iconsax.heart5,
-        'photo':
-            'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&q=80',
+        'photo': AppConfig.exploreCategoryPhotos[1],
         'accent': const Color(0xFFFF4D85),
       },
       {
@@ -90,8 +89,7 @@ class ExploreScreen extends StatelessWidget {
         'subtitle': languageProvider.getString('cat_short_term_rel_sub'),
         'key': 'Short Term Relationship',
         'icon': Iconsax.calendar_1,
-        'photo':
-            'https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=600&q=80',
+        'photo': AppConfig.exploreCategoryPhotos[2],
         'accent': const Color(0xFFFF9A8B),
       },
       {

@@ -7,6 +7,7 @@ import '../providers/profile_provider.dart';
 import '../providers/language_provider.dart';
 import '../services/profile_service.dart';
 import '../services/notification_service.dart';
+import '../config/app_config.dart';
 
 class RewardsScreen extends StatelessWidget {
   const RewardsScreen({super.key});
@@ -145,7 +146,7 @@ class _InviteSectionState extends State<_InviteSection> {
     if (mounted) setState(() { _referralCode = code; _loading = false; });
   }
 
-  String get _link => 'https://snellum.app/join?ref=${_referralCode ?? ''}';
+  String get _link => '${AppConfig.referralUrlPrefix}${_referralCode ?? ''}';
 
   void _copy() {
     Clipboard.setData(ClipboardData(text: _link));

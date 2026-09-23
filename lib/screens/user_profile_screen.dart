@@ -6,6 +6,7 @@ import '../providers/profile_provider.dart';
 import '../services/profile_service.dart';
 import '../widgets/meetup_sheet.dart';
 import '../services/chat_service.dart';
+import '../config/app_config.dart';
 
 class UserProfileScreen extends StatefulWidget {
   final UserProfile profile;
@@ -85,7 +86,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     const primaryColor = Color(0xFFFF4D85);
     final photos = widget.profile.photos.isNotEmpty 
         ? widget.profile.photos 
-        : ['https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=800'];
+        : [AppConfig.defaultProfileImageUrl];
 
     return Scaffold(
       body: Stack(

@@ -10,6 +10,7 @@ import 'landing_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../config/app_config.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -28,8 +29,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   double _uploadProgress = 0.0;
   final _profileService = ProfileService();
   final ImagePicker _picker = ImagePicker();
-  final String _uploadUrl =
-      'https://lynxtechmedia.com/ronaldstech/snellum/api/upload.php';
+  final String _uploadUrl = AppConfig.profileImageUploadUrl;
 
   late PageController _pageController;
   int _currentPage = 0;

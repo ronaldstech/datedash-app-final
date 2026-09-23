@@ -1,8 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../config/app_config.dart';
 
 class JitsiCallService {
-  static const String serverBase = 'https://meet.ffmuc.net';
+  static const String serverBase = AppConfig.jitsiServerBase;
 
   Uri buildRoomUri({
     required String roomName,

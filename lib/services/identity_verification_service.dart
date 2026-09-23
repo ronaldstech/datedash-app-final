@@ -2,11 +2,12 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
+import '../config/app_config.dart';
 
 class IdentityVerificationService {
   static const String _baseUrl = String.fromEnvironment(
     'IDENTITY_VERIFICATION_API_BASE_URL',
-    defaultValue: 'https://us-central1-datedash-35789.cloudfunctions.net',
+    defaultValue: AppConfig.datedashCloudFunctionsUrl,
   );
 
   Future<String> createVerificationLink() async {

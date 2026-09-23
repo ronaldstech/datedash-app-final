@@ -13,6 +13,7 @@ import '../providers/language_provider.dart';
 import '../screens/landing_screen.dart';
 import '../screens/auth/sign_in_screen.dart';
 import '../services/auth_service.dart';
+import '../config/app_config.dart';
 
 class IncompleteProfileWizard extends StatefulWidget {
   final UserProfile profile;
@@ -145,8 +146,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
   final ImagePicker _picker = ImagePicker();
   bool _isUploading = false;
   double _uploadProgress = 0.0;
-  final String _uploadUrl =
-      'https://lynxtechmedia.com/ronaldstech/snellum/api/upload.php';
+  final String _uploadUrl = AppConfig.profileImageUploadUrl;
 
   final Color _primaryColor = const Color(0xFFFF4D85);
 
@@ -208,7 +208,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
     // 2. IP-based lookup (fast & non-intrusive, like MandatoryPhoneSheet)
     try {
       final response = await http.get(
-        Uri.parse('http://ip-api.com/json'),
+        Uri.parse(AppConfig.ipApiUrl),
         headers: {'User-Agent': 'Snellum/1.0.0'},
       ).timeout(const Duration(seconds: 3));
       if (response.statusCode == 200) {
@@ -231,7 +231,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
     // 3. Fallback: Secondary IP check
     try {
       final response = await http
-          .get(Uri.parse('https://ipapi.co/json/'))
+          .get(Uri.parse(AppConfig.ipApiCoUrl))
           .timeout(const Duration(seconds: 3));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../providers/profile_provider.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../config/app_config.dart';
 
 class MandatoryPhoneSheet extends StatefulWidget {
   const MandatoryPhoneSheet({super.key});
@@ -43,7 +44,7 @@ class _MandatoryPhoneSheetState extends State<MandatoryPhoneSheet> {
     // 2. Try IP-based lookup
     try {
       final response = await http.get(
-        Uri.parse('http://ip-api.com/json'),
+        Uri.parse(AppConfig.ipApiUrl),
         headers: {'User-Agent': 'Snellum/1.0.0'},
       );
       if (response.statusCode == 200) {

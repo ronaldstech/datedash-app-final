@@ -17,6 +17,7 @@ import 'meetup_sheet.dart';
 import 'boost_sheet.dart';
 import '../services/chat_service.dart';
 import '../screens/premium_screen.dart';
+import '../config/app_config.dart';
 import 'swipe/swipe_profile_card.dart';
 
 class SwipeView extends StatefulWidget {
@@ -514,7 +515,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
 
     final photos = profile.photos.isNotEmpty
         ? profile.photos
-        : ['https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=800'];
+        : [AppConfig.defaultProfileImageUrl];
     final photoUrl = _currentPhotoIndex < photos.length
         ? photos[_currentPhotoIndex]
         : photos.first;
@@ -599,7 +600,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
                                     profile: nextProfile!,
                                     photoUrl: nextProfile.photos.isNotEmpty
                                         ? nextProfile.photos.first
-                                        : 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=800',
+                                        : AppConfig.defaultProfileImageUrl,
                                     totalPhotos: nextProfile.photos.length,
                                     photoIndex: 0,
                                     isBackCard: true,

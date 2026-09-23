@@ -6,6 +6,7 @@ import '../../providers/language_provider.dart';
 import '../../utils/date_formatter.dart';
 import '../meetup_bubble.dart';
 import 'voice_note_bubble.dart';
+import 'sticker_bubble.dart';
 
 class MessageBubble extends StatelessWidget {
   final ChatMessage message;
@@ -484,6 +485,10 @@ class MessageBubble extends StatelessWidget {
         isMe: isMe,
         durationMs: message.voiceDuration,
       );
+    }
+
+    if (message.messageType == MessageType.sticker) {
+      return StickerBubble(emoji: message.text, isMe: isMe);
     }
 
     if (message.messageType == MessageType.meetup && message.mediaUrl != null) {
