@@ -116,6 +116,10 @@ class UserProfile {
   bool isPremium;
   String? premiumType; // 'Pro', 'Premium', 'Elite'
   bool get isElite => isPremium && premiumType?.toUpperCase() == 'ELITE';
+  bool get isPremiumOrElite =>
+      isPremium &&
+      (premiumType?.toUpperCase() == 'PREMIUM' ||
+          premiumType?.toUpperCase() == 'ELITE');
   DateTime? premiumExpiry;
   DateTime? premiumPurchasedAt;
   bool isPlanMonthly;

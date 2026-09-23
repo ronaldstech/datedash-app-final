@@ -102,11 +102,11 @@ class _LiveListScreenState extends State<LiveListScreen>
       return;
     }
 
-    final bool isPremium = currentUser.isPremium;
     final bool isElite = currentUser.isElite;
+    final bool hasGenderFilter = currentUser.isPremiumOrElite;
 
-    // Premium/Elite restriction: non-premium users locked on gender, non-elite users locked on country
-    final String effectiveGender = isPremium ? _selectedGender : 'Any';
+    // Premium/Elite restriction: gender only for Premium/Elite, country only for Elite
+    final String effectiveGender = hasGenderFilter ? _selectedGender : 'Any';
     final String effectiveCountry = isElite ? _selectedCountry : 'Any';
 
     Navigator.push(
@@ -392,8 +392,8 @@ class _LiveListScreenState extends State<LiveListScreen>
     ProfileProvider pp,
     LanguageProvider lp,
   ) {
-    final bool isPremium = pp.userProfile?.isPremium == true;
     final bool isElite = pp.userProfile?.isElite == true;
+    final bool hasGenderFilter = pp.userProfile?.isPremiumOrElite == true;
 
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(
@@ -462,7 +462,7 @@ class _LiveListScreenState extends State<LiveListScreen>
             title: 'Premium & Elite filters',
             subtitle: isElite
                 ? 'Tune gender and country for a more focused match.'
-                : (isPremium
+                : (hasGenderFilter
                       ? 'Gender filter unlocked. Country filter requires Elite.'
                       : 'Upgrade to control gender (Premium) and country (Elite) matching.'),
             children: [
@@ -483,7 +483,8 @@ class _LiveListScreenState extends State<LiveListScreen>
                       );
                     }).toList(),
                   ),
-                  if (!isPremium) _buildPremiumLockedOverlay(context, 'Gender'),
+                  if (!hasGenderFilter)
+                    _buildPremiumLockedOverlay(context, 'Gender'),
                 ],
               ),
               const SizedBox(height: 18),
@@ -503,7 +504,7 @@ class _LiveListScreenState extends State<LiveListScreen>
             ],
           ),
           const SizedBox(height: 18),
-          _buildStartCard(isDark, pp, isPremium, isElite),
+          _buildStartCard(isDark, pp, hasGenderFilter, isElite),
         ],
       ),
     );
@@ -760,14 +761,14 @@ class _LiveListScreenState extends State<LiveListScreen>
   Widget _buildStartCard(
     bool isDark,
     ProfileProvider pp,
-    bool isPremium,
+    bool hasGenderFilter,
     bool isElite,
   ) {
     final String infoText = isElite
         ? 'Your selected filters will be applied.'
-        : (isPremium
+        : (hasGenderFilter
               ? 'Gender filter active. Country set to Any (Elite feature).'
-              : 'Gender and country are set to Any on Basic.');
+              : 'Gender and country are set to Any on your plan.');
 
     return Container(
       width: double.infinity,

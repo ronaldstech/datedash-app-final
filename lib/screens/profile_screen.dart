@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:snellum/providers/profile_provider.dart';
 import 'package:snellum/screens/premium_screen.dart';
+import 'package:snellum/screens/manage_subscription_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -103,7 +104,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onPressed: () => Navigator.pop(modalCtx, false),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                         side: BorderSide(
                           color: isDarkMode ? Colors.white24 : Colors.black12,
                         ),
@@ -120,7 +123,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         foregroundColor: Colors.white,
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
                       child: const Text(
                         'Activate Now',
@@ -164,12 +169,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       // 2. Prepare new active plan info
       final isNewMonthly = selectedPlan['isMonthly'] == true;
-      final newDays = (selectedPlan['days'] as num?)?.toInt() ?? (isNewMonthly ? 30 : 7);
+      final newDays =
+          (selectedPlan['days'] as num?)?.toInt() ?? (isNewMonthly ? 30 : 7);
       final newExpiry = now.add(Duration(days: newDays));
 
       // 3. New queued subscriptions = (old queue minus selected item) + demotedPlan
       final updatedQueue = List<Map<String, dynamic>>.from(
-        currentProfile.queuedSubscriptions.map((e) => Map<String, dynamic>.from(e)),
+        currentProfile.queuedSubscriptions.map(
+          (e) => Map<String, dynamic>.from(e),
+        ),
       );
       if (index >= 0 && index < updatedQueue.length) {
         updatedQueue.removeAt(index);
@@ -181,12 +189,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'isPremium': true,
         'premiumType': newPlanName,
         'premiumExpiry': Timestamp.fromDate(newExpiry),
-        'premiumPurchasedAt': selectedPlan['purchasedAt'] ?? Timestamp.fromDate(now),
+        'premiumPurchasedAt':
+            selectedPlan['purchasedAt'] ?? Timestamp.fromDate(now),
         'isPlanMonthly': isNewMonthly,
         'queuedSubscriptions': updatedQueue,
       };
 
-      await FirebaseFirestore.instance.collection('users').doc(uid).update(updates);
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .update(updates);
 
       // Reload local profile
       await _loadProfile();
@@ -203,7 +215,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             backgroundColor: const Color(0xFF4CAF50),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         );
       }
@@ -666,26 +680,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ],
                           ),
                           const SizedBox(height: 2),
-                          Builder(builder: (context) {
-                            final bool isMonthlyPlan = profile.isPlanMonthly ||
-                                (expiry != null &&
-                                    purchasedAt != null &&
-                                    expiry.difference(purchasedAt).inDays >= 25) ||
-                                (expiry != null &&
-                                    expiry.difference(DateTime.now()).inDays >= 25);
-                            return Text(
-                              isActive
-                                  ? (isMonthlyPlan
-                                      ? 'Monthly Membership • $remainingText'
-                                      : 'Weekly Membership • $remainingText')
-                                  : 'Upgrade to unlock all VIP perks & boosts',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Theme.of(context).hintColor,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            );
-                          }),
+                          Builder(
+                            builder: (context) {
+                              final bool isMonthlyPlan =
+                                  profile.isPlanMonthly ||
+                                  (expiry != null &&
+                                      purchasedAt != null &&
+                                      expiry.difference(purchasedAt).inDays >=
+                                          25) ||
+                                  (expiry != null &&
+                                      expiry
+                                              .difference(DateTime.now())
+                                              .inDays >=
+                                          25);
+                              return Text(
+                                isActive
+                                    ? (isMonthlyPlan
+                                          ? 'Monthly Membership • $remainingText'
+                                          : 'Weekly Membership • $remainingText')
+                                    : 'Upgrade to unlock all VIP perks & boosts',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Theme.of(context).hintColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              );
+                            },
+                          ),
                         ],
                       ),
                     ),
@@ -856,7 +877,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        ...profile.queuedSubscriptions.asMap().entries.map((entry) {
+                        ...profile.queuedSubscriptions.asMap().entries.map((
+                          entry,
+                        ) {
                           final index = entry.key;
                           final q = entry.value;
                           final qPlan = q['plan']?.toString() ?? 'Premium';
@@ -864,7 +887,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           final qDays =
                               (q['days'] as num?)?.toInt() ??
                               (qMonthly ? 30 : 7);
-                          final isActivatingThis = _activatingPlanIndex == index;
+                          final isActivatingThis =
+                              _activatingPlanIndex == index;
 
                           return Container(
                             margin: const EdgeInsets.only(bottom: 6),
@@ -887,7 +911,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               children: [
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         '${qPlan.toUpperCase()} (${qMonthly ? "1 Month" : "$qDays Days"})',
@@ -922,7 +947,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   InkWell(
                                     onTap: _activatingPlanIndex != null
                                         ? null
-                                        : () => _activateQueuedPlan(profile, q, index),
+                                        : () => _activateQueuedPlan(
+                                            profile,
+                                            q,
+                                            index,
+                                          ),
                                     borderRadius: BorderRadius.circular(8),
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(
@@ -939,7 +968,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         borderRadius: BorderRadius.circular(8),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: const Color(0xFFFF4D85).withValues(alpha: 0.25),
+                                            color: const Color(
+                                              0xFFFF4D85,
+                                            ).withValues(alpha: 0.25),
                                             blurRadius: 4,
                                             offset: const Offset(0, 2),
                                           ),
@@ -981,12 +1012,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // Action button to Manage / Upgrade / Renew
               InkWell(
                 onTap: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const PremiumScreen(),
-                    ),
-                  );
+                  if (isActive || profile.queuedSubscriptions.isNotEmpty) {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ManageSubscriptionScreen(),
+                      ),
+                    );
+                  } else {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PremiumScreen(),
+                      ),
+                    );
+                  }
                   _loadProfile();
                 },
                 borderRadius: const BorderRadius.vertical(
@@ -1009,7 +1049,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Text(
                         isActive
                             ? 'Manage or Upgrade Plan'
-                            : 'Upgrade to Premium ⚡',
+                            : 'Upgrade to Premium',
                         style: TextStyle(
                           color: isActive ? planAccentColor : _primaryColor,
                           fontWeight: FontWeight.w800,
@@ -1432,7 +1472,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const PremiumScreen(),
+                    builder: (context) => isPremium
+                        ? const ManageSubscriptionScreen()
+                        : const PremiumScreen(),
                   ),
                 ),
               );

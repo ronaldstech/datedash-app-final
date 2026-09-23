@@ -776,6 +776,115 @@ class ProfileService {
     }
   }
 
+  /// Cancels a user's active subscription in Firestore.
+  /// If [clearQueuedSubscriptions] is true, also clears any queued memberships.
+  Future<void> cancelSubscription(
+    String uid, {
+    bool clearQueuedSubscriptions = true,
+  }) async {
+    try {
+      final updates = <String, dynamic>{
+        'isPremium': false,
+        'premiumType': null,
+        'premiumExpiry': null,
+        'premiumPurchasedAt': null,
+        'isPlanMonthly': false,
+      };
+
+      if (clearQueuedSubscriptions) {
+        updates['queuedSubscriptions'] = <dynamic>[];
+      }
+
+      await _usersCollection.doc(uid).update(updates);
+      debugPrint(
+          'ProfileService: Cancelled subscription for $uid (clearedQueue: $clearQueuedSubscriptions)');
+    } catch (e) {
+      debugPrint('Error cancelling subscription: $e');
+      rethrow;
+    }
+  }
+
+  /// Removes a single queued subscription by index
+  Future<void> removeQueuedSubscription(String uid, int index) async {
+    try {
+      final doc = await _usersCollection.doc(uid).get();
+      if (!doc.exists || doc.data() == null) return;
+      final data = doc.data() as Map<String, dynamic>;
+      final List<dynamic> queued =
+          List<dynamic>.from(data['queuedSubscriptions'] as List<dynamic>? ?? []);
+      if (index >= 0 && index < queued.length) {
+        queued.removeAt(index);
+        await _usersCollection.doc(uid).update({'queuedSubscriptions': queued});
+        debugPrint(
+            'ProfileService: Removed queued subscription at index $index for $uid');
+      }
+    } catch (e) {
+      debugPrint('Error removing queued subscription: $e');
+      rethrow;
+    }
+  }
+
+  /// Swaps the currently active plan with one from the queued list, preserving remaining days.
+  Future<void> switchQueuedSubscription(
+    String uid,
+    dynamic currentProfile,
+    Map<String, dynamic> selectedPlan,
+    int index,
+  ) async {
+    try {
+      final now = DateTime.now();
+      final currentExpiry = currentProfile.premiumExpiry as DateTime?;
+      int remainingDays = 0;
+      if (currentExpiry != null && currentExpiry.isAfter(now)) {
+        remainingDays = currentExpiry.difference(now).inDays;
+        if (remainingDays < 1) remainingDays = 1;
+      } else {
+        remainingDays = (currentProfile.isPlanMonthly == true) ? 30 : 7;
+      }
+
+      final demotedPlan = <String, dynamic>{
+        'plan': currentProfile.premiumType ?? 'Premium',
+        'isMonthly': currentProfile.isPlanMonthly == true,
+        'days': remainingDays,
+        'purchasedAt': currentProfile.premiumPurchasedAt != null
+            ? Timestamp.fromDate(currentProfile.premiumPurchasedAt!)
+            : Timestamp.fromDate(now),
+      };
+
+      final newPlanName = selectedPlan['plan']?.toString() ?? 'Premium';
+      final isNewMonthly = selectedPlan['isMonthly'] == true;
+      final newDays =
+          (selectedPlan['days'] as num?)?.toInt() ?? (isNewMonthly ? 30 : 7);
+      final newExpiry = now.add(Duration(days: newDays));
+
+      final updatedQueue = List<Map<String, dynamic>>.from(
+        (currentProfile.queuedSubscriptions as List)
+            .map((e) => Map<String, dynamic>.from(e as Map)),
+      );
+      if (index >= 0 && index < updatedQueue.length) {
+        updatedQueue.removeAt(index);
+      }
+      updatedQueue.add(demotedPlan);
+
+      final updates = <String, dynamic>{
+        'isPremium': true,
+        'premiumType': newPlanName,
+        'premiumExpiry': Timestamp.fromDate(newExpiry),
+        'premiumPurchasedAt':
+            selectedPlan['purchasedAt'] ?? Timestamp.fromDate(now),
+        'isPlanMonthly': isNewMonthly,
+        'queuedSubscriptions': updatedQueue,
+      };
+
+      await _usersCollection.doc(uid).update(updates);
+      debugPrint(
+          'ProfileService: Swapped active subscription to $newPlanName for $uid');
+    } catch (e) {
+      debugPrint('Error switching queued subscription: $e');
+      rethrow;
+    }
+  }
+
   /// Adds sparks to a user's account
   Future<void> addCredits(String uid, int amount) async {
     try {

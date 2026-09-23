@@ -527,4 +527,75 @@ class ProfileProvider with ChangeNotifier, WidgetsBindingObserver {
       rethrow;
     }
   }
+
+  /// Cancels the user's active membership in Firestore and updates local state.
+  Future<void> cancelSubscription({bool clearQueuedSubscriptions = true}) async {
+    final uid = _currentUser?.uid;
+    if (uid == null) return;
+
+    try {
+      await _profileService.cancelSubscription(
+        uid,
+        clearQueuedSubscriptions: clearQueuedSubscriptions,
+      );
+
+      // Local state update for immediate responsiveness
+      if (_userProfile != null) {
+        _userProfile!.isPremium = false;
+        _userProfile!.premiumType = null;
+        _userProfile!.premiumExpiry = null;
+        _userProfile!.premiumPurchasedAt = null;
+        _userProfile!.isPlanMonthly = false;
+        if (clearQueuedSubscriptions) {
+          _userProfile!.queuedSubscriptions = [];
+        }
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('ProfileProvider: Error cancelling subscription: $e');
+      rethrow;
+    }
+  }
+
+  /// Removes a single queued subscription by index
+  Future<void> removeQueuedSubscription(int index) async {
+    final uid = _currentUser?.uid;
+    if (uid == null) return;
+
+    try {
+      await _profileService.removeQueuedSubscription(uid, index);
+      if (_userProfile != null &&
+          index >= 0 &&
+          index < _userProfile!.queuedSubscriptions.length) {
+        _userProfile!.queuedSubscriptions.removeAt(index);
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('ProfileProvider: Error removing queued subscription: $e');
+      rethrow;
+    }
+  }
+
+  /// Swaps the currently active plan with one from the queued list
+  Future<void> switchQueuedSubscription(
+    Map<String, dynamic> selectedPlan,
+    int index,
+  ) async {
+    final uid = _currentUser?.uid;
+    final profile = _userProfile;
+    if (uid == null || profile == null) return;
+
+    try {
+      await _profileService.switchQueuedSubscription(
+        uid,
+        profile,
+        selectedPlan,
+        index,
+      );
+      // Stream updates _userProfile automatically
+    } catch (e) {
+      debugPrint('ProfileProvider: Error switching queued subscription: $e');
+      rethrow;
+    }
+  }
 }
