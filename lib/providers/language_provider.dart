@@ -12,6 +12,8 @@ import '../translations/it_translations.dart';
 import '../translations/ja_translations.dart';
 import '../translations/ko_translations.dart';
 import '../translations/zh_translations.dart';
+import '../translations/ru_translations.dart';
+import '../translations/tr_translations.dart';
 
 class LanguageProvider with ChangeNotifier {
   static const String _languageKey = 'app_language_code';
@@ -33,6 +35,8 @@ class LanguageProvider with ChangeNotifier {
     {'code': 'zh', 'name': '中文'},
     {'code': 'ja', 'name': '日本語'},
     {'code': 'ko', 'name': '한국어'},
+    {'code': 'ru', 'name': 'Russian'},
+    {'code': 'tr', 'name': 'Turkish'},
   ];
 
   LanguageProvider() {
@@ -92,5 +96,7 @@ class LanguageProvider with ChangeNotifier {
     'zh': zhTranslations,
     'ja': jaTranslations,
     'ko': koTranslations,
+    'ru': ruTranslations,
+    'tr': trTranslations,
   };
 }

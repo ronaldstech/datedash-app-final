@@ -1135,6 +1135,39 @@ class ChatService {
     }
   }
 
+  /// Set or clear a reaction on a message (single emoji per user -> toggle).
+  /// Returns the emoji now attached (null if cleared).
+  Future<String?> updateMessageReaction(
+    String chatId,
+    String messageId,
+    String userId,
+    String emoji, {
+    String? currentEmoji,
+  }) async {
+    try {
+      final msgRef = _firestore
+          .collection('chats')
+          .doc(chatId)
+          .collection('messages')
+          .doc(messageId);
+
+      if (emoji == currentEmoji) {
+        await msgRef.update({
+          'reactions.$userId': FieldValue.delete(),
+        });
+        return null;
+      }
+
+      await msgRef.update({
+        'reactions.$userId': emoji,
+      });
+      return emoji;
+    } catch (e) {
+      debugPrint('Error updating reaction: $e');
+      rethrow;
+    }
+  }
+
   /// Stream of a single chat document
   Stream<Chat?> getChatStream(String chatId) {
     return _firestore.collection('chats').doc(chatId).snapshots().map((snap) {

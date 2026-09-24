@@ -68,6 +68,8 @@ class ChatMessage {
       replyToText: data['replyToText'],
       replyToSenderName: data['replyToSenderName'],
       isSuperRequest: isSuper,
+      reactions:
+          Map<String, String>.from(data['reactions'] ?? const {}),
     );
   }
 
@@ -110,6 +112,7 @@ class ChatMessage {
         'replyToId': replyToId,
         'replyToText': replyToText,
         'replyToSenderName': replyToSenderName,
+        'reactions': reactions,
       };
 }
 
