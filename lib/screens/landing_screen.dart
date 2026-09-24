@@ -161,6 +161,17 @@ class _LandingScreenState extends State<LandingScreen>
         final currentIndex = profileProvider.currentTabIndex;
         final selectedCategory = profileProvider.selectedExploreCategory;
 
+        // Paid members (Pro/Premium/Elite) no longer see the Premium nav item
+        final isPaidMember = profileProvider.userProfile?.isPremium ?? false;
+
+        // If the user is a paid member and currently on the premium tab,
+        // redirect them to swipe since the tab is no longer in the nav.
+        if (isPaidMember && currentIndex == 5) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            profileProvider.setTabIndex(0);
+          });
+        }
+
         return Stack(
           children: [
             Scaffold(
@@ -394,14 +405,15 @@ class _LandingScreenState extends State<LandingScreen>
                           currentIndex,
                           profileProvider,
                         ),
-                        _buildNavItem(
-                          5,
-                          Iconsax.crown,
-                          Iconsax.crown5,
-                          languageProvider.getString('nav_premium'),
-                          currentIndex,
-                          profileProvider,
-                        ),
+                        if (!isPaidMember)
+                          _buildNavItem(
+                            5,
+                            Iconsax.crown,
+                            Iconsax.crown5,
+                            languageProvider.getString('nav_premium'),
+                            currentIndex,
+                            profileProvider,
+                          ),
                       ],
                     ),
                   ),

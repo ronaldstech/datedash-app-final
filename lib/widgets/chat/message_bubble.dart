@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../models/chat_model.dart';
 import '../../models/gift_model.dart';
@@ -19,6 +20,18 @@ class MessageBubble extends StatelessWidget {
   final Function(ChatMessage) onReply;
   final Function(ChatMessage)? onEdit;
   final Function(ChatMessage) onDelete;
+  final Function(String emoji)? onReact;
+  final String? currentUserId;
+
+  static const List<String> _emojiRow = [
+    '❤️',
+    '👍',
+    '😂',
+    '😮',
+    '😢',
+    '🔥',
+    '🙏',
+  ];
 
   const MessageBubble({
     super.key,
@@ -32,69 +45,269 @@ class MessageBubble extends StatelessWidget {
     required this.onReply,
     this.onEdit,
     required this.onDelete,
+    this.onReact,
+    this.currentUserId,
   });
 
-  void _showActionMenu(BuildContext context) {
-    showModalBottomSheet(
+  void _showReactionAndActionMenu(BuildContext context) {
+    HapticFeedback.mediumImpact();
+
+    final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+    final Offset bubbleOffset =
+        renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
+    final Size bubbleSize = renderBox?.size ?? const Size(200, 60);
+
+    final mediaQuery = MediaQuery.of(context);
+    final screenSize = mediaQuery.size;
+    final topPadding = mediaQuery.padding.top;
+    final bottomPadding = mediaQuery.padding.bottom;
+
+    const double emojiBarHeight = 52.0;
+    const double menuApproxHeight = 160.0;
+    const double totalOverlayHeight = emojiBarHeight + 8.0 + menuApproxHeight;
+
+    final bool showAbove =
+        (bubbleOffset.dy - topPadding) >= (emojiBarHeight + 30);
+
+    double targetTop;
+    if (showAbove) {
+      if ((bubbleOffset.dy - topPadding) >= totalOverlayHeight + 10) {
+        targetTop = bubbleOffset.dy - totalOverlayHeight - 6;
+      } else {
+        targetTop = bubbleOffset.dy - emojiBarHeight - 8;
+      }
+    } else {
+      targetTop = bubbleOffset.dy + bubbleSize.height + 8;
+    }
+
+    targetTop = targetTop.clamp(
+      topPadding + 10,
+      screenSize.height - bottomPadding - totalOverlayHeight - 10,
+    );
+
+    showGeneralDialog(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+      barrierDismissible: true,
+      barrierLabel: 'Dismiss',
+      barrierColor: Colors.black.withValues(alpha: 0.35),
+      transitionDuration: const Duration(milliseconds: 180),
+      pageBuilder: (dialogCtx, anim1, anim2) {
+        final isDark = Theme.of(dialogCtx).brightness == Brightness.dark;
+        final cardBg = isDark ? const Color(0xFF222228) : Colors.white;
+        final borderColor = isDark ? Colors.white12 : Colors.black12;
+
+        return SafeArea(
+          child: Stack(
             children: [
-              const SizedBox(height: 8),
-              Container(
-                height: 4,
-                width: 40,
-                decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(2),
+              Positioned.fill(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => Navigator.of(dialogCtx).pop(),
+                  child: const SizedBox.expand(),
                 ),
               ),
-              const SizedBox(height: 16),
-              if (isMe && message.messageType == MessageType.text && !message.isDeleted && onEdit != null)
-                ListTile(
-                  leading: const Icon(
-                    Icons.edit_outlined,
-                    color: Color(0xFFFF4D85),
+              Positioned(
+                top: targetTop,
+                left: isMe ? null : 16,
+                right: isMe ? 16 : null,
+                child: Material(
+                  color: Colors.transparent,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment:
+                        isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                    children: [
+                      // Floating Emoji Reaction Bar
+                      Container(
+                        height: emojiBarHeight,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        decoration: BoxDecoration(
+                          color: cardBg,
+                          borderRadius: BorderRadius.circular(26),
+                          border: Border.all(color: borderColor),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.18),
+                              blurRadius: 16,
+                              offset: const Offset(0, 4),
+                              spreadRadius: 1,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: _emojiRow.map((emoji) {
+                            final bool isSelected = currentUserId != null &&
+                                message.reactions[currentUserId] == emoji;
+                            return InkWell(
+                              borderRadius: BorderRadius.circular(20),
+                              onTap: () {
+                                HapticFeedback.lightImpact();
+                                Navigator.of(dialogCtx).pop();
+                                onReact?.call(emoji);
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 150),
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 3,
+                                  vertical: 4,
+                                ),
+                                padding: const EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? const Color(0xFFFF4D85)
+                                          .withValues(alpha: 0.2)
+                                      : Colors.transparent,
+                                  shape: BoxShape.circle,
+                                  border: isSelected
+                                      ? Border.all(
+                                          color: const Color(0xFFFF4D85),
+                                          width: 1.5,
+                                        )
+                                      : null,
+                                ),
+                                child: Text(
+                                  emoji,
+                                  style: TextStyle(
+                                    fontSize: isSelected ? 26 : 24,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      // Actions Menu Card
+                      Container(
+                        width: 190,
+                        decoration: BoxDecoration(
+                          color: cardBg,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: borderColor),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.12),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _buildMenuItem(
+                                icon: Icons.reply_rounded,
+                                iconColor: const Color(0xFFFF4D85),
+                                title: languageProvider.getString('reply'),
+                                onTap: () {
+                                  Navigator.of(dialogCtx).pop();
+                                  onReply(message);
+                                },
+                              ),
+                              if (message.messageType == MessageType.text &&
+                                  message.text.isNotEmpty &&
+                                  !message.isDeleted)
+                                _buildMenuItem(
+                                  icon: Icons.copy_rounded,
+                                  iconColor: Colors.blueAccent,
+                                  title: languageProvider.getString(
+                                    'copy',
+                                  ),
+                                  onTap: () {
+                                    Navigator.of(dialogCtx).pop();
+                                    Clipboard.setData(
+                                      ClipboardData(text: message.text),
+                                    );
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          languageProvider.getString(
+                                            'copied_to_clipboard',
+                                          ),
+                                        ),
+                                        duration: const Duration(seconds: 1),
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              if (isMe &&
+                                  message.messageType == MessageType.text &&
+                                  !message.isDeleted &&
+                                  onEdit != null)
+                                _buildMenuItem(
+                                  icon: Icons.edit_outlined,
+                                  iconColor: const Color(0xFFFF85B3),
+                                  title: languageProvider.getString('edit'),
+                                  onTap: () {
+                                    Navigator.of(dialogCtx).pop();
+                                    onEdit!(message);
+                                  },
+                                ),
+                              if (isMe && !message.isDeleted)
+                                _buildMenuItem(
+                                  icon: Icons.delete_outline_rounded,
+                                  iconColor: Colors.redAccent,
+                                  title: languageProvider.getString('delete'),
+                                  isDestructive: true,
+                                  onTap: () {
+                                    Navigator.of(dialogCtx).pop();
+                                    _confirmDelete(context);
+                                  },
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  title: Text(languageProvider.getString('edit')),
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    onEdit!(message);
-                  },
                 ),
-              if (isMe && !message.isDeleted)
-                ListTile(
-                  leading: const Icon(
-                    Icons.delete_outline,
-                    color: Colors.redAccent,
-                  ),
-                  title: Text(
-                    languageProvider.getString('delete'),
-                    style: const TextStyle(color: Colors.redAccent),
-                  ),
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    _confirmDelete(context);
-                  },
-                ),
-              ListTile(
-                leading: const Icon(Icons.reply_outlined, color: Colors.blue),
-                title: Text(languageProvider.getString('reply')),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  onReply(message);
-                },
               ),
-              const SizedBox(height: 20),
             ],
           ),
+        );
+      },
+      transitionBuilder: (dialogCtx, anim1, anim2, child) {
+        return FadeTransition(
+          opacity: CurvedAnimation(parent: anim1, curve: Curves.easeOut),
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.9, end: 1.0).animate(
+              CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
+            ),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildMenuItem({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: iconColor),
+            const SizedBox(width: 12),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: isDestructive ? Colors.redAccent : null,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -548,6 +761,90 @@ class MessageBubble extends StatelessWidget {
     );
   }
 
+  Widget _buildReactionsBadge(BuildContext context) {
+    if (message.reactions.isEmpty) return const SizedBox.shrink();
+
+    // Count occurrences of each emoji
+    final Map<String, int> counts = {};
+    for (final emoji in message.reactions.values) {
+      counts[emoji] = (counts[emoji] ?? 0) + 1;
+    }
+
+    final bool hasMyReaction = currentUserId != null &&
+        message.reactions.containsKey(currentUserId);
+    final String? myReactionEmoji =
+        currentUserId != null ? message.reactions[currentUserId] : null;
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 3),
+      child: GestureDetector(
+        onTap: () {
+          if (onReact != null &&
+              myReactionEmoji != null &&
+              counts.length == 1 &&
+              counts[myReactionEmoji] == 1) {
+            // Quick toggle off user's reaction
+            onReact!(myReactionEmoji);
+          } else {
+            _showReactionAndActionMenu(context);
+          }
+        },
+        onLongPress: () => _showReactionAndActionMenu(context),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+          decoration: BoxDecoration(
+            color: hasMyReaction
+                ? const Color(0xFFFF4D85).withValues(alpha: isDark ? 0.25 : 0.12)
+                : (isDark ? const Color(0xFF2C2C32) : Colors.white),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: hasMyReaction
+                  ? const Color(0xFFFF4D85).withValues(alpha: 0.6)
+                  : Theme.of(context).dividerColor.withValues(alpha: 0.2),
+              width: hasMyReaction ? 1.2 : 0.8,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 3,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ...counts.keys.take(3).map(
+                    (emoji) => Padding(
+                      padding: const EdgeInsets.only(right: 2),
+                      child: Text(
+                        emoji,
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ),
+                  ),
+              if (message.reactions.length > 1) ...[
+                const SizedBox(width: 2),
+                Text(
+                  '${message.reactions.length}',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: hasMyReaction
+                        ? const Color(0xFFFF4D85)
+                        : (isDark ? Colors.white70 : Colors.black87),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -595,12 +892,14 @@ class MessageBubble extends StatelessWidget {
                 ],
                 Flexible(
                   child: GestureDetector(
-                    onLongPress: () => _showActionMenu(context),
+                    onLongPress: () => _showReactionAndActionMenu(context),
                     child: Column(
                       crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                       children: [
                         if (message.replyToId != null) _buildReplyContext(context),
                         _buildMessageContent(context),
+                        if (message.reactions.isNotEmpty)
+                          _buildReactionsBadge(context),
                         Padding(
                           padding: const EdgeInsets.only(top: 2, left: 4, right: 4),
                           child: Text(

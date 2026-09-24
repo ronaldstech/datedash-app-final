@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:snellum/translations/bn_translations.dart';
+import 'package:snellum/translations/fa_translations.dart';
+import 'package:snellum/translations/he_translations.dart';
+import 'package:snellum/translations/id_translations.dart';
+import 'package:snellum/translations/ms_translations.dart';
+import 'package:snellum/translations/ro_translations.dart';
+import 'package:snellum/translations/th_translations.dart';
+import 'package:snellum/translations/uk_translations.dart';
+import 'package:snellum/translations/vi_translations.dart';
 import '../translations/en_translations.dart';
 import '../translations/sw_translations.dart';
 import '../translations/es_translations.dart';
@@ -14,6 +23,8 @@ import '../translations/ko_translations.dart';
 import '../translations/zh_translations.dart';
 import '../translations/ru_translations.dart';
 import '../translations/tr_translations.dart';
+import '../translations/nl_translations.dart';
+import '../translations/pl_translations.dart';
 
 class LanguageProvider with ChangeNotifier {
   static const String _languageKey = 'app_language_code';
@@ -37,6 +48,17 @@ class LanguageProvider with ChangeNotifier {
     {'code': 'ko', 'name': '한국어'},
     {'code': 'ru', 'name': 'Russian'},
     {'code': 'tr', 'name': 'Turkish'},
+    {'code': 'nl', 'name': 'Dutch'},
+    {'code': 'pl', 'name': 'Polish'},
+    {'code': 'vi', 'name': 'Vietnamese'},
+    {'code': 'th', 'name': 'Thai'},
+    {'code': 'id', 'name': 'Indonesian'},
+    {'code': 'ms', 'name': 'Malay'},
+    {'code': 'fa', 'name': 'Farsi'},
+    {'code': 'he', 'name': 'Hebrew'},
+    {'code': 'bn', 'name': 'Bengali'},
+    {'code': 'uk', 'name': 'Ukrainian'},
+    {'code': 'ro', 'name': 'Romanian'},
   ];
 
   LanguageProvider() {
@@ -98,5 +120,16 @@ class LanguageProvider with ChangeNotifier {
     'ko': koTranslations,
     'ru': ruTranslations,
     'tr': trTranslations,
+    'nl': nlTranslations,
+    'pl': plTranslations,
+    'vi': viTranslations,
+    'th': thTranslations,
+    'id': idTranslations,
+    'ms': msTranslations,
+    'fa': faTranslations,
+    'he': heTranslations,
+    'bn': bnTranslations,
+    'uk': ukTranslations,
+    'ro': roTranslations,
   };
 }

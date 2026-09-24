@@ -175,42 +175,70 @@ class _PremiumScreenState extends State<PremiumScreen>
     'Unlimited voice calls',
   ];
 
+  // Advanced premium discovery filters (unlocked with any paid plan)
+  static const List<String> advancedFilterFeatures = [
+    'Relationship status filter',
+    'Religion filter',
+    'Smoking habits filter',
+    'Drinking habits filter',
+    'Zodiac sign filter',
+    'Education level filter',
+    'Online now only filter',
+    'Kids filter',
+    'Pets filter',
+    'Personality type filter',
+    'Max photos filter',
+    'Must have bio filter',
+    'Family plans filter',
+    'Communication style filter',
+    'Love style filter',
+  ];
+
+  // Elite-only discovery filters
+  static const List<String> eliteFilterFeatures = [
+    'Verified profiles only filter',
+    'Partner country (Green Card) filter',
+  ];
+
   final List<String> premiumFeatures = [
-    'Meet new friends',
-    'Extended Filter',
-    'Looking For',
-    'See everyone\'s online status',
-    'Rewind',
-    '2x more profile views',
-    'Unlimited likes',
-    'See all your matches',
-    'Unlimited messages',
-    'Unlimited voice calls',
-    'Unlimited video calls',
-    'See missed matches',
-    '1 free profile boost per week',
+    ...advancedFilterFeatures,
+    ...[
+      'Meet new friends',
+      'See everyone\'s online status',
+      'Rewind',
+      '2x more profile views',
+      'Unlimited likes',
+      'See all your matches',
+      'Unlimited messages',
+      'Unlimited voice calls',
+      'Unlimited video calls',
+      'See missed matches',
+      '1 free profile boost per week',
+    ],
   ];
 
   final List<String> eliteFeatures = [
-    'Meet new friends',
-    'Extended Filter',
-    'Looking For',
-    'See everyone\'s online status',
-    'Rewind',
-    '2x more profile views',
-    'Unlimited likes',
-    'See all your matches',
-    'Unlimited messages',
-    'Unlimited voice calls',
-    'Unlimited video calls',
-    'See missed matches',
-    '2 free profile boosts',
-    'Get 2000 free sparks',
-    'Hide your age on profile',
-    'Global Green card',
-    'Lock your profile',
-    'Unlimited chat requests',
-    'See who likes and match instantly',
+    ...advancedFilterFeatures,
+    ...eliteFilterFeatures,
+    ...[
+      'Meet new friends',
+      'See everyone\'s online status',
+      'Rewind',
+      '2x more profile views',
+      'Unlimited likes',
+      'See all your matches',
+      'Unlimited messages',
+      'Unlimited voice calls',
+      'Unlimited video calls',
+      'See missed matches',
+      '2 free profile boosts',
+      'Get 2000 free sparks',
+      'Hide your age on profile',
+      'Global Green card',
+      'Lock your profile',
+      'Unlimited chat requests',
+      'See who likes and match instantly',
+    ],
   ];
 
   @override
@@ -932,17 +960,23 @@ class _PremiumScreenState extends State<PremiumScreen>
                     ],
                   ),
                   const SizedBox(height: 8),
-                  // Feature Summary List (limit to 3)
-                  Column(
-                    children: features.take(2).map((feature) {
-                      return _buildFeatureRow(
-                        feature,
-                        isPopular,
-                        accentColor,
-                        isDark,
-                      );
-                    }).toList(),
+                  // Benefit rows fill all available space above the buttons
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        children: features.map((feature) {
+                          return _buildFeatureRow(
+                            feature,
+                            isPopular,
+                            accentColor,
+                            isDark,
+                          );
+                        }).toList(),
+                      ),
+                    ),
                   ),
+                  const SizedBox(height: 8),
                   // See all features button
                   Padding(
                     padding: const EdgeInsets.only(top: 8),

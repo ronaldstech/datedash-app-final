@@ -596,6 +596,8 @@ const Map<String, String> enTranslations = {
   'select_partner_language': 'Select Partner Language',
   'select_partner_country': 'Select Partner Country',
   'reply': 'Reply',
+  'copy': 'Copy',
+  'copied_to_clipboard': 'Copied to clipboard',
   'image_unavailable': 'Image unavailable',
   'you_sent_gift': 'You sent a {gift}!',
   'sent_you_gift': 'Sent you a {gift}!',

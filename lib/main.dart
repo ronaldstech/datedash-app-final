@@ -136,6 +136,7 @@ class _SnellumAppState extends State<SnellumApp> with WidgetsBindingObserver {
 
     return refreshedUser.emailVerified ||
         (profile?.isEmailVerified == true) ||
+        (profile?.isPhoneVerified == true) ||
         isFirestoreVerified;
   }
 

@@ -64,6 +64,7 @@ class UserProfile {
   String? videoIntro;
   bool isVerified;
   bool isEmailVerified;
+  bool isPhoneVerified;
   bool isOnline;
   String? verificationStatus; // 'unverified', 'pending', 'verified'
   String? nationalId;
@@ -193,6 +194,7 @@ class UserProfile {
     this.videoIntro,
     this.isVerified = false,
     this.isEmailVerified = false,
+    this.isPhoneVerified = false,
     this.isOnline = false,
     this.verificationStatus = 'unverified',
     this.nationalId,
@@ -382,6 +384,7 @@ class UserProfile {
         videoIntro: map['videoIntro']?.toString(),
         isVerified: map['isVerified'] == true,
         isEmailVerified: map['isEmailVerified'] == true,
+        isPhoneVerified: map['isPhoneVerified'] == true,
         isOnline: map['isOnline'] == true,
         verificationStatus: map['verificationStatus']?.toString() ?? 'unverified',
         nationalId: map['nationalId']?.toString(),
@@ -527,6 +530,7 @@ class UserProfile {
       'videoIntro': videoIntro,
       'isVerified': isVerified,
       'isEmailVerified': isEmailVerified,
+      'isPhoneVerified': isPhoneVerified,
       'isOnline': isOnline,
       'verificationStatus': verificationStatus,
       'nationalId': nationalId,

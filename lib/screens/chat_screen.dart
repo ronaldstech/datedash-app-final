@@ -1663,6 +1663,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                       MessageBubble(
                                         message: msg,
                                         isMe: isMe,
+                                        currentUserId: _myUid,
                                         isRecipientOnline: isRecipientOnline,
                                         otherUserPhoto: widget.otherUserPhoto,
                                         otherUserId: widget.otherUserId,
@@ -1685,6 +1686,17 @@ class _ChatScreenState extends State<ChatScreen> {
                                           _chatService.deleteMessage(
                                             _chatId,
                                             delMsg.id,
+                                          );
+                                        },
+                                        onReact: (emoji) {
+                                          final currentEmoji =
+                                              msg.reactions[_myUid];
+                                          _chatService.updateMessageReaction(
+                                            _chatId,
+                                            msg.id,
+                                            _myUid,
+                                            emoji,
+                                            currentEmoji: currentEmoji,
                                           );
                                         },
                                       ),
