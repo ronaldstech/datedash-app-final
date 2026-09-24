@@ -90,12 +90,12 @@ class GiftPickerSheet extends StatelessWidget {
 
               return GestureDetector(
                 onTap: () {
-                  if (!canAfford) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Not enough credits!')),
-                    );
-                    return;
-                  }
+              if (!canAfford) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(lp.getString('gift_not_enough_credits'))),
+                );
+                return;
+              }
                   Navigator.pop(context);
                   onSelectGift(gift.name, gift.cost);
                 },

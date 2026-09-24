@@ -1,0 +1,402 @@
+[
+  {
+    "key": "select_language",
+    "val": "'Select Language',"
+  },
+  {
+    "key": "settings_title",
+    "val": "'Settings',"
+  },
+  {
+    "key": "account",
+    "val": "'Account',"
+  },
+  {
+    "key": "my_meetups",
+    "val": "'My Meet Ups',"
+  },
+  {
+    "key": "preferences",
+    "val": "'Preferences',"
+  },
+  {
+    "key": "discovery",
+    "val": "'Discovery',"
+  },
+  {
+    "key": "video_chat",
+    "val": "'Video chat',"
+  },
+  {
+    "key": "support",
+    "val": "'Support',"
+  },
+  {
+    "key": "edit_profile",
+    "val": "'Edit Profile',"
+  },
+  {
+    "key": "edit_profile_sub",
+    "val": "'Change your profile details',"
+  },
+  {
+    "key": "email_settings",
+    "val": "'Email Settings',"
+  },
+  {
+    "key": "email_settings_sub",
+    "val": "'Update your email address',"
+  },
+  {
+    "key": "security",
+    "val": "'Security',"
+  },
+  {
+    "key": "security_sub",
+    "val": "'Password, blocked users',"
+  },
+  {
+    "key": "blocked_users",
+    "val": "'Blocked Users',"
+  },
+  {
+    "key": "night_mode",
+    "val": "'Night Mode',"
+  },
+  {
+    "key": "night_mode_on",
+    "val": "'Dark theme enabled',"
+  },
+  {
+    "key": "night_mode_off",
+    "val": "'Light theme enabled',"
+  },
+  {
+    "key": "language",
+    "val": "'Language',"
+  },
+  {
+    "key": "reset_swipes",
+    "val": "'Reset Swipes',"
+  },
+  {
+    "key": "reset_swipes_sub",
+    "val": "'See previously swiped profiles again',"
+  },
+  {
+    "key": "help_center",
+    "val": "'Help Center',"
+  },
+  {
+    "key": "help_center_sub",
+    "val": "'FAQs and support chat',"
+  },
+  {
+    "key": "terms_of_service",
+    "val": "'Terms of Service',"
+  },
+  {
+    "key": "terms_of_service_sub",
+    "val": "'Legal information',"
+  },
+  {
+    "key": "delete_account",
+    "val": "'Delete Account',"
+  },
+  {
+    "key": "delete_account_sub",
+    "val": "'Permanently remove your profile and data',"
+  },
+  {
+    "key": "wipe_local_data",
+    "val": "'Wipe Local Data',"
+  },
+  {
+    "key": "wipe_local_data_sub",
+    "val": "'Clear offline cache and local database',"
+  },
+  {
+    "key": "wipe_confirm_title",
+    "val": "'Wipe Local Data?',"
+  },
+  {
+    "key": "wipe_confirm_content",
+    "val": "'This will clear all locally stored data including Firestore cache, shared preferences, and the local database. You will need to re-sync with the server.\\n\\nThis action cannot be undone.',"
+  },
+  {
+    "key": "wipe_success",
+    "val": "'Local data wiped successfully!',"
+  },
+  {
+    "key": "wipe_failed",
+    "val": "'Failed to wipe local data.',"
+  },
+  {
+    "key": "signin_title",
+    "val": "'Welcome Back',"
+  },
+  {
+    "key": "signin_sub",
+    "val": "'Sign in to continue your journey',"
+  },
+  {
+    "key": "email",
+    "val": "'Email Address',"
+  },
+  {
+    "key": "password",
+    "val": "'Password',"
+  },
+  {
+    "key": "forgot_password",
+    "val": "'Forgot Password?',"
+  },
+  {
+    "key": "signin_button",
+    "val": "'Sign In',"
+  },
+  {
+    "key": "no_account",
+    "val": "'Don\\'t have an account?',"
+  },
+  {
+    "key": "signup_link",
+    "val": "'Sign Up',"
+  },
+  {
+    "key": "signup_button",
+    "val": "'Sign Up',"
+  },
+  {
+    "key": "or_continue_with",
+    "val": "'Or continue with',"
+  },
+  {
+    "key": "google_signin",
+    "val": "'Continue with Google',"
+  },
+  {
+    "key": "like",
+    "val": "'Like',"
+  },
+  {
+    "key": "pass",
+    "val": "'Pass',"
+  },
+  {
+    "key": "rewind",
+    "val": "'Rewind',"
+  },
+  {
+    "key": "view_profile",
+    "val": "'View Profile',"
+  },
+  {
+    "key": "no_profiles_title",
+    "val": "'You\\'ve seen everyone!',"
+  },
+  {
+    "key": "no_profiles_sub",
+    "val": "'Come back later or refresh to revisit profiles.',"
+  },
+  {
+    "key": "refresh_profiles",
+    "val": "'Refresh Profiles',"
+  },
+  {
+    "key": "finding_matches",
+    "val": "'Finding your matches…',"
+  },
+  {
+    "key": "like_stamp",
+    "val": "'LIKE',"
+  },
+  {
+    "key": "nope_stamp",
+    "val": "'NOPE',"
+  },
+  {
+    "key": "add_photos_now",
+    "val": "'Add Photos Now',"
+  },
+  {
+    "key": "upload_more_photos_title",
+    "val": "'Upload More Photos',"
+  },
+  {
+    "key": "upload_more_photos_sub",
+    "val": "'Add at least 4 photos to your profile to keep swiping, view profiles, and browse photos.',"
+  },
+  {
+    "key": "view_full_profile",
+    "val": "'View Full Profile',"
+  },
+  {
+    "key": "about_me",
+    "val": "'About Me',"
+  },
+  {
+    "key": "quick_facts",
+    "val": "'Quick Facts',"
+  },
+  {
+    "key": "background",
+    "val": "'Background',"
+  },
+  {
+    "key": "lifestyle",
+    "val": "'Lifestyle',"
+  },
+  {
+    "key": "relationship_goals",
+    "val": "'Relationship Goals',"
+  },
+  {
+    "key": "interests_hobbies",
+    "val": "'Interests & Hobbies',"
+  },
+  {
+    "key": "music_taste",
+    "val": "'Music Taste',"
+  },
+  {
+    "key": "personality",
+    "val": "'Personality',"
+  },
+  {
+    "key": "prompts",
+    "val": "'Prompts',"
+  },
+  {
+    "key": "message",
+    "val": "'Message',"
+  },
+  {
+    "key": "height_label",
+    "val": "'Height',"
+  },
+  {
+    "key": "education_label",
+    "val": "'Education',"
+  },
+  {
+    "key": "religion_label",
+    "val": "'Religion',"
+  },
+  {
+    "key": "wants_kids_label",
+    "val": "'Wants Kids',"
+  },
+  {
+    "key": "long_distance_label",
+    "val": "'Long Distance',"
+  },
+  {
+    "key": "body_type_label",
+    "val": "'Body Type',"
+  },
+  {
+    "key": "status_label",
+    "val": "'Status',"
+  },
+  {
+    "key": "school_label",
+    "val": "'School',"
+  },
+  {
+    "key": "want_kids_label",
+    "val": "'Want Kids?',"
+  },
+  {
+    "key": "occupation_label",
+    "val": "'Occupation',"
+  },
+  {
+    "key": "industry_label",
+    "val": "'Industry',"
+  },
+  {
+    "key": "education_level_label",
+    "val": "'Education Level',"
+  },
+  {
+    "key": "introvert_extrovert_label",
+    "val": "'Introvert or Extrovert?',"
+  },
+  {
+    "key": "languages_spoken_label",
+    "val": "'Languages',"
+  },
+  {
+    "key": "smoking_label",
+    "val": "'Smoking',"
+  },
+  {
+    "key": "drinking_label",
+    "val": "'Drinking',"
+  },
+  {
+    "key": "exercise_label",
+    "val": "'Mazoezi',"
+  },
+  {
+    "key": "diet_label",
+    "val": "'Diet',"
+  },
+  {
+    "key": "sleep_label",
+    "val": "'Sleep',"
+  },
+  {
+    "key": "pets_label",
+    "val": "'Pets',"
+  },
+  {
+    "key": "zodiac_label",
+    "val": "'Zodiac Sign',"
+  },
+  {
+    "key": "personality_type_label",
+    "val": "'Personality Type',"
+  },
+  {
+    "key": "social_style_label",
+    "val": "'Social Style',"
+  },
+  {
+    "key": "love_language_label",
+    "val": "'Love Language',"
+  },
+  {
+    "key": "core_values_label",
+    "val": "'Core Values',"
+  },
+  {
+    "key": "notifications",
+    "val": "'Notifications',"
+  },
+  {
+    "key": "notifications_sub",
+    "val": "'Manage your alerts and sounds',"
+  },
+  {
+    "key": "privacy_visibility",
+    "val": "'Privacy & Visibility',"
+  },
+  {
+    "key": "show_age",
+    "val": "'Show Age',"
+  },
+  {
+    "key": "show_age_sub",
+    "val": "'Display your age on your profile',"
+  },
+  {
+    "key": "show_distance",
+    "val": "'Show Distance',"
+  },
+  {
+    "key": "show_distance_sub",
+    "val": "'Display how far you are from others.',"
+  }
+]

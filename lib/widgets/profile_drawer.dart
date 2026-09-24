@@ -157,7 +157,7 @@ class ProfileDrawer extends StatelessWidget {
                           Expanded(
                             child: _buildDrawerTile(
                               context,
-                              title: 'Sparks',
+                              title: languageProvider.getString('sparks_label'),
                               value: (profileProvider.userProfile?.credits ?? 0)
                                   .toString()
                                   .replaceAllMapped(
@@ -177,7 +177,7 @@ class ProfileDrawer extends StatelessWidget {
                           Expanded(
                             child: _buildDrawerTile(
                               context,
-                              title: 'Membership',
+                              title: languageProvider.getString('nav_premium'),
                               value:
                                   profileProvider.userProfile?.isPremium == true
                                   ? (profileProvider.userProfile?.premiumType ?? 'Premium')
@@ -403,7 +403,7 @@ class ProfileDrawer extends StatelessWidget {
                   _buildItem(
                     context,
                     Iconsax.cup,
-                    'Rewards',
+                    languageProvider.getString('rewards'),
                     color: Colors.orangeAccent,
                     onTap: () {
                       Navigator.pop(context);
@@ -431,7 +431,7 @@ class ProfileDrawer extends StatelessWidget {
                   _buildItem(
                     context,
                     Iconsax.flash5,
-                    'Boost Profile',
+                    languageProvider.getString('boost_profile'),
                     color: const Color(0xFFFF9E00),
                     onTap: () {
                       Navigator.pop(context);

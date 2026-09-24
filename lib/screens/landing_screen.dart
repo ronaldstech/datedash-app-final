@@ -398,7 +398,7 @@ class _LandingScreenState extends State<LandingScreen>
                           5,
                           Iconsax.crown,
                           Iconsax.crown5,
-                          'Premium',
+                          languageProvider.getString('nav_premium'),
                           currentIndex,
                           profileProvider,
                         ),

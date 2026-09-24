@@ -1,0 +1,402 @@
+[
+  {
+    "key": "cat_coffee_date",
+    "val": "'Coffee Date',"
+  },
+  {
+    "key": "cat_coffee_date_sub",
+    "val": "'Relaxed vibes',"
+  },
+  {
+    "key": "cat_movie_night",
+    "val": "'Learn Cultures',"
+  },
+  {
+    "key": "cat_movie_night_sub",
+    "val": "'Explore the world',"
+  },
+  {
+    "key": "cat_fitness_duo",
+    "val": "'Fitness Duo',"
+  },
+  {
+    "key": "cat_fitness_duo_sub",
+    "val": "'Gym buddies',"
+  },
+  {
+    "key": "cat_gaming_duo",
+    "val": "'Gaming Duo',"
+  },
+  {
+    "key": "cat_gaming_duo_sub",
+    "val": "'Player 2?',"
+  },
+  {
+    "key": "just_now",
+    "val": "'Just now',"
+  },
+  {
+    "key": "min_ago",
+    "val": "'{n} min ago',"
+  },
+  {
+    "key": "hr_ago",
+    "val": "'{n} hr ago',"
+  },
+  {
+    "key": "yesterday",
+    "val": "'Yesterday',"
+  },
+  {
+    "key": "days_ago",
+    "val": "'{n} days ago',"
+  },
+  {
+    "key": "today",
+    "val": "'Today',"
+  },
+  {
+    "key": "earlier",
+    "val": "'Earlier',"
+  },
+  {
+    "key": "call_cancelled",
+    "val": "'Call Cancelled',"
+  },
+  {
+    "key": "incoming_video_call",
+    "val": "'INCOMING VIDEO CALL',"
+  },
+  {
+    "key": "incoming_voice_call",
+    "val": "'INCOMING VOICE CALL',"
+  },
+  {
+    "key": "decline",
+    "val": "'Decline',"
+  },
+  {
+    "key": "accept",
+    "val": "'Accept',"
+  },
+  {
+    "key": "call_ended",
+    "val": "'Call Ended',"
+  },
+  {
+    "key": "dialing_video_call",
+    "val": "'Dialing Video Call...',"
+  },
+  {
+    "key": "dialing_voice_call",
+    "val": "'Dialing Voice Call...',"
+  },
+  {
+    "key": "mark_all_read",
+    "val": "'Mark all as read',"
+  },
+  {
+    "key": "liked_profile_suffix",
+    "val": "'liked your profile',"
+  },
+  {
+    "key": "missed_call_suffix",
+    "val": "'missed your call',"
+  },
+  {
+    "key": "viewed_profile_suffix",
+    "val": "'viewed your profile',"
+  },
+  {
+    "key": "no_notifications_title",
+    "val": "'Keep it quiet?',"
+  },
+  {
+    "key": "no_notifications_sub",
+    "val": "'New likes and views will appear here',"
+  },
+  {
+    "key": "rewind_confirm_title",
+    "val": "'Rewind Profile',"
+  },
+  {
+    "key": "rewind_confirm_message",
+    "val": "'Spend 100 sparks to rewind and see the last profile again?',"
+  },
+  {
+    "key": "confirm_button",
+    "val": "'Confirm',"
+  },
+  {
+    "key": "get_credits_button",
+    "val": "'Get Sparks',"
+  },
+  {
+    "key": "insufficient_credits_title",
+    "val": "'Insufficient Sparks',"
+  },
+  {
+    "key": "insufficient_credits_message",
+    "val": "'You need at least 100 sparks to rewind. Would you like to get more now?',"
+  },
+  {
+    "key": "unlock_for_credits",
+    "val": "'Unlock for 20 Sparks',"
+  },
+  {
+    "key": "unlock_title",
+    "val": "'Unlock Profile',"
+  },
+  {
+    "key": "unlock_message",
+    "val": "'See who liked you for 20 sparks or upgrade to Premium for unlimited access.',"
+  },
+  {
+    "key": "locked_profile",
+    "val": "'Locked Profile',"
+  },
+  {
+    "key": "edit",
+    "val": "'Edit',"
+  },
+  {
+    "key": "delete",
+    "val": "'Delete',"
+  },
+  {
+    "key": "delete_chat",
+    "val": "'Delete Chat',"
+  },
+  {
+    "key": "delete_chat_title",
+    "val": "'Delete Conversation',"
+  },
+  {
+    "key": "delete_chat_confirm",
+    "val": "'Are you sure you want to delete this chat with {name}? This will remove it from your messages list.',"
+  },
+  {
+    "key": "chat_deleted_snack",
+    "val": "'Chat deleted',"
+  },
+  {
+    "key": "delete_message_title",
+    "val": "'Delete Message',"
+  },
+  {
+    "key": "delete_message_confirm",
+    "val": "'Are you sure you want to delete this message?',"
+  },
+  {
+    "key": "message_deleted",
+    "val": "'This message was deleted',"
+  },
+  {
+    "key": "edited_badge",
+    "val": "'(edited)',"
+  },
+  {
+    "key": "edit_message",
+    "val": "'Edit Message',"
+  },
+  {
+    "key": "insufficient_credits_msg",
+    "val": "'You need 10 sparks to send a message. Upgrade to Premium for unlimited messaging!',"
+  },
+  {
+    "key": "premium_benefit_msg",
+    "val": "'Premium members enjoy unlimited messaging!',"
+  },
+  {
+    "key": "get_credits",
+    "val": "'Get Sparks',"
+  },
+  {
+    "key": "cat_short_term_rel",
+    "val": "'Short Term Relationship',"
+  },
+  {
+    "key": "cat_short_term_rel_sub",
+    "val": "'Something in between',"
+  },
+  {
+    "key": "cat_sponsor",
+    "val": "'Travel the world',"
+  },
+  {
+    "key": "cat_sponsor_sub",
+    "val": "'Let\\'s explore together',"
+  },
+  {
+    "key": "cat_figuring_out",
+    "val": "'Figuring Out',"
+  },
+  {
+    "key": "cat_figuring_out_sub",
+    "val": "'Seeing where it goes',"
+  },
+  {
+    "key": "nudge_send_more_likes",
+    "val": "'Send {count} more likes to get started',"
+  },
+  {
+    "key": "chat_waiting_for_reply",
+    "val": "'Waiting for {name} to accept your request. You can send more messages once they reply.',"
+  },
+  {
+    "key": "chat_waiting_for_reply_hint",
+    "val": "'Waiting for reply...',"
+  },
+  {
+    "key": "message_request_title",
+    "val": "'Message Request',"
+  },
+  {
+    "key": "message_request_desc",
+    "val": "'Do you want to let {name} message you? They won\\'t know you\\'ve seen their message until you accept.',"
+  },
+  {
+    "key": "accept_request",
+    "val": "'Accept',"
+  },
+  {
+    "key": "decline_request",
+    "val": "'Decline',"
+  },
+  {
+    "key": "request_declined",
+    "val": "'Request declined. You cannot send messages.',"
+  },
+  {
+    "key": "booking_section_title",
+    "val": "'Meetup Settings',"
+  },
+  {
+    "key": "verification_status_unverified",
+    "val": "'Verify Identity',"
+  },
+  {
+    "key": "verification_status_unverified_sub",
+    "val": "'Verify with Stripe Identity checks',"
+  },
+  {
+    "key": "verification_status_pending",
+    "val": "'Verification Pending',"
+  },
+  {
+    "key": "verification_status_pending_sub",
+    "val": "'Your ID is being reviewed by Stripe',"
+  },
+  {
+    "key": "verification_status_failed",
+    "val": "'Verification Failed',"
+  },
+  {
+    "key": "verification_status_failed_sub",
+    "val": "'Verification was canceled or declined. Tap to try again.',"
+  },
+  {
+    "key": "verification_status_verified",
+    "val": "'Identity Verified',"
+  },
+  {
+    "key": "verification_status_verified_sub",
+    "val": "'Your identity has been fully confirmed',"
+  },
+  {
+    "key": "national_id_number",
+    "val": "'National ID Number',"
+  },
+  {
+    "key": "full_name_on_id",
+    "val": "'Full Name on ID',"
+  },
+  {
+    "key": "id_document_photo",
+    "val": "'ID Document Photo',"
+  },
+  {
+    "key": "submit_verification",
+    "val": "'Submit for Verification',"
+  },
+  {
+    "key": "verification_submitted_success",
+    "val": "'Verification started successfully!',"
+  },
+  {
+    "key": "use_mock_id",
+    "val": "'Use Mock ID Card',"
+  },
+  {
+    "key": "simulated_admin_panel",
+    "val": "'Simulated Admin Action',"
+  },
+  {
+    "key": "approve_request",
+    "val": "'Approve Request',"
+  },
+  {
+    "key": "reject_request",
+    "val": "'Reject Request',"
+  },
+  {
+    "key": "continue_with_phone",
+    "val": "'Continue with Phone',"
+  },
+  {
+    "key": "verify_phone_code",
+    "val": "'Verify Phone Code',"
+  },
+  {
+    "key": "enter_phone_prompt",
+    "val": "'Enter your registered phone number to receive \\na verification code.',"
+  },
+  {
+    "key": "enter_code_sent_to",
+    "val": "'Enter the 6-digit code sent to \\n{phone}',"
+  },
+  {
+    "key": "send_code",
+    "val": "'Send Code',"
+  },
+  {
+    "key": "verify_and_continue",
+    "val": "'Verify & Continue',"
+  },
+  {
+    "key": "change_phone_number",
+    "val": "'Change Phone Number',"
+  },
+  {
+    "key": "resend_code_sms",
+    "val": "'Resend Code via SMS',"
+  },
+  {
+    "key": "resend_available_in",
+    "val": "'Resend available in {sec}s',"
+  },
+  {
+    "key": "rewards",
+    "val": "'Rewards',"
+  },
+  {
+    "key": "boost_profile",
+    "val": "'Boost Profile',"
+  },
+  {
+    "key": "manage_subscription",
+    "val": "'Manage Subscription',"
+  },
+  {
+    "key": "manage_or_upgrade_plan",
+    "val": "'Manage or Upgrade Plan',"
+  },
+  {
+    "key": "upgrade_to_premium",
+    "val": "'Upgrade to Premium',"
+  },
+  {
+    "key": "active_status",
+    "val": "'ACTIVE',"
+  }
+]

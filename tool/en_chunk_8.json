@@ -1,0 +1,402 @@
+[
+  {
+    "key": "loss_unlimited_likes",
+    "val": "'Unlimited likes & rewind swipes',"
+  },
+  {
+    "key": "loss_video_voice",
+    "val": "'HD video & voice calling privileges',"
+  },
+  {
+    "key": "loss_priority_visibility",
+    "val": "'Priority VIP matching & profile visibility',"
+  },
+  {
+    "key": "error_generic_error",
+    "val": "'Error: {error}',"
+  },
+  {
+    "key": "payment_pending_failed",
+    "val": "'Payment still pending or failed on server.',"
+  },
+  {
+    "key": "verification_error",
+    "val": "'Verification error: {error}',"
+  },
+  {
+    "key": "no_transactions",
+    "val": "'No transactions yet',"
+  },
+  {
+    "key": "sparks_amount",
+    "val": "'{sparkAmount} Sparks',"
+  },
+  {
+    "key": "reverify_payment",
+    "val": "'Re-verify Payment',"
+  },
+  {
+    "key": "plan_pro",
+    "val": "'PRO',"
+  },
+  {
+    "key": "plan_premium",
+    "val": "'PREMIUM',"
+  },
+  {
+    "key": "plan_elite",
+    "val": "'ELITE',"
+  },
+  {
+    "key": "subscriptions_tab",
+    "val": "'Subscriptions',"
+  },
+  {
+    "key": "sparks_tab",
+    "val": "'Sparks',"
+  },
+  {
+    "key": "billing_weekly",
+    "val": "'Weekly',"
+  },
+  {
+    "key": "billing_monthly",
+    "val": "'Monthly',"
+  },
+  {
+    "key": "plan_benefits_title",
+    "val": "'{title} BENEFITS',"
+  },
+  {
+    "key": "back_to_plans",
+    "val": "'BACK TO PLANS',"
+  },
+  {
+    "key": "most_popular",
+    "val": "'MOST POPULAR',"
+  },
+  {
+    "key": "elite_sparks_bonus",
+    "val": "'+2,000 SPARKS',"
+  },
+  {
+    "key": "view_all_benefits",
+    "val": "'View all {count} benefits',"
+  },
+  {
+    "key": "choose_plan",
+    "val": "'Choose Plan',"
+  },
+  {
+    "key": "available_balance",
+    "val": "'AVAILABLE BALANCE',"
+  },
+  {
+    "key": "sparks",
+    "val": "'Sparks',"
+  },
+  {
+    "key": "purchase_sparks",
+    "val": "'Purchase Sparks',"
+  },
+  {
+    "key": "bonus_10000_free",
+    "val": "'10,000 FREE',"
+  },
+  {
+    "key": "best_value_badge",
+    "val": "'BEST VALUE',"
+  },
+  {
+    "key": "confirm_details",
+    "val": "'Confirm Details',"
+  },
+  {
+    "key": "operator_payment",
+    "val": "'{operatorName} Payment',"
+  },
+  {
+    "key": "amount_to_pay",
+    "val": "'Amount to Pay',"
+  },
+  {
+    "key": "phone_hint_airtel",
+    "val": "'09xxxxxxx',"
+  },
+  {
+    "key": "phone_hint_tnm",
+    "val": "'08xxxxxxx',"
+  },
+  {
+    "key": "enter_valid_number",
+    "val": "'Please enter a valid number',"
+  },
+  {
+    "key": "confirm_and_pay",
+    "val": "'Confirm & Pay',"
+  },
+  {
+    "key": "change_payment_method",
+    "val": "'Change payment method',"
+  },
+  {
+    "key": "securely_processing",
+    "val": "'Securely Processing...',"
+  },
+  {
+    "key": "processing_prompt_desc",
+    "val": "'Confirm the payment prompt on your device. This may take a few seconds.',"
+  },
+  {
+    "key": "payment_successful",
+    "val": "'Payment Successful!',"
+  },
+  {
+    "key": "success_elite",
+    "val": "'High five! Your ELITE subscription is active and 2,000 Sparks have been added to your balance!',"
+  },
+  {
+    "key": "success_subscription",
+    "val": "'High five! Your {plan} subscription is now active and ready to go.',"
+  },
+  {
+    "key": "success_sparks_added",
+    "val": "'High five! {sparks} Sparks have been added to your balance!',"
+  },
+  {
+    "key": "sparks_added_badge",
+    "val": "'+{sparks} Sparks Added',"
+  },
+  {
+    "key": "done",
+    "val": "'Done!',"
+  },
+  {
+    "key": "payment_failed",
+    "val": "'Payment Failed',"
+  },
+  {
+    "key": "try_again",
+    "val": "'Try Again',"
+  },
+  {
+    "key": "payment_failed_short",
+    "val": "'Payment failed',"
+  },
+  {
+    "key": "payment_timeout",
+    "val": "'Timeout: Payment verification is taking too long. Please check your balance or contact support.',"
+  },
+  {
+    "key": "select_payment_method",
+    "val": "'Select Payment Method',"
+  },
+  {
+    "key": "choose_operator",
+    "val": "'Choose your preferred mobile money operator',"
+  },
+  {
+    "key": "failed_load_operators",
+    "val": "'Failed to load operators.',"
+  },
+  {
+    "key": "operator_country_currency",
+    "val": "'{countryName} • {currency}',"
+  },
+  {
+    "key": "amount_mwk",
+    "val": "'{price} MWK',"
+  },
+  {
+    "key": "mobile_number",
+    "val": "'Mobile Number',"
+  },
+  {
+    "key": "crop_image",
+    "val": "'Crop Image',"
+  },
+  {
+    "key": "failed_process_image",
+    "val": "'Failed to process image: {error}',"
+  },
+  {
+    "key": "add_caption_hint",
+    "val": "'Add a caption...',"
+  },
+  {
+    "key": "live_stream_default_title",
+    "val": "'Live Stream',"
+  },
+  {
+    "key": "gift_sent_chat_message",
+    "val": "'sent a {giftType}!',"
+  },
+  {
+    "key": "live_you_label",
+    "val": "'You',"
+  },
+  {
+    "key": "live_host_label",
+    "val": "'Host',"
+  },
+  {
+    "key": "live_guest_label",
+    "val": "'Guest',"
+  },
+  {
+    "key": "live_host_tag",
+    "val": "'{hostName} (Host)',"
+  },
+  {
+    "key": "live_cohost_tag",
+    "val": "'{guestName} (Co-host)',"
+  },
+  {
+    "key": "live_camera_off_message",
+    "val": "'{name}\\'s camera is off',"
+  },
+  {
+    "key": "live_fallback_name",
+    "val": "'Live',"
+  },
+  {
+    "key": "live_badge_label",
+    "val": "'LIVE',"
+  },
+  {
+    "key": "live_end_button",
+    "val": "'END',"
+  },
+  {
+    "key": "live_leave_button",
+    "val": "'LEAVE',"
+  },
+  {
+    "key": "live_unmute_label",
+    "val": "'Unmute',"
+  },
+  {
+    "key": "live_mute_label",
+    "val": "'Mute',"
+  },
+  {
+    "key": "live_show_camera_label",
+    "val": "'Show',"
+  },
+  {
+    "key": "live_hide_camera_label",
+    "val": "'Hide',"
+  },
+  {
+    "key": "live_leave_seat_label",
+    "val": "'Leave Seat',"
+  },
+  {
+    "key": "live_remove_guest_label",
+    "val": "'Remove Guest',"
+  },
+  {
+    "key": "live_invite_match_label",
+    "val": "'Invite Match',"
+  },
+  {
+    "key": "live_invite_a_match_title",
+    "val": "'Invite a Match',"
+  },
+  {
+    "key": "live_no_matches_found",
+    "val": "'No matches found. Swipe to get matches first!',"
+  },
+  {
+    "key": "invitation_sent_snack",
+    "val": "'Invitation sent to {match.firstName}!',"
+  },
+  {
+    "key": "invite_button",
+    "val": "'Invite',"
+  },
+  {
+    "key": "say_something_hint",
+    "val": "'Say something…',"
+  },
+  {
+    "key": "gender_option_male",
+    "val": "'Male',"
+  },
+  {
+    "key": "gender_option_female",
+    "val": "'Female',"
+  },
+  {
+    "key": "gender_option_non_binary",
+    "val": "'Non-Binary',"
+  },
+  {
+    "key": "gender_option_other",
+    "val": "'Other',"
+  },
+  {
+    "key": "interested_in_men",
+    "val": "'Men',"
+  },
+  {
+    "key": "interested_in_women",
+    "val": "'Women',"
+  },
+  {
+    "key": "interested_in_everyone",
+    "val": "'Everyone',"
+  },
+  {
+    "key": "relationship_single",
+    "val": "'Single',"
+  },
+  {
+    "key": "relationship_married",
+    "val": "'Married',"
+  },
+  {
+    "key": "relationship_divorced",
+    "val": "'Divorced',"
+  },
+  {
+    "key": "relationship_widowed",
+    "val": "'Widowed',"
+  },
+  {
+    "key": "relationship_separated",
+    "val": "'Separated',"
+  },
+  {
+    "key": "looking_for_marriage",
+    "val": "'Marriage',"
+  },
+  {
+    "key": "looking_for_long_term",
+    "val": "'Long Term Relationship',"
+  },
+  {
+    "key": "looking_for_short_term",
+    "val": "'Short Term Relationship',"
+  },
+  {
+    "key": "looking_for_casual",
+    "val": "'Casual',"
+  },
+  {
+    "key": "looking_for_short_term_fun",
+    "val": "'Short Term Fun',"
+  },
+  {
+    "key": "looking_for_coffee_date",
+    "val": "'Coffee Date',"
+  },
+  {
+    "key": "looking_for_new_friends",
+    "val": "'New Friends',"
+  },
+  {
+    "key": "looking_for_learn_cultures",
+    "val": "'Learn Cultures',"
+  }
+]

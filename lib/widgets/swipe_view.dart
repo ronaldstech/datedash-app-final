@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -1398,10 +1398,10 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'IT\'S A MATCH!',
+              Text(
+                context.read<LanguageProvider>().getString('its_a_match'),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Color(0xFFFF4D85),
                   fontSize: 32,
                   fontWeight: FontWeight.w900,
@@ -1410,7 +1410,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
               ),
               const SizedBox(height: 12),
               Text(
-                'You and ${otherProfile.firstName} liked each other.',
+                context.read<LanguageProvider>().getString('you_and_liked_each_other').replaceAll('{name}', otherProfile.firstName ?? ''),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Colors.white,
@@ -1510,9 +1510,9 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
                   elevation: 8,
                   shadowColor: const Color(0xFFFF4D85).withValues(alpha: 0.4),
                 ),
-                child: const Text(
-                  'SEND A MESSAGE',
-                  style: TextStyle(
+                child: Text(
+                  context.read<LanguageProvider>().getString('send_a_message'),
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1,
@@ -1523,7 +1523,7 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text(
-                  'KEEP SWIPING',
+                  context.read<LanguageProvider>().getString('keep_swiping'),
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.7),
                     fontSize: 14,
@@ -1582,10 +1582,10 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'YOU MISSED A MATCH!',
+              Text(
+                context.read<LanguageProvider>().getString('you_missed_a_match'),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Color(0xFFFF4D85),
                   fontSize: 24,
                   fontWeight: FontWeight.w900,
@@ -1593,10 +1593,10 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
                 ),
               ),
               const SizedBox(height: 12),
-              const Text(
-                'Someone who liked your profile was just passed. They were interested in you!',
+              Text(
+                context.read<LanguageProvider>().getString('missed_match_desc'),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
                   height: 1.5,
@@ -1641,9 +1641,9 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
                         ),
                       ),
                       onPressed: () => Navigator.pop(context),
-                      child: const Text(
-                        'Keep Swiping',
-                        style: TextStyle(
+                      child: Text(
+                        context.read<LanguageProvider>().getString('keep_swiping_title'),
+                        style: const TextStyle(
                           color: Colors.white70,
                           fontWeight: FontWeight.bold,
                         ),
@@ -1675,7 +1675,9 @@ class _SwipeViewState extends State<SwipeView> with TickerProviderStateMixin {
                         }
                       },
                       child: Text(
-                        isPremium ? 'Rewind Match' : 'Unlock Rewind',
+                        isPremium
+                            ? context.read<LanguageProvider>().getString('rewind_match')
+                            : context.read<LanguageProvider>().getString('unlock_rewind'),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),

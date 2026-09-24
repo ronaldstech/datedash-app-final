@@ -86,7 +86,7 @@ class MessageBubble extends StatelessWidget {
                 ),
               ListTile(
                 leading: const Icon(Icons.reply_outlined, color: Colors.blue),
-                title: const Text('Reply'),
+                title: Text(languageProvider.getString('reply')),
                 onTap: () {
                   Navigator.pop(ctx);
                   onReply(message);
@@ -220,8 +220,8 @@ class MessageBubble extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             isMe
-                ? 'You sent a ${message.giftType}!'
-                : 'Sent you a ${message.giftType}!',
+                ? languageProvider.getString('you_sent_gift').replaceAll('{gift}', message.giftType ?? '')
+                : languageProvider.getString('sent_you_gift').replaceAll('{gift}', message.giftType ?? ''),
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -236,7 +236,7 @@ class MessageBubble extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              '${message.giftValue} credits',
+              languageProvider.getString('credits_amount').replaceAll('{n}', '${message.giftValue}'),
               style: const TextStyle(
                 color: Colors.orangeAccent,
                 fontSize: 11,
@@ -449,7 +449,7 @@ class MessageBubble extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Image unavailable',
+                              languageProvider.getString('image_unavailable'),
                               style: TextStyle(
                                 color: Colors.grey.shade600,
                                 fontSize: 12,

@@ -32,6 +32,35 @@ class AppConfig {
       '$payChanguBaseUrl/verify_payment.php';
 
   // ---------------------------------------------------------------------------
+  // Telcomw SMS API & Custom Auth Token
+  // ---------------------------------------------------------------------------
+
+  /// Telcomw SMS API endpoint
+  static const String telcomApiUrl = 'https://telcomw.com/api-v2/send';
+
+  /// Telcomw API Key
+  static const String telcomApiKey = String.fromEnvironment(
+    'TELCOM_API_KEY',
+    defaultValue: '',
+  );
+
+  /// Telcomw Password
+  static const String telcomApiPassword = String.fromEnvironment(
+    'TELCOM_API_PASSWORD',
+    defaultValue: '',
+  );
+
+  /// Telcomw Sender ID
+  static const String telcomSenderId = 'WGIT';
+
+  /// Server endpoint to generate a Firebase Custom Token for verified UID
+  static const String firebaseCustomTokenUrl = String.fromEnvironment(
+    'FIREBASE_CUSTOM_TOKEN_URL',
+    defaultValue:
+        'https://lynxtechmedia.com/ronaldstech/snellum/api/custom_token.php',
+  );
+
+  // ---------------------------------------------------------------------------
   // Email verification backends
   // ---------------------------------------------------------------------------
 

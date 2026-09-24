@@ -27,6 +27,86 @@ class ProfileService {
     }
   }
 
+  /// Looks up a user in Firestore by matching their phone number.
+  /// Handles variations (+265..., 265..., 0...) to ensure robust matching.
+  Future<UserProfile?> findUserByPhoneNumber(String rawPhoneNumber) async {
+    try {
+      final clean = rawPhoneNumber.replaceAll(RegExp(r'[\s\-()]'), '');
+      final candidates = <String>{clean};
+
+      if (clean.startsWith('+265')) {
+        candidates.add(clean.substring(1)); // 265...
+        candidates.add('0${clean.substring(4)}'); // 0...
+      } else if (clean.startsWith('265')) {
+        candidates.add('+$clean'); // +265...
+        candidates.add('0${clean.substring(3)}'); // 0...
+      } else if (clean.startsWith('0')) {
+        candidates.add('+265${clean.substring(1)}');
+        candidates.add('265${clean.substring(1)}');
+      }
+
+      for (final candidate in candidates) {
+        final querySnap = await _usersCollection
+            .where('phoneNumber', isEqualTo: candidate)
+            .limit(1)
+            .get();
+
+        if (querySnap.docs.isNotEmpty) {
+          final doc = querySnap.docs.first;
+          final data = doc.data() as Map<String, dynamic>;
+          data['uid'] = doc.id;
+          return UserProfile.fromMap(data);
+        }
+      }
+      return null;
+    } catch (e) {
+      debugPrint('Error finding user by phone number: $e');
+      return null;
+    }
+  }
+
+  /// Saves 6-digit phone verification OTP directly in the user document
+  Future<void> savePhoneOtp({
+    required String uid,
+    required String code,
+  }) async {
+    try {
+      await _usersCollection.doc(uid).set({
+        'phoneVerificationCode': code,
+        'phoneVerificationUpdatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('Error saving phone OTP: $e');
+      rethrow;
+    }
+  }
+
+  /// Verifies the OTP stored in the user document
+  Future<bool> verifyPhoneOtp({
+    required String uid,
+    required String code,
+  }) async {
+    try {
+      final doc = await _usersCollection.doc(uid).get();
+      if (!doc.exists || doc.data() == null) return false;
+
+      final data = doc.data() as Map<String, dynamic>;
+      final savedCode = data['phoneVerificationCode']?.toString();
+
+      if (savedCode != null && savedCode.trim() == code.trim()) {
+        // Clear the OTP code after successful verification
+        await _usersCollection.doc(uid).update({
+          'phoneVerificationCode': FieldValue.delete(),
+        });
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('Error verifying phone OTP: $e');
+      return false;
+    }
+  }
+
   /// Saves or updates a UserProfile in Firestore
   Future<void> saveUserProfile(String uid, UserProfile profile) async {
     try {

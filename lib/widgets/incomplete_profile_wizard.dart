@@ -407,6 +407,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
   }
 
   void _showCountryPicker(BuildContext context) {
+    final lp = context.read<LanguageProvider>();
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -441,9 +442,9 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Select Your Country',
-                    style: TextStyle(
+                  Text(
+                    lp.getString('select_your_country'),
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
                       color: Colors.black87,
@@ -460,7 +461,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                       },
                       style: const TextStyle(fontSize: 14),
                       decoration: InputDecoration(
-                        hintText: 'Search country...',
+                        hintText: lp.getString('search_country_hint'),
                         hintStyle: const TextStyle(color: Colors.black38),
                         prefixIcon: const Icon(Iconsax.search_normal, size: 18),
                         filled: true,
@@ -525,11 +526,12 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
   }
 
   Widget _buildCountrySelector() {
+    final lp = context.read<LanguageProvider>();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Your Location / Country',
+          lp.getString('your_country_location'),
           style: TextStyle(
             color: Colors.black.withValues(alpha: 0.8),
             fontSize: 14,
@@ -559,7 +561,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    _selectedCountry ?? 'Select your country',
+                    _selectedCountry ?? lp.getString('select_country_hint'),
                     style: TextStyle(
                       color: _selectedCountry != null
                           ? Colors.black87
@@ -675,10 +677,13 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
       if (!mounted) return;
       final newCompletion = profile.completionPercentage;
       if (newCompletion < 40) {
+        final lp = context.read<LanguageProvider>();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Your profile is currently $newCompletion% complete. Upload more details or photos to reach 40%!',
+              lp
+                  .getString('profile_completion_alert')
+                  .replaceAll('{n}', newCompletion.toString()),
             ),
             backgroundColor: _primaryColor,
           ),
@@ -701,9 +706,10 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
     final List<String> photos = List<String>.from(widget.profile.photos);
     int remainingSlots = 6 - photos.length;
     if (remainingSlots <= 0) {
+      final lp = context.read<LanguageProvider>();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('You can only have up to 6 photos in the wizard.'),
+        SnackBar(
+          content: Text(lp.getString('max_6_photos_wizard')),
           backgroundColor: Colors.red,
         ),
       );
@@ -956,7 +962,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
           initialValue: hasCustomValue ? normalizedValue : null,
           style: const TextStyle(color: Colors.black87, fontSize: 16),
           decoration: InputDecoration(
-            hintText: hint ?? 'Or type your own',
+            hintText: hint ?? context.read<LanguageProvider>().getString('or_type_own'),
             hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.35)),
             prefixIcon: Icon(
               Iconsax.edit_2,
@@ -1285,14 +1291,15 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
   }
 
   Widget _buildPhotoUploadGrid() {
+    final lp = context.read<LanguageProvider>();
     final photos = widget.profile.photos;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Upload Photos',
-          style: TextStyle(
+        Text(
+          lp.getString('upload_photos'),
+          style: const TextStyle(
             color: Colors.black87,
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -1300,7 +1307,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
         ),
         const SizedBox(height: 6),
         Text(
-          'Upload up to 6 high-quality photos. Adding photos significantly boosts your completion score.',
+          lp.getString('upload_photos_wizard_desc'),
           style: TextStyle(
             color: Colors.black.withValues(alpha: 0.5),
             fontSize: 13,
@@ -1317,7 +1324,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Uploading selected photos...',
+                lp.getString('uploading_photos_progress'),
                 style: TextStyle(
                   color: Colors.black.withValues(alpha: 0.5),
                   fontSize: 12,
@@ -1438,9 +1445,9 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Setup Profile',
-                    style: TextStyle(
+                  Text(
+                    lp.getString('setup_profile'),
+                    style: const TextStyle(
                       color: Colors.black87,
                       fontSize: 22,
                       fontWeight: FontWeight.w900,
@@ -1449,7 +1456,10 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Step ${_currentPage + 1} of 7',
+                    lp
+                        .getString('step_n_of_total')
+                        .replaceAll('{step}', (_currentPage + 1).toString())
+                        .replaceAll('{total}', '7'),
                     style: TextStyle(
                       color: Colors.black.withValues(alpha: 0.5),
                       fontSize: 13,
@@ -1484,7 +1494,9 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                         ),
                         const SizedBox(width: 6),
                     Text(
-                      'Score: ${widget.completion}%',
+                      lp
+                          .getString('score_n')
+                          .replaceAll('{n}', widget.completion.toString()),
                       style: const TextStyle(
                         color: Colors.black87,
                             fontSize: 12,
@@ -1762,15 +1774,15 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                             children: [
                               // PAGE 1: Basics (Name & DOB)
                               _buildWizardPage(
-                                title: 'The Basics',
-                                subtitle: 'Introduce yourself to the community',
+                                title: languageProvider.getString('the_basics'),
+                                subtitle: languageProvider.getString('the_basics_sub'),
                                 children: [
                                   _buildTextInput(
                                     label: languageProvider.getString(
                                       'username_label',
                                     ),
                                     controller: _firstNameController,
-                                    hint: 'Enter your first name',
+                                    hint: languageProvider.getString('enter_first_name'),
                                     icon: Iconsax.user,
                                   ),
                                   const SizedBox(height: 24),
@@ -1789,9 +1801,8 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                               ),
                               // PAGE 2: Identity & Vibe
                               _buildWizardPage(
-                                title: 'Identity',
-                                subtitle:
-                                    'Who are you and who matches your vibe?',
+                                title: languageProvider.getString('identity_title'),
+                                subtitle: languageProvider.getString('identity_sub'),
                                 children: [
                                   _buildCustomSelectGrid(
                                     label: languageProvider.getString(
@@ -1852,9 +1863,8 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                               ),
                               // PAGE 3: Status & Goals
                               _buildWizardPage(
-                                title: 'Goals & Status',
-                                subtitle:
-                                    'What are you looking for on Snellum?',
+                                title: languageProvider.getString('goals_status_title'),
+                                subtitle: languageProvider.getString('goals_status_sub'),
                                 children: [
                                   _buildCustomSelectGrid(
                                     label: languageProvider.getString(
@@ -1891,7 +1901,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                                   ),
                                   const SizedBox(height: 24),
                                   _buildCustomSelectGrid(
-                                    label: 'Looking For',
+                                    label: languageProvider.getString('looking_for'),
                                     value: _selectedLookingFor,
                                     items: const [
                                       _SelectCardItem(
@@ -1946,9 +1956,8 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                               ),
                               // PAGE 4: Habits & Lifestyle
                               _buildWizardPage(
-                                title: 'Habits & Lifestyle',
-                                subtitle:
-                                    'Help matches understand your daily habits',
+                                title: languageProvider.getString('habits_lifestyle_title'),
+                                subtitle: languageProvider.getString('habits_lifestyle_sub'),
                                 children: [
                                   _buildCustomSelectGrid(
                                     label: languageProvider.getString(
@@ -2037,8 +2046,8 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                               ),
                               // PAGE 5: Details & Star Sign
                               _buildWizardPage(
-                                title: 'Personality & Vibe',
-                                subtitle: 'What makes you unique?',
+                                title: languageProvider.getString('personality_vibe_title'),
+                                subtitle: languageProvider.getString('personality_vibe_sub'),
                                 children: [
                                   _buildCustomSelectGrid(
                                     label: languageProvider.getString(
@@ -2180,9 +2189,8 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                               ),
                               // PAGE 6: Bio & Location
                               _buildWizardPage(
-                                title: 'Tell Us More',
-                                subtitle:
-                                    'Where do you live and what is your story?',
+                                title: languageProvider.getString('tell_us_more_title'),
+                                subtitle: languageProvider.getString('tell_us_more_sub'),
                                 children: [
                                   _buildCountrySelector(),
                                   const SizedBox(height: 24),
@@ -2238,7 +2246,7 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                                       'bio_about_label',
                                     ),
                                     controller: _bioController,
-                                    hint: 'Tell us a bit about who you are...',
+                                    hint: languageProvider.getString('bio_hint'),
                                     maxLines: 4,
                                     icon: Iconsax.note_2,
                                   ),
@@ -2246,8 +2254,8 @@ class _IncompleteProfileWizardState extends State<IncompleteProfileWizard> {
                               ),
                               // PAGE 7: Photo upload
                               _buildWizardPage(
-                                title: 'Photos',
-                                subtitle: 'Show off your best angles!',
+                                title: languageProvider.getString('photos_title'),
+                                subtitle: languageProvider.getString('photos_sub'),
                                 children: [_buildPhotoUploadGrid()],
                               ),
                             ],

@@ -1,0 +1,402 @@
+[
+  {
+    "key": "hide_profile",
+    "val": "'Hide Profile',"
+  },
+  {
+    "key": "hide_profile_sub",
+    "val": "'Temporarily hide your profile from search & discovery',"
+  },
+  {
+    "key": "allow_messages_label",
+    "val": "'Allow Messages',"
+  },
+  {
+    "key": "allow_messages_sub",
+    "val": "'Receive direct messages from other users.',"
+  },
+  {
+    "key": "allow_bookings_label",
+    "val": "'Allow Meetup Requests',"
+  },
+  {
+    "key": "allow_bookings_sub",
+    "val": "'Let other users send you meetup requests.',"
+  },
+  {
+    "key": "booking_preferences",
+    "val": "'Meetup Details',"
+  },
+  {
+    "key": "booking_details",
+    "val": "'Edit Meetup Details',"
+  },
+  {
+    "key": "booking_details_sub",
+    "val": "'Set your location, and rules for meetups.',"
+  },
+  {
+    "key": "booking_details_hint",
+    "val": "'These details will be shown to users who want to meet with you.',"
+  },
+  {
+    "key": "booking_location_label",
+    "val": "'Preferred Location',"
+  },
+  {
+    "key": "booking_rate_label",
+    "val": "'Requirements',"
+  },
+  {
+    "key": "booking_notes_label",
+    "val": "'Rules & Notes',"
+  },
+  {
+    "key": "my_bookings",
+    "val": "'My Meetups',"
+  },
+  {
+    "key": "reset_swipes_title",
+    "val": "'Reset Swipes',"
+  },
+  {
+    "key": "reset_swipes_content",
+    "val": "'This will clear your \"Pass\" history. You will see users you passed on again, but your \"Likes\" will remain.\\n\\nThis action cannot be undone.',"
+  },
+  {
+    "key": "cancel",
+    "val": "'Cancel',"
+  },
+  {
+    "key": "reset",
+    "val": "'Reset',"
+  },
+  {
+    "key": "swipes_reset_success",
+    "val": "'Swipes reset! Fresh profiles are loading.',"
+  },
+  {
+    "key": "swipes_reset_failed",
+    "val": "'Failed to reset swipes. Please try again.',"
+  },
+  {
+    "key": "photo_lock_snack",
+    "val": "'Upload at least 4 photos to browse more pictures!',"
+  },
+  {
+    "key": "upload_label",
+    "val": "'Upload',"
+  },
+  {
+    "key": "messages_disabled_snack",
+    "val": "'This user has disabled direct messaging.',"
+  },
+  {
+    "key": "refresh_cost_title",
+    "val": "'Confirm Refresh',"
+  },
+  {
+    "key": "refresh_cost_content",
+    "val": "'Refreshing profiles costs 50 sparks. Your current balance is {credits} sparks.',"
+  },
+  {
+    "key": "not_enough_credits",
+    "val": "'Not enough sparks. Please top up to refresh profiles.',"
+  },
+  {
+    "key": "pay_refresh",
+    "val": "'Pay 50 Sparks',"
+  },
+  {
+    "key": "send_gift",
+    "val": "'Send Gift',"
+  },
+  {
+    "key": "gift_sent_success",
+    "val": "'Gift sent successfully!',"
+  },
+  {
+    "key": "select_gift",
+    "val": "'Select a Gift',"
+  },
+  {
+    "key": "received_gift_suffix",
+    "val": "'sent you a gift!',"
+  },
+  {
+    "key": "signup_title",
+    "val": "'Create Account',"
+  },
+  {
+    "key": "signup_sub",
+    "val": "'Join Snellum and find your perfect match',"
+  },
+  {
+    "key": "full_name",
+    "val": "'Full Name',"
+  },
+  {
+    "key": "already_have_account",
+    "val": "'Already have an account?',"
+  },
+  {
+    "key": "register_with",
+    "val": "'Or register with',"
+  },
+  {
+    "key": "fill_all_fields",
+    "val": "'Please fill all fields',"
+  },
+  {
+    "key": "likes_label",
+    "val": "'Likes',"
+  },
+  {
+    "key": "visitors_label",
+    "val": "'Visitors',"
+  },
+  {
+    "key": "matches_label",
+    "val": "'Matches',"
+  },
+  {
+    "key": "account_section",
+    "val": "'Account',"
+  },
+  {
+    "key": "my_profile",
+    "val": "'My Profile',"
+  },
+  {
+    "key": "settings_label",
+    "val": "'Settings',"
+  },
+  {
+    "key": "discovery_section",
+    "val": "'Discovery',"
+  },
+  {
+    "key": "explore_people",
+    "val": "'Explore People',"
+  },
+  {
+    "key": "activity_section",
+    "val": "'Activity',"
+  },
+  {
+    "key": "blog",
+    "val": "'Blog',"
+  },
+  {
+    "key": "live_videos",
+    "val": "'Video Chat',"
+  },
+  {
+    "key": "finance_section",
+    "val": "'Finance',"
+  },
+  {
+    "key": "go_premium",
+    "val": "'Go Premium',"
+  },
+  {
+    "key": "my_credits",
+    "val": "'My Sparks',"
+  },
+  {
+    "key": "gifts",
+    "val": "'Gifts',"
+  },
+  {
+    "key": "transactions",
+    "val": "'Transactions',"
+  },
+  {
+    "key": "appearance_section",
+    "val": "'Appearance',"
+  },
+  {
+    "key": "support_section",
+    "val": "'Support',"
+  },
+  {
+    "key": "about_us",
+    "val": "'About Us',"
+  },
+  {
+    "key": "safety_tips",
+    "val": "'Safety Tips',"
+  },
+  {
+    "key": "logout",
+    "val": "'Logout',"
+  },
+  {
+    "key": "logout_sub",
+    "val": "'Sign out of your account',"
+  },
+  {
+    "key": "light_mode",
+    "val": "'Light Mode',"
+  },
+  {
+    "key": "dark_mode",
+    "val": "'Dark Mode',"
+  },
+  {
+    "key": "nav_swipe",
+    "val": "'Swipe',"
+  },
+  {
+    "key": "nav_explore",
+    "val": "'Explore',"
+  },
+  {
+    "key": "nav_likes",
+    "val": "'Likes',"
+  },
+  {
+    "key": "nav_chat",
+    "val": "'Chat',"
+  },
+  {
+    "key": "nav_video",
+    "val": "'Video',"
+  },
+  {
+    "key": "profile_needs_attention",
+    "val": "'Profile Needs Attention',"
+  },
+  {
+    "key": "profile_completion_sub",
+    "val": "'Your profile is currently {completion}% complete. You need to complete your profile past 40% before you can start matching, chatting, and exploring!',"
+  },
+  {
+    "key": "complete_profile_button",
+    "val": "'Complete Profile',"
+  },
+  {
+    "key": "signout_label",
+    "val": "'Sign Out',"
+  },
+  {
+    "key": "unread_notifications",
+    "val": "'Notifications',"
+  },
+  {
+    "key": "join_community",
+    "val": "'Join the community',"
+  },
+  {
+    "key": "signin_to_see_likes",
+    "val": "'Please sign in to see likes',"
+  },
+  {
+    "key": "all_likes",
+    "val": "'All Likes',"
+  },
+  {
+    "key": "new_likes",
+    "val": "'New Likes',"
+  },
+  {
+    "key": "no_likes_yet",
+    "val": "'No likes yet',"
+  },
+  {
+    "key": "keep_swiping_matches",
+    "val": "'Keep swiping to find matches!',"
+  },
+  {
+    "key": "someone_fallback",
+    "val": "'Someone',"
+  },
+  {
+    "key": "visitors_header",
+    "val": "'Recent Viewers',"
+  },
+  {
+    "key": "no_visitors_yet",
+    "val": "'No views yet',"
+  },
+  {
+    "key": "no_visitors_sub",
+    "val": "'People who visited your profile will appear here.',"
+  },
+  {
+    "key": "messages_title",
+    "val": "'Messages',"
+  },
+  {
+    "key": "no_messages_yet",
+    "val": "'No messages yet',"
+  },
+  {
+    "key": "no_messages_sub",
+    "val": "'Your conversations will appear here.',"
+  },
+  {
+    "key": "search_hint",
+    "val": "'Search...',"
+  },
+  {
+    "key": "signin_to_view_messages",
+    "val": "'Please sign in to view messages',"
+  },
+  {
+    "key": "failed_load_messages",
+    "val": "'Failed to load messages',"
+  },
+  {
+    "key": "retry_button",
+    "val": "'Retry',"
+  },
+  {
+    "key": "no_conversations_yet",
+    "val": "'No conversations yet',"
+  },
+  {
+    "key": "no_conversations_sub",
+    "val": "'Like someone to start a conversation',"
+  },
+  {
+    "key": "new_matches_header",
+    "val": "'New Matches',"
+  },
+  {
+    "key": "no_matches_yet_sub",
+    "val": "'No matches yet. Keep swiping!',"
+  },
+  {
+    "key": "recent_messages_header",
+    "val": "'Recent Messages',"
+  },
+  {
+    "key": "say_hello",
+    "val": "'Say hello!',"
+  },
+  {
+    "key": "you_prefix",
+    "val": "'You:',"
+  },
+  {
+    "key": "user_fallback",
+    "val": "'User',"
+  },
+  {
+    "key": "welcome_back",
+    "val": "'Welcome back!',"
+  },
+  {
+    "key": "profile_complete_title",
+    "val": "'Profile Complete!',"
+  },
+  {
+    "key": "complete_your_profile",
+    "val": "'Complete Your Profile',"
+  },
+  {
+    "key": "tap_update_details",
+    "val": "'Tap here to update your details',"
+  }
+]

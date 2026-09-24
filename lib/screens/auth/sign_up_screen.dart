@@ -6,7 +6,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../widgets/social_login_button.dart';
 import '../../services/auth_service.dart';
-import '../../services/email_verification_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
@@ -28,7 +27,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String _phoneNumber = '';
   String _detectedCountryCode = 'US';
   final _authService = AuthService();
-  final _emailVerificationService = EmailVerificationService();
   bool _isLoading = false;
 
   @override
@@ -105,9 +103,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // 1. Send verification code
-      await _emailVerificationService.requestCode(email, recipientName: name);
-
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -115,12 +110,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
           behavior: SnackBarBehavior.floating,
           backgroundColor: const Color(0xFF111827),
           content: Text(
-            'Verification code sent to $email. Check your inbox and spam folder.',
+            'Verification code sent to $email. Check your inbox.',
           ),
         ),
       );
 
-      // 2. Navigate to dedicated VerifyEmailScreen
+      // Navigate to dedicated VerifyEmailScreen
       Navigator.push(
         context,
         MaterialPageRoute(

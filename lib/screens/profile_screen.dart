@@ -111,7 +111,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           color: isDarkMode ? Colors.white24 : Colors.black12,
                         ),
                       ),
-                      child: const Text('Cancel'),
+                      child: Consumer<LanguageProvider>(
+                        builder: (_, lp, __) => Text(lp.getString('cancel')),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -127,9 +129,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      child: const Text(
-                        'Activate Now',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      child: Consumer<LanguageProvider>(
+                        builder: (_, lp, __) => Text(
+                          lp.getString('activate_now'),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ),
@@ -763,7 +767,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
                                       const SizedBox(width: 6),
                                       Text(
-                                        'Purchased on',
+                                        languageProvider.getString('purchased_on'),
                                         style: TextStyle(
                                           fontSize: 12,
                                           color: Theme.of(context).hintColor,
@@ -795,7 +799,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
-                                      'Expires at',
+                                      languageProvider.getString('expires_at'),
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: Theme.of(context).hintColor,
@@ -867,7 +871,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ],
                             ),
                             Text(
-                              'Tap Activate to switch',
+                              languageProvider.getString('tap_activate_switch'),
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
@@ -976,22 +980,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ),
                                         ],
                                       ),
-                                      child: const Row(
+                                      child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Icon(
+                                          const Icon(
                                             Iconsax.flash_1,
                                             size: 11,
                                             color: Colors.white,
                                           ),
-                                          SizedBox(width: 4),
-                                          Text(
-                                            'Activate',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w800,
-                                              letterSpacing: 0.2,
+                                          const SizedBox(width: 4),
+                                          Consumer<LanguageProvider>(
+                                            builder: (_, lp, __) => Text(
+                                              lp.getString('activate'),
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w800,
+                                                letterSpacing: 0.2,
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -1047,9 +1053,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        isActive
-                            ? 'Manage or Upgrade Plan'
-                            : 'Upgrade to Premium',
+                      languageProvider.getString(
+                          isActive ? 'manage_or_upgrade_plan' : 'upgrade_to_premium'),
                         style: TextStyle(
                           color: isActive ? planAccentColor : _primaryColor,
                           fontWeight: FontWeight.w800,
@@ -1425,14 +1430,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     size: 20,
                   ),
                 ),
-                title: const Text(
-                  'Boost Profile',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                title: Text(
+                  languageProvider.getString('boost_profile'),
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
                 ),
                 subtitle: Text(
                   isBoosted && boostExpiry != null
-                      ? '⚡ Active until ${boostExpiry.day}/${boostExpiry.month}/${boostExpiry.year}'
-                      : 'Get 10x more visibility',
+                      ? languageProvider.getString('boost_profile_active')
+                          .replaceAll('{date}', '${boostExpiry.day}/${boostExpiry.month}/${boostExpiry.year}')
+                      : languageProvider.getString('boost_profile_sub'),
                   style: TextStyle(
                     fontSize: 12,
                     color: isBoosted
@@ -1466,8 +1472,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ? '$planName Subscription'
                     : languageProvider.getString('get_premium'),
                 subtitle: isPremium
-                    ? 'Active Plan • Manage or Upgrade'
-                    : languageProvider.getString('my_credits'),
+                    ? languageProvider.getString('active_plan_manage')
+                    : languageProvider.getString('go_premium_sub'),
                 color: const Color(0xFFFFB300),
                 onTap: () => Navigator.push(
                   context,

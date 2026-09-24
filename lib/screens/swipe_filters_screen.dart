@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:iconsax/iconsax.dart';
 import '../providers/profile_provider.dart';
+import '../providers/language_provider.dart';
 import 'premium_screen.dart';
 
 class SwipeFiltersScreen extends StatefulWidget {
@@ -219,8 +220,9 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
       }
     } catch (e) {
       if (mounted) {
+        final lp = context.read<LanguageProvider>();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving filters: $e')),
+          SnackBar(content: Text(lp.getString('error_saving_filters').replaceAll('{e}', e.toString()))),
         );
         setState(() => _isSaving = false);
       }
@@ -249,6 +251,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
       context: context,
       builder: (BuildContext context) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
+        final lp = context.watch<LanguageProvider>();
         return Dialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -271,7 +274,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  '$tierName Feature',
+                  lp.getString('feature_exclusive').replaceAll('{tier}', tierName),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 20,
@@ -281,7 +284,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Advanced filters are exclusive to $tierName members. Upgrade your plan to get unlimited access and unlock $tierName filters!',
+                  lp.getString('feature_exclusive_desc').replaceAll('{tier}', tierName),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -302,7 +305,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                           ),
                         ),
                         child: Text(
-                          'Maybe Later',
+                          lp.getString('maybe_later'),
                           style: TextStyle(
                             color: isDark ? Colors.white60 : Colors.black54,
                             fontWeight: FontWeight.w700,
@@ -331,9 +334,9 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                             borderRadius: BorderRadius.circular(14),
                           ),
                         ),
-                        child: const Text(
-                          'Upgrade',
-                          style: TextStyle(
+                        child: Text(
+                          lp.getString('upgrade'),
+                          style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w800,
                           ),
@@ -553,6 +556,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
     final profileProvider = context.watch<ProfileProvider>();
     final isPremium = profileProvider.userProfile?.isPremium ?? false;
     final isElite = profileProvider.userProfile?.isElite ?? false;
+    final lp = context.watch<LanguageProvider>();
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
@@ -589,9 +593,9 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Discovery Filters',
-                      style: TextStyle(
+                    Text(
+                      lp.getString('discovery_filters'),
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
                         letterSpacing: -0.5,
@@ -619,7 +623,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       // 1. Basic discovery filters
-                      _buildSectionHeader('Basic Demographics'),
+                      _buildSectionHeader(lp.getString('basic_demographics')),
                       
                       // Show me Gender card
                       _buildGroupCard(
@@ -630,9 +634,9 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                               children: [
                                 Icon(Iconsax.profile_2user, size: 18, color: _primaryColor),
                                 const SizedBox(width: 8),
-                                const Text(
-                                  'Show me',
-                                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                                Text(
+                                  lp.getString('show_me'),
+                                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
@@ -680,7 +684,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                       // Looking For card
                       _buildDropdownCard(
                         icon: Iconsax.search_status,
-                        title: 'Looking For',
+                        title: lp.getString('looking_for'),
                         value: _lookingFor,
                         items: _lookingForOptions,
                         onChanged: (val) => setState(() => _lookingFor = val),
@@ -699,9 +703,9 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                                   children: [
                                     Icon(Iconsax.calendar_1, size: 18, color: _primaryColor),
                                     const SizedBox(width: 8),
-                                    const Text(
-                                      'Age Range',
-                                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                                    Text(
+                                      lp.getString('age_range'),
+                                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                                     ),
                                   ],
                                 ),
@@ -746,8 +750,8 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                             ),
                             Divider(color: isDark ? Colors.white12 : Colors.black12, height: 24),
                             _buildToggleRow(
-                              title: 'Strict Age Match',
-                              subtitle: "We'll slip in a few outliers if you run out.",
+                              title: lp.getString('strict_age_match'),
+                              subtitle: lp.getString('strict_age_sub'),
                               value: _ageStrict,
                               activeColor: _primaryColor,
                               onChanged: (val) => setState(() => _ageStrict = val),
@@ -768,9 +772,9 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                                   children: [
                                     Icon(Iconsax.location, size: 18, color: _secondaryColor),
                                     const SizedBox(width: 8),
-                                    const Text(
-                                      'Maximum Distance',
-                                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                                    Text(
+                                      lp.getString('maximum_distance'),
+                                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                                     ),
                                   ],
                                 ),
@@ -814,8 +818,8 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                             ),
                             Divider(color: isDark ? Colors.white12 : Colors.black12, height: 24),
                             _buildToggleRow(
-                              title: 'Strict Distance Match',
-                              subtitle: "We'll suggest folks further away if you run out.",
+                              title: lp.getString('strict_distance_match'),
+                              subtitle: lp.getString('strict_distance_sub'),
                               value: _distanceStrict,
                               activeColor: _secondaryColor,
                               onChanged: (val) => setState(() => _distanceStrict = val),
@@ -827,12 +831,12 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                       const SizedBox(height: 12),
                       
                       // 2. Advanced Premium filters
-                      _buildSectionHeader('Premium Advanced Filters'),
+                      _buildSectionHeader(lp.getString('premium_advanced_filters')),
 
                       // Relationship Goal
                       _buildDropdownCard(
                         icon: Icons.favorite_rounded,
-                        title: 'Relationship Status',
+                        title: lp.getString('relationship_status'),
                         value: _relationshipStatus,
                         items: _relationshipStatusOptions,
                         onChanged: (val) => setState(() => _relationshipStatus = val),
@@ -843,7 +847,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                       // Religion
                       _buildDropdownCard(
                         icon: Icons.menu_book_rounded,
-                        title: 'Religion / Beliefs',
+                        title: lp.getString('religion_beliefs'),
                         value: _religion,
                         items: _religionOptions,
                         onChanged: (val) => setState(() => _religion = val),
@@ -854,7 +858,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                       // Smoking
                       _buildDropdownCard(
                         icon: Icons.smoking_rooms_rounded,
-                        title: 'Smoking Habits',
+                        title: lp.getString('smoking_habits'),
                         value: _smoking,
                         items: _habitOptions,
                         onChanged: (val) => setState(() => _smoking = val),
@@ -865,7 +869,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                       // Drinking
                       _buildDropdownCard(
                         icon: Icons.local_bar_rounded,
-                        title: 'Drinking Habits',
+                        title: lp.getString('drinking_habits'),
                         value: _drinking,
                         items: _habitOptions,
                         onChanged: (val) => setState(() => _drinking = val),
@@ -876,7 +880,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                       // Zodiac
                       _buildDropdownCard(
                         icon: Icons.star_rounded,
-                        title: 'Zodiac Sign',
+                        title: lp.getString('zodiac_sign'),
                         value: _zodiac,
                         items: _zodiacOptions,
                         onChanged: (val) => setState(() => _zodiac = val),
@@ -887,7 +891,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                       // Education
                       _buildDropdownCard(
                         icon: Icons.school_rounded,
-                        title: 'Education level',
+                        title: lp.getString('education_level'),
                         value: _educationLevel,
                         items: _educationOptions,
                         onChanged: (val) => setState(() => _educationLevel = val),
@@ -898,8 +902,8 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                       // Online Status Only
                       _buildGroupCard(
                         child: _buildToggleRow(
-                          title: 'Online Now Only',
-                          subtitle: 'Only show users who are currently active.',
+                          title: lp.getString('online_now_only'),
+                          subtitle: lp.getString('online_now_sub'),
                           value: _onlineOnly,
                           activeColor: const Color(0xFF4CAF50),
                           onChanged: (val) => setState(() => _onlineOnly = val),
@@ -910,7 +914,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                       // Kids
                       _buildDropdownCard(
                         icon: Icons.child_care_rounded,
-                        title: 'Kids / Children',
+                        title: lp.getString('kids_children'),
                         value: _kids,
                         items: _kidsOptions,
                         onChanged: (val) => setState(() => _kids = val),
@@ -921,7 +925,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                       // Pets
                       _buildDropdownCard(
                         icon: Icons.pets_rounded,
-                        title: 'Pets',
+                        title: lp.getString('pets'),
                         value: _pets,
                         items: _petsOptions,
                         onChanged: (val) => setState(() => _pets = val),
@@ -932,7 +936,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                       // Introvert/Extrovert
                       _buildDropdownCard(
                         icon: Icons.psychology_rounded,
-                        title: 'Personality Type',
+                        title: lp.getString('personality_type'),
                         value: _introvertExtrovert,
                         items: _introvertExtrovertOptions,
                         onChanged: (val) => setState(() => _introvertExtrovert = val),
@@ -952,9 +956,9 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                                   children: [
                                     Icon(Icons.photo_library_rounded, size: 18, color: Colors.blueAccent),
                                     const SizedBox(width: 8),
-                                    const Text(
-                                      'Max Photos Needed',
-                                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                                    Text(
+                                      lp.getString('max_photos_needed'),
+                                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                                     ),
                                     if (!isPremium) ...[
                                       const SizedBox(width: 8),
@@ -969,7 +973,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Text(
-                                    _maxPhotos >= 9 ? 'Any' : '$_maxPhotos photos',
+                                    _maxPhotos >= 9 ? lp.getString('any_count') : lp.getString('photos_count').replaceAll('{n}', '$_maxPhotos'),
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w800,
@@ -1014,8 +1018,8 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                       // Has Bio
                       _buildGroupCard(
                         child: _buildToggleRow(
-                          title: 'Must Have a Bio',
-                          subtitle: 'Only show users who have written a bio.',
+                          title: lp.getString('must_have_bio'),
+                          subtitle: lp.getString('must_have_bio_sub'),
                           value: _hasBio,
                           activeColor: const Color(0xFFFF4D85),
                           onChanged: (val) => setState(() => _hasBio = val),
@@ -1026,7 +1030,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                       // Family Plans
                       _buildDropdownCard(
                         icon: Icons.family_restroom_rounded,
-                        title: 'Family Plans',
+                        title: lp.getString('family_plans'),
                         value: _familyPlans,
                         items: _familyPlansOptions,
                         onChanged: (val) => setState(() => _familyPlans = val),
@@ -1037,7 +1041,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                       // Communication Style
                       _buildDropdownCard(
                         icon: Icons.chat_bubble_rounded,
-                        title: 'Communication Style',
+                        title: lp.getString('communication_style'),
                         value: _communicationStyle,
                         items: _communicationStyleOptions,
                         onChanged: (val) => setState(() => _communicationStyle = val),
@@ -1048,7 +1052,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                       // Love Style
                       _buildDropdownCard(
                         icon: Icons.favorite_border_rounded,
-                        title: 'Love Style',
+                        title: lp.getString('love_style'),
                         value: _loveStyle,
                         items: _loveStyleOptions,
                         onChanged: (val) => setState(() => _loveStyle = val),
@@ -1059,13 +1063,13 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                       const SizedBox(height: 12),
 
                       // 3. Advanced Elite filters
-                      _buildSectionHeader('Elite Advanced Filters'),
+                      _buildSectionHeader(lp.getString('elite_advanced_filters')),
 
                       // Verified Profiles Only
                       _buildGroupCard(
                         child: _buildToggleRow(
-                          title: 'Verified Profiles Only',
-                          subtitle: 'Only show users who have verified their identity.',
+                          title: lp.getString('verified_profiles_only'),
+                          subtitle: lp.getString('verified_profiles_sub'),
                           value: _verifiedOnly,
                           activeColor: const Color(0xFFFF4D85),
                           onChanged: (val) => setState(() => _verifiedOnly = val),
@@ -1077,7 +1081,7 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                       // Country / Green Card Filter
                       _buildDropdownCard(
                         icon: Icons.public_rounded,
-                        title: 'Partner Country (Green Card)',
+                        title: lp.getString('partner_country'),
                         value: _country,
                         items: _countryOptions,
                         onChanged: (val) => setState(() => _country = val),
@@ -1114,9 +1118,9 @@ class _SwipeFiltersScreenState extends State<SwipeFiltersScreen> {
                           strokeWidth: 2.5,
                         ),
                       )
-                    : const Text(
-                        'Apply Filters',
-                        style: TextStyle(
+                    : Text(
+                        lp.getString('apply_filters'),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
                           color: Colors.white,

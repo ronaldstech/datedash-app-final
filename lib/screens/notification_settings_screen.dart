@@ -70,11 +70,11 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
           : ListView(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               children: [
-                _buildSectionHeader(languageProvider.currentLanguageCode == 'sw' ? 'MKUU' : 'MASTER CONTROL'),
+                _buildSectionHeader(languageProvider.getString('notif_master_control')),
                 _buildSwitchTile(
                   icon: Iconsax.notification_status,
-                  title: languageProvider.currentLanguageCode == 'sw' ? 'Ruhusu Arifa' : 'Allow Notifications',
-                  subtitle: languageProvider.currentLanguageCode == 'sw' ? 'Washa au zima arifa zote' : 'Enable or disable all notifications',
+                  title: languageProvider.getString('notif_allow'),
+                  subtitle: languageProvider.getString('notif_allow_sub'),
                   value: _masterEnabled,
                   onChanged: (val) {
                     setState(() => _masterEnabled = val);
@@ -91,11 +91,11 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildSectionHeader(languageProvider.currentLanguageCode == 'sw' ? 'ARIZAJI' : 'ALERT PREFERENCES'),
+                        _buildSectionHeader(languageProvider.getString('notif_alert_preferences')),
                         _buildSwitchTile(
                           icon: Iconsax.volume_high,
-                          title: languageProvider.currentLanguageCode == 'sw' ? 'Sauti ya Arifa' : 'Notification Sound',
-                          subtitle: languageProvider.currentLanguageCode == 'sw' ? 'Cheza sauti ya arifa zinazoingia' : 'Play a sound for incoming alerts',
+                          title: languageProvider.getString('notif_sound'),
+                          subtitle: languageProvider.getString('notif_sound_sub'),
                           value: _soundEnabled,
                           onChanged: (val) {
                             setState(() => _soundEnabled = val);
@@ -105,8 +105,8 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                         ),
                         _buildSwitchTile(
                           icon: Iconsax.repeate_one,
-                          title: languageProvider.currentLanguageCode == 'sw' ? 'Tetemeko' : 'Vibrate',
-                          subtitle: languageProvider.currentLanguageCode == 'sw' ? 'Tetemeka arifa zinapoingia' : 'Vibrate on notifications',
+                          title: languageProvider.getString('notif_vibrate'),
+                          subtitle: languageProvider.getString('notif_vibrate_sub'),
                           value: _vibrateEnabled,
                           onChanged: (val) {
                             setState(() => _vibrateEnabled = val);
@@ -115,11 +115,11 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                           activeThumbColor: primaryPink,
                         ),
                         const SizedBox(height: 10),
-                        _buildSectionHeader(languageProvider.currentLanguageCode == 'sw' ? 'AINA ZA ARIFA' : 'NOTIFICATION TYPES'),
+                        _buildSectionHeader(languageProvider.getString('notif_types_section')),
                         _buildSwitchTile(
                           icon: Iconsax.heart,
-                          title: languageProvider.currentLanguageCode == 'sw' ? 'Mechi Mpya' : 'New Matches',
-                          subtitle: languageProvider.currentLanguageCode == 'sw' ? 'Arifiwa unapopata mechi mpya' : 'Get notified when you get a new match',
+                          title: languageProvider.getString('notif_matches'),
+                          subtitle: languageProvider.getString('notif_matches_sub'),
                           value: _matchesEnabled,
                           onChanged: (val) {
                             setState(() => _matchesEnabled = val);
@@ -129,8 +129,8 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                         ),
                         _buildSwitchTile(
                           icon: Iconsax.message,
-                          title: languageProvider.currentLanguageCode == 'sw' ? 'Ujumbe' : 'Messages',
-                          subtitle: languageProvider.currentLanguageCode == 'sw' ? 'Arifiwa unapopokea ujumbe mpya' : 'Get notified for new chat messages',
+                          title: languageProvider.getString('notif_messages'),
+                          subtitle: languageProvider.getString('notif_messages_sub'),
                           value: _messagesEnabled,
                           onChanged: (val) {
                             setState(() => _messagesEnabled = val);
@@ -140,8 +140,8 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                         ),
                         _buildSwitchTile(
                           icon: Iconsax.like_1,
-                          title: languageProvider.currentLanguageCode == 'sw' ? 'Likes' : 'Likes',
-                          subtitle: languageProvider.currentLanguageCode == 'sw' ? 'Arifiwa mtu anapopenda wasifu wako' : 'Get notified when someone likes your profile',
+                          title: languageProvider.getString('notif_likes'),
+                          subtitle: languageProvider.getString('notif_likes_sub'),
                           value: _likesEnabled,
                           onChanged: (val) {
                             setState(() => _likesEnabled = val);
@@ -151,8 +151,8 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                         ),
                         _buildSwitchTile(
                           icon: Iconsax.call,
-                          title: languageProvider.currentLanguageCode == 'sw' ? 'Simu' : 'Calls',
-                          subtitle: languageProvider.currentLanguageCode == 'sw' ? 'Arifiwa kwa simu za sauti na video' : 'Get notified for voice and video calls',
+                          title: languageProvider.getString('notif_calls'),
+                          subtitle: languageProvider.getString('notif_calls_sub'),
                           value: _callsEnabled,
                           onChanged: (val) {
                             setState(() => _callsEnabled = val);

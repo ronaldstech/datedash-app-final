@@ -261,6 +261,7 @@ class _LiveListScreenState extends State<LiveListScreen>
     String title, {
     String tier = 'Premium',
   }) {
+    final lp = context.watch<LanguageProvider>();
     return Positioned.fill(
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
@@ -302,9 +303,9 @@ class _LiveListScreenState extends State<LiveListScreen>
                               ),
                             ),
                             const SizedBox(height: 2),
-                            const Text(
-                              'Tap to unlock',
-                              style: TextStyle(
+                            Text(
+                              lp.getString('tap_to_unlock'),
+                              style: const TextStyle(
                                 color: Colors.amberAccent,
                                 fontSize: 10,
                                 fontWeight: FontWeight.w800,
@@ -380,7 +381,7 @@ class _LiveListScreenState extends State<LiveListScreen>
           ),
 
           _isMatching
-              ? _buildMatchingRadar(pp)
+              ? _buildMatchingRadar(pp, lp)
               : _buildFiltersForm(isDark, pp, lp),
         ],
       ),
@@ -417,23 +418,23 @@ class _LiveListScreenState extends State<LiveListScreen>
               ),
             ),
           ),
-          _buildHeroPanel(pp),
+          _buildHeroPanel(pp, lp),
           const SizedBox(height: 18),
-          _buildQuickStats(isDark, pp.userProfile),
+          _buildQuickStats(isDark, pp.userProfile, lp),
           const SizedBox(height: 22),
           _buildFilterPanel(
             isDark: isDark,
-            title: 'Match preferences',
-            subtitle: 'These are used before the full-screen camera search.',
+            title: lp.getString('match_preferences'),
+            subtitle: lp.getString('match_preferences_sub'),
             children: [
-              _buildFilterLabel('Partner Language', Iconsax.language_square),
+              _buildFilterLabel(lp.getString('partner_language'), Iconsax.language_square),
               const SizedBox(height: 10),
               _buildLanguagePickerButton(context, isDark),
               const SizedBox(height: 18),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildFilterLabel('Age Range', Iconsax.calendar),
+                  _buildFilterLabel(lp.getString('age_range'), Iconsax.calendar),
                   _buildValuePill(
                     '${_ageRange.start.round()}-${_ageRange.end.round()}',
                     isDark,
@@ -459,14 +460,14 @@ class _LiveListScreenState extends State<LiveListScreen>
           const SizedBox(height: 14),
           _buildFilterPanel(
             isDark: isDark,
-            title: 'Premium & Elite filters',
+            title: lp.getString('premium_elite_filters'),
             subtitle: isElite
                 ? 'Tune gender and country for a more focused match.'
                 : (hasGenderFilter
                       ? 'Gender filter unlocked. Country filter requires Elite.'
                       : 'Upgrade to control gender (Premium) and country (Elite) matching.'),
             children: [
-              _buildFilterLabel('Desired Gender', Iconsax.user),
+              _buildFilterLabel(lp.getString('desired_gender'), Iconsax.user),
               const SizedBox(height: 10),
               Stack(
                 children: [
@@ -488,7 +489,7 @@ class _LiveListScreenState extends State<LiveListScreen>
                 ],
               ),
               const SizedBox(height: 18),
-              _buildFilterLabel('Partner Country', Iconsax.global),
+              _buildFilterLabel(lp.getString('partner_country'), Iconsax.global),
               const SizedBox(height: 10),
               Stack(
                 children: [
@@ -510,7 +511,7 @@ class _LiveListScreenState extends State<LiveListScreen>
     );
   }
 
-  Widget _buildHeroPanel(ProfileProvider pp) {
+  Widget _buildHeroPanel(ProfileProvider pp, LanguageProvider lp) {
     final photo = pp.photoURL ?? '';
 
     return Container(
@@ -553,22 +554,22 @@ class _LiveListScreenState extends State<LiveListScreen>
                 ),
               ),
               const SizedBox(width: 14),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Verify First Love For Real',
-                      style: TextStyle(
+                      lp.getString('verify_first_love'),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
-                      "Don't act just be you for 60 seconds.",
-                      style: TextStyle(
+                      lp.getString('dont_act_be_you'),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -613,7 +614,7 @@ class _LiveListScreenState extends State<LiveListScreen>
     );
   }
 
-  Widget _buildQuickStats(bool isDark, UserProfile? profile) {
+  Widget _buildQuickStats(bool isDark, UserProfile? profile, LanguageProvider lp) {
     final bool isPremium = profile?.isPremium == true;
     String membershipName = 'Basic';
     IconData membershipIcon = Iconsax.lock;
@@ -639,7 +640,7 @@ class _LiveListScreenState extends State<LiveListScreen>
                 isDark,
                 Iconsax.people,
                 '${snapshot.data ?? 0}',
-                'chatting now',
+                lp.getString('chatting_now'),
               );
             },
           ),
@@ -650,7 +651,7 @@ class _LiveListScreenState extends State<LiveListScreen>
             isDark,
             membershipIcon,
             membershipName,
-            isPremium ? 'filters on' : 'filters limited',
+            isPremium ? lp.getString('filters_on') : lp.getString('filters_limited'),
           ),
         ),
       ],
@@ -806,9 +807,9 @@ class _LiveListScreenState extends State<LiveListScreen>
             child: ElevatedButton.icon(
               onPressed: () => _startMatchingFlow(pp),
               icon: const Icon(Iconsax.video_play),
-              label: const Text(
-                'Start Matching',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+              label: Text(
+                context.watch<LanguageProvider>().getString('start_matching'),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF4D85),
@@ -1022,6 +1023,7 @@ class _LiveListScreenState extends State<LiveListScreen>
   }
 
   void _showLanguageSelectorBottomSheet(BuildContext context, bool isDark) {
+    final lp = context.read<LanguageProvider>();
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -1056,9 +1058,9 @@ class _LiveListScreenState extends State<LiveListScreen>
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Select Partner Language',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Text(
+                    lp.getString('select_partner_language'),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
                   Padding(
@@ -1070,7 +1072,7 @@ class _LiveListScreenState extends State<LiveListScreen>
                         });
                       },
                       decoration: InputDecoration(
-                        hintText: 'Search language...',
+                        hintText: lp.getString('search_language_hint'),
                         prefixIcon: const Icon(Icons.search, size: 20),
                         filled: true,
                         fillColor: isDark
@@ -1220,6 +1222,7 @@ class _LiveListScreenState extends State<LiveListScreen>
   }
 
   void _showCountrySelectorBottomSheet(BuildContext context, bool isDark) {
+    final lp = context.read<LanguageProvider>();
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -1254,9 +1257,9 @@ class _LiveListScreenState extends State<LiveListScreen>
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Select Partner Country',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                  Text(
+                    lp.getString('select_partner_country'),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
                   ),
                   const SizedBox(height: 16),
                   Padding(
@@ -1269,7 +1272,7 @@ class _LiveListScreenState extends State<LiveListScreen>
                       },
                       style: const TextStyle(fontSize: 14),
                       decoration: InputDecoration(
-                        hintText: 'Search country...',
+                        hintText: lp.getString('search_country_hint'),
                         hintStyle: TextStyle(
                           color: isDark ? Colors.white38 : Colors.black38,
                         ),
@@ -1339,7 +1342,7 @@ class _LiveListScreenState extends State<LiveListScreen>
     );
   }
 
-  Widget _buildMatchingRadar(ProfileProvider pp) {
+  Widget _buildMatchingRadar(ProfileProvider pp, LanguageProvider lp) {
     final photo = pp.photoURL ?? '';
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Center(
@@ -1420,9 +1423,9 @@ class _LiveListScreenState extends State<LiveListScreen>
             ],
           ),
           const SizedBox(height: 48),
-          const Text(
-            'Finding your Match...',
-            style: TextStyle(
+          Text(
+            lp.getString('finding_your_match'),
+            style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w900,
               letterSpacing: -0.5,
@@ -1464,9 +1467,9 @@ class _LiveListScreenState extends State<LiveListScreen>
           OutlinedButton.icon(
             onPressed: () => _cancelMatchingFlow(pp),
             icon: const Icon(Iconsax.close_circle, size: 18),
-            label: const Text(
-              'Cancel Search',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            label: Text(
+              lp.getString('cancel_search'),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             style: OutlinedButton.styleFrom(
               foregroundColor: const Color(0xFFFF4D85),

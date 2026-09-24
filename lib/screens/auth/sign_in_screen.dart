@@ -376,7 +376,7 @@ class _SignInScreenState extends State<SignInScreen> {
               ),
               const SizedBox(height: 12),
               SocialLoginButton(
-                text: 'Continue with Phone',
+                text: languageProvider.getString('continue_with_phone'),
                 icon: Iconsax.mobile,
                 onPressed: _isLoading
                     ? () {}

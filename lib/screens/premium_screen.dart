@@ -207,7 +207,7 @@ class _PremiumScreenState extends State<PremiumScreen>
     '2 free profile boosts',
     'Get 2000 free sparks',
     'Hide your age on profile',
-    'Green card',
+    'Global Green card',
     'Lock your profile',
     'Unlimited chat requests',
     'See who likes and match instantly',
@@ -868,10 +868,14 @@ class _PremiumScreenState extends State<PremiumScreen>
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFB300).withValues(alpha: 0.18),
+                            color: const Color(
+                              0xFFFFB300,
+                            ).withValues(alpha: 0.18),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: const Color(0xFFFFB300).withValues(alpha: 0.6),
+                              color: const Color(
+                                0xFFFFB300,
+                              ).withValues(alpha: 0.6),
                               width: 1,
                             ),
                           ),
@@ -2065,8 +2069,8 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
           Text(
             widget.type == 'subscription'
                 ? (widget.title.toUpperCase() == 'ELITE'
-                    ? 'High five! Your ELITE subscription is active and 2,000 Sparks have been added to your balance!'
-                    : 'High five! Your ${widget.title} subscription is now active and ready to go.')
+                      ? 'High five! Your ELITE subscription is active and 2,000 Sparks have been added to your balance!'
+                      : 'High five! Your ${widget.title} subscription is now active and ready to go.')
                 : 'High five! ${_totalCreditAmount().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')} Sparks have been added to your balance!',
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -2075,7 +2079,8 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
               height: 1.5,
             ),
           ),
-          if (widget.type == 'subscription' && widget.title.toUpperCase() == 'ELITE' ||
+          if (widget.type == 'subscription' &&
+                  widget.title.toUpperCase() == 'ELITE' ||
               widget.type == 'credits') ...[
             const SizedBox(height: 16),
             Container(

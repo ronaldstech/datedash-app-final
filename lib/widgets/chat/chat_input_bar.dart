@@ -119,8 +119,8 @@ class _ChatInputBarState extends State<ChatInputBar> {
               children: [
                 Text(
                   widget.replyingMessage!.senderId == widget.myUid
-                      ? 'Replying to yourself'
-                      : 'Replying to ${widget.otherUserName}',
+                      ? widget.languageProvider.getString('replying_to_yourself')
+                      : widget.languageProvider.getString('replying_to_user').replaceAll('{user}', widget.otherUserName),
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,

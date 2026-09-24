@@ -1,0 +1,3934 @@
+[
+  {
+    "key": "select_language",
+    "val": "'Select Language',"
+  },
+  {
+    "key": "settings_title",
+    "val": "'Settings',"
+  },
+  {
+    "key": "account",
+    "val": "'Account',"
+  },
+  {
+    "key": "my_meetups",
+    "val": "'My Meet Ups',"
+  },
+  {
+    "key": "preferences",
+    "val": "'Preferences',"
+  },
+  {
+    "key": "discovery",
+    "val": "'Discovery',"
+  },
+  {
+    "key": "video_chat",
+    "val": "'Video chat',"
+  },
+  {
+    "key": "support",
+    "val": "'Support',"
+  },
+  {
+    "key": "edit_profile",
+    "val": "'Edit Profile',"
+  },
+  {
+    "key": "edit_profile_sub",
+    "val": "'Change your profile details',"
+  },
+  {
+    "key": "email_settings",
+    "val": "'Email Settings',"
+  },
+  {
+    "key": "email_settings_sub",
+    "val": "'Update your email address',"
+  },
+  {
+    "key": "security",
+    "val": "'Security',"
+  },
+  {
+    "key": "security_sub",
+    "val": "'Password, blocked users',"
+  },
+  {
+    "key": "blocked_users",
+    "val": "'Blocked Users',"
+  },
+  {
+    "key": "night_mode",
+    "val": "'Night Mode',"
+  },
+  {
+    "key": "night_mode_on",
+    "val": "'Dark theme enabled',"
+  },
+  {
+    "key": "night_mode_off",
+    "val": "'Light theme enabled',"
+  },
+  {
+    "key": "language",
+    "val": "'Language',"
+  },
+  {
+    "key": "reset_swipes",
+    "val": "'Reset Swipes',"
+  },
+  {
+    "key": "reset_swipes_sub",
+    "val": "'See previously swiped profiles again',"
+  },
+  {
+    "key": "help_center",
+    "val": "'Help Center',"
+  },
+  {
+    "key": "help_center_sub",
+    "val": "'FAQs and support chat',"
+  },
+  {
+    "key": "terms_of_service",
+    "val": "'Terms of Service',"
+  },
+  {
+    "key": "terms_of_service_sub",
+    "val": "'Legal information',"
+  },
+  {
+    "key": "delete_account",
+    "val": "'Delete Account',"
+  },
+  {
+    "key": "delete_account_sub",
+    "val": "'Permanently remove your profile and data',"
+  },
+  {
+    "key": "wipe_local_data",
+    "val": "'Wipe Local Data',"
+  },
+  {
+    "key": "wipe_local_data_sub",
+    "val": "'Clear offline cache and local database',"
+  },
+  {
+    "key": "wipe_confirm_title",
+    "val": "'Wipe Local Data?',"
+  },
+  {
+    "key": "wipe_confirm_content",
+    "val": "'This will clear all locally stored data including Firestore cache, shared preferences, and the local database. You will need to re-sync with the server.\\n\\nThis action cannot be undone.',"
+  },
+  {
+    "key": "wipe_success",
+    "val": "'Local data wiped successfully!',"
+  },
+  {
+    "key": "wipe_failed",
+    "val": "'Failed to wipe local data.',"
+  },
+  {
+    "key": "signin_title",
+    "val": "'Welcome Back',"
+  },
+  {
+    "key": "signin_sub",
+    "val": "'Sign in to continue your journey',"
+  },
+  {
+    "key": "email",
+    "val": "'Email Address',"
+  },
+  {
+    "key": "password",
+    "val": "'Password',"
+  },
+  {
+    "key": "forgot_password",
+    "val": "'Forgot Password?',"
+  },
+  {
+    "key": "signin_button",
+    "val": "'Sign In',"
+  },
+  {
+    "key": "no_account",
+    "val": "'Don\\'t have an account?',"
+  },
+  {
+    "key": "signup_link",
+    "val": "'Sign Up',"
+  },
+  {
+    "key": "signup_button",
+    "val": "'Sign Up',"
+  },
+  {
+    "key": "or_continue_with",
+    "val": "'Or continue with',"
+  },
+  {
+    "key": "google_signin",
+    "val": "'Continue with Google',"
+  },
+  {
+    "key": "like",
+    "val": "'Like',"
+  },
+  {
+    "key": "pass",
+    "val": "'Pass',"
+  },
+  {
+    "key": "rewind",
+    "val": "'Rewind',"
+  },
+  {
+    "key": "view_profile",
+    "val": "'View Profile',"
+  },
+  {
+    "key": "no_profiles_title",
+    "val": "'You\\'ve seen everyone!',"
+  },
+  {
+    "key": "no_profiles_sub",
+    "val": "'Come back later or refresh to revisit profiles.',"
+  },
+  {
+    "key": "refresh_profiles",
+    "val": "'Refresh Profiles',"
+  },
+  {
+    "key": "finding_matches",
+    "val": "'Finding your matches…',"
+  },
+  {
+    "key": "like_stamp",
+    "val": "'LIKE',"
+  },
+  {
+    "key": "nope_stamp",
+    "val": "'NOPE',"
+  },
+  {
+    "key": "add_photos_now",
+    "val": "'Add Photos Now',"
+  },
+  {
+    "key": "upload_more_photos_title",
+    "val": "'Upload More Photos',"
+  },
+  {
+    "key": "upload_more_photos_sub",
+    "val": "'Add at least 4 photos to your profile to keep swiping, view profiles, and browse photos.',"
+  },
+  {
+    "key": "view_full_profile",
+    "val": "'View Full Profile',"
+  },
+  {
+    "key": "about_me",
+    "val": "'About Me',"
+  },
+  {
+    "key": "quick_facts",
+    "val": "'Quick Facts',"
+  },
+  {
+    "key": "background",
+    "val": "'Background',"
+  },
+  {
+    "key": "lifestyle",
+    "val": "'Lifestyle',"
+  },
+  {
+    "key": "relationship_goals",
+    "val": "'Relationship Goals',"
+  },
+  {
+    "key": "interests_hobbies",
+    "val": "'Interests & Hobbies',"
+  },
+  {
+    "key": "music_taste",
+    "val": "'Music Taste',"
+  },
+  {
+    "key": "personality",
+    "val": "'Personality',"
+  },
+  {
+    "key": "prompts",
+    "val": "'Prompts',"
+  },
+  {
+    "key": "message",
+    "val": "'Message',"
+  },
+  {
+    "key": "height_label",
+    "val": "'Height',"
+  },
+  {
+    "key": "education_label",
+    "val": "'Education',"
+  },
+  {
+    "key": "religion_label",
+    "val": "'Religion',"
+  },
+  {
+    "key": "wants_kids_label",
+    "val": "'Wants Kids',"
+  },
+  {
+    "key": "long_distance_label",
+    "val": "'Long Distance',"
+  },
+  {
+    "key": "body_type_label",
+    "val": "'Body Type',"
+  },
+  {
+    "key": "status_label",
+    "val": "'Status',"
+  },
+  {
+    "key": "school_label",
+    "val": "'School',"
+  },
+  {
+    "key": "want_kids_label",
+    "val": "'Want Kids?',"
+  },
+  {
+    "key": "occupation_label",
+    "val": "'Occupation',"
+  },
+  {
+    "key": "industry_label",
+    "val": "'Industry',"
+  },
+  {
+    "key": "education_level_label",
+    "val": "'Education Level',"
+  },
+  {
+    "key": "introvert_extrovert_label",
+    "val": "'Introvert or Extrovert?',"
+  },
+  {
+    "key": "languages_spoken_label",
+    "val": "'Languages',"
+  },
+  {
+    "key": "smoking_label",
+    "val": "'Smoking',"
+  },
+  {
+    "key": "drinking_label",
+    "val": "'Drinking',"
+  },
+  {
+    "key": "exercise_label",
+    "val": "'Mazoezi',"
+  },
+  {
+    "key": "diet_label",
+    "val": "'Diet',"
+  },
+  {
+    "key": "sleep_label",
+    "val": "'Sleep',"
+  },
+  {
+    "key": "pets_label",
+    "val": "'Pets',"
+  },
+  {
+    "key": "zodiac_label",
+    "val": "'Zodiac Sign',"
+  },
+  {
+    "key": "personality_type_label",
+    "val": "'Personality Type',"
+  },
+  {
+    "key": "social_style_label",
+    "val": "'Social Style',"
+  },
+  {
+    "key": "love_language_label",
+    "val": "'Love Language',"
+  },
+  {
+    "key": "core_values_label",
+    "val": "'Core Values',"
+  },
+  {
+    "key": "notifications",
+    "val": "'Notifications',"
+  },
+  {
+    "key": "notifications_sub",
+    "val": "'Manage your alerts and sounds',"
+  },
+  {
+    "key": "privacy_visibility",
+    "val": "'Privacy & Visibility',"
+  },
+  {
+    "key": "show_age",
+    "val": "'Show Age',"
+  },
+  {
+    "key": "show_age_sub",
+    "val": "'Display your age on your profile',"
+  },
+  {
+    "key": "show_distance",
+    "val": "'Show Distance',"
+  },
+  {
+    "key": "show_distance_sub",
+    "val": "'Display how far you are from others.',"
+  },
+  {
+    "key": "hide_profile",
+    "val": "'Hide Profile',"
+  },
+  {
+    "key": "hide_profile_sub",
+    "val": "'Temporarily hide your profile from search & discovery',"
+  },
+  {
+    "key": "allow_messages_label",
+    "val": "'Allow Messages',"
+  },
+  {
+    "key": "allow_messages_sub",
+    "val": "'Receive direct messages from other users.',"
+  },
+  {
+    "key": "allow_bookings_label",
+    "val": "'Allow Meetup Requests',"
+  },
+  {
+    "key": "allow_bookings_sub",
+    "val": "'Let other users send you meetup requests.',"
+  },
+  {
+    "key": "booking_preferences",
+    "val": "'Meetup Details',"
+  },
+  {
+    "key": "booking_details",
+    "val": "'Edit Meetup Details',"
+  },
+  {
+    "key": "booking_details_sub",
+    "val": "'Set your location, and rules for meetups.',"
+  },
+  {
+    "key": "booking_details_hint",
+    "val": "'These details will be shown to users who want to meet with you.',"
+  },
+  {
+    "key": "booking_location_label",
+    "val": "'Preferred Location',"
+  },
+  {
+    "key": "booking_rate_label",
+    "val": "'Requirements',"
+  },
+  {
+    "key": "booking_notes_label",
+    "val": "'Rules & Notes',"
+  },
+  {
+    "key": "my_bookings",
+    "val": "'My Meetups',"
+  },
+  {
+    "key": "reset_swipes_title",
+    "val": "'Reset Swipes',"
+  },
+  {
+    "key": "reset_swipes_content",
+    "val": "'This will clear your \"Pass\" history. You will see users you passed on again, but your \"Likes\" will remain.\\n\\nThis action cannot be undone.',"
+  },
+  {
+    "key": "cancel",
+    "val": "'Cancel',"
+  },
+  {
+    "key": "reset",
+    "val": "'Reset',"
+  },
+  {
+    "key": "swipes_reset_success",
+    "val": "'Swipes reset! Fresh profiles are loading.',"
+  },
+  {
+    "key": "swipes_reset_failed",
+    "val": "'Failed to reset swipes. Please try again.',"
+  },
+  {
+    "key": "photo_lock_snack",
+    "val": "'Upload at least 4 photos to browse more pictures!',"
+  },
+  {
+    "key": "upload_label",
+    "val": "'Upload',"
+  },
+  {
+    "key": "messages_disabled_snack",
+    "val": "'This user has disabled direct messaging.',"
+  },
+  {
+    "key": "refresh_cost_title",
+    "val": "'Confirm Refresh',"
+  },
+  {
+    "key": "refresh_cost_content",
+    "val": "'Refreshing profiles costs 50 sparks. Your current balance is {credits} sparks.',"
+  },
+  {
+    "key": "not_enough_credits",
+    "val": "'Not enough sparks. Please top up to refresh profiles.',"
+  },
+  {
+    "key": "pay_refresh",
+    "val": "'Pay 50 Sparks',"
+  },
+  {
+    "key": "send_gift",
+    "val": "'Send Gift',"
+  },
+  {
+    "key": "gift_sent_success",
+    "val": "'Gift sent successfully!',"
+  },
+  {
+    "key": "select_gift",
+    "val": "'Select a Gift',"
+  },
+  {
+    "key": "received_gift_suffix",
+    "val": "'sent you a gift!',"
+  },
+  {
+    "key": "signup_title",
+    "val": "'Create Account',"
+  },
+  {
+    "key": "signup_sub",
+    "val": "'Join Snellum and find your perfect match',"
+  },
+  {
+    "key": "full_name",
+    "val": "'Full Name',"
+  },
+  {
+    "key": "already_have_account",
+    "val": "'Already have an account?',"
+  },
+  {
+    "key": "register_with",
+    "val": "'Or register with',"
+  },
+  {
+    "key": "fill_all_fields",
+    "val": "'Please fill all fields',"
+  },
+  {
+    "key": "likes_label",
+    "val": "'Likes',"
+  },
+  {
+    "key": "visitors_label",
+    "val": "'Visitors',"
+  },
+  {
+    "key": "matches_label",
+    "val": "'Matches',"
+  },
+  {
+    "key": "account_section",
+    "val": "'Account',"
+  },
+  {
+    "key": "my_profile",
+    "val": "'My Profile',"
+  },
+  {
+    "key": "settings_label",
+    "val": "'Settings',"
+  },
+  {
+    "key": "discovery_section",
+    "val": "'Discovery',"
+  },
+  {
+    "key": "explore_people",
+    "val": "'Explore People',"
+  },
+  {
+    "key": "activity_section",
+    "val": "'Activity',"
+  },
+  {
+    "key": "blog",
+    "val": "'Blog',"
+  },
+  {
+    "key": "live_videos",
+    "val": "'Video Chat',"
+  },
+  {
+    "key": "finance_section",
+    "val": "'Finance',"
+  },
+  {
+    "key": "go_premium",
+    "val": "'Go Premium',"
+  },
+  {
+    "key": "my_credits",
+    "val": "'My Sparks',"
+  },
+  {
+    "key": "gifts",
+    "val": "'Gifts',"
+  },
+  {
+    "key": "transactions",
+    "val": "'Transactions',"
+  },
+  {
+    "key": "appearance_section",
+    "val": "'Appearance',"
+  },
+  {
+    "key": "support_section",
+    "val": "'Support',"
+  },
+  {
+    "key": "about_us",
+    "val": "'About Us',"
+  },
+  {
+    "key": "safety_tips",
+    "val": "'Safety Tips',"
+  },
+  {
+    "key": "logout",
+    "val": "'Logout',"
+  },
+  {
+    "key": "logout_sub",
+    "val": "'Sign out of your account',"
+  },
+  {
+    "key": "light_mode",
+    "val": "'Light Mode',"
+  },
+  {
+    "key": "dark_mode",
+    "val": "'Dark Mode',"
+  },
+  {
+    "key": "nav_swipe",
+    "val": "'Swipe',"
+  },
+  {
+    "key": "nav_explore",
+    "val": "'Explore',"
+  },
+  {
+    "key": "nav_likes",
+    "val": "'Likes',"
+  },
+  {
+    "key": "nav_chat",
+    "val": "'Chat',"
+  },
+  {
+    "key": "nav_video",
+    "val": "'Video',"
+  },
+  {
+    "key": "profile_needs_attention",
+    "val": "'Profile Needs Attention',"
+  },
+  {
+    "key": "profile_completion_sub",
+    "val": "'Your profile is currently {completion}% complete. You need to complete your profile past 40% before you can start matching, chatting, and exploring!',"
+  },
+  {
+    "key": "complete_profile_button",
+    "val": "'Complete Profile',"
+  },
+  {
+    "key": "signout_label",
+    "val": "'Sign Out',"
+  },
+  {
+    "key": "unread_notifications",
+    "val": "'Notifications',"
+  },
+  {
+    "key": "join_community",
+    "val": "'Join the community',"
+  },
+  {
+    "key": "signin_to_see_likes",
+    "val": "'Please sign in to see likes',"
+  },
+  {
+    "key": "all_likes",
+    "val": "'All Likes',"
+  },
+  {
+    "key": "new_likes",
+    "val": "'New Likes',"
+  },
+  {
+    "key": "no_likes_yet",
+    "val": "'No likes yet',"
+  },
+  {
+    "key": "keep_swiping_matches",
+    "val": "'Keep swiping to find matches!',"
+  },
+  {
+    "key": "someone_fallback",
+    "val": "'Someone',"
+  },
+  {
+    "key": "visitors_header",
+    "val": "'Recent Viewers',"
+  },
+  {
+    "key": "no_visitors_yet",
+    "val": "'No views yet',"
+  },
+  {
+    "key": "no_visitors_sub",
+    "val": "'People who visited your profile will appear here.',"
+  },
+  {
+    "key": "messages_title",
+    "val": "'Messages',"
+  },
+  {
+    "key": "no_messages_yet",
+    "val": "'No messages yet',"
+  },
+  {
+    "key": "no_messages_sub",
+    "val": "'Your conversations will appear here.',"
+  },
+  {
+    "key": "search_hint",
+    "val": "'Search...',"
+  },
+  {
+    "key": "signin_to_view_messages",
+    "val": "'Please sign in to view messages',"
+  },
+  {
+    "key": "failed_load_messages",
+    "val": "'Failed to load messages',"
+  },
+  {
+    "key": "retry_button",
+    "val": "'Retry',"
+  },
+  {
+    "key": "no_conversations_yet",
+    "val": "'No conversations yet',"
+  },
+  {
+    "key": "no_conversations_sub",
+    "val": "'Like someone to start a conversation',"
+  },
+  {
+    "key": "new_matches_header",
+    "val": "'New Matches',"
+  },
+  {
+    "key": "no_matches_yet_sub",
+    "val": "'No matches yet. Keep swiping!',"
+  },
+  {
+    "key": "recent_messages_header",
+    "val": "'Recent Messages',"
+  },
+  {
+    "key": "say_hello",
+    "val": "'Say hello!',"
+  },
+  {
+    "key": "you_prefix",
+    "val": "'You:',"
+  },
+  {
+    "key": "user_fallback",
+    "val": "'User',"
+  },
+  {
+    "key": "welcome_back",
+    "val": "'Welcome back!',"
+  },
+  {
+    "key": "profile_complete_title",
+    "val": "'Profile Complete!',"
+  },
+  {
+    "key": "complete_your_profile",
+    "val": "'Complete Your Profile',"
+  },
+  {
+    "key": "tap_update_details",
+    "val": "'Tap here to update your details',"
+  },
+  {
+    "key": "matches_3x_likely",
+    "val": "'Matches are 3x more likely with a full profile.',"
+  },
+  {
+    "key": "views_label",
+    "val": "'Views',"
+  },
+  {
+    "key": "edit_profile_label",
+    "val": "'Edit Profile',"
+  },
+  {
+    "key": "saving_label",
+    "val": "'Saving...',"
+  },
+  {
+    "key": "save_profile_button",
+    "val": "'Save Profile',"
+  },
+  {
+    "key": "category_basic",
+    "val": "'Basic',"
+  },
+  {
+    "key": "category_personal",
+    "val": "'Personal',"
+  },
+  {
+    "key": "category_goals",
+    "val": "'Goals',"
+  },
+  {
+    "key": "category_work",
+    "val": "'Work',"
+  },
+  {
+    "key": "category_lifestyle",
+    "val": "'Lifestyle',"
+  },
+  {
+    "key": "category_interests",
+    "val": "'Interests',"
+  },
+  {
+    "key": "category_personality",
+    "val": "'Personality',"
+  },
+  {
+    "key": "category_media",
+    "val": "'Media',"
+  },
+  {
+    "key": "category_location",
+    "val": "'Location',"
+  },
+  {
+    "key": "category_prompts",
+    "val": "'Prompts',"
+  },
+  {
+    "key": "category_verification",
+    "val": "'Verification',"
+  },
+  {
+    "key": "username_label",
+    "val": "'User Name',"
+  },
+  {
+    "key": "gender_label",
+    "val": "'Gender',"
+  },
+  {
+    "key": "dob_label",
+    "val": "'Date of Birth',"
+  },
+  {
+    "key": "interested_in_label",
+    "val": "'Interested In',"
+  },
+  {
+    "key": "bio_about_label",
+    "val": "'Bio / About Me',"
+  },
+  {
+    "key": "height_hint",
+    "val": "'e.g., 5\\'10\" or 178cm',"
+  },
+  {
+    "key": "relationship_status_label",
+    "val": "'Relationship Status',"
+  },
+  {
+    "key": "looking_for_label",
+    "val": "'Looking For',"
+  },
+  {
+    "key": "open_to_long_distance_label",
+    "val": "'Open to long-distance?',"
+  },
+  {
+    "key": "fitness_label",
+    "val": "'Fitness Level',"
+  },
+  {
+    "key": "sleeping_habits_label",
+    "val": "'Sleeping Habits',"
+  },
+  {
+    "key": "hobbies_label",
+    "val": "'Hobbies',"
+  },
+  {
+    "key": "music_genres_label",
+    "val": "'Favorite Music Genres',"
+  },
+  {
+    "key": "movies_shows_label",
+    "val": "'Favorite Movies/Shows',"
+  },
+  {
+    "key": "weekend_activities_label",
+    "val": "'Weekend Activities',"
+  },
+  {
+    "key": "political_views_label",
+    "val": "'Political Views',"
+  },
+  {
+    "key": "add_photos_title",
+    "val": "'Add Your Photos',"
+  },
+  {
+    "key": "upload_photos_sub",
+    "val": "'Upload at least 4 photos to stand out. Max 8.',"
+  },
+  {
+    "key": "uploading_photos",
+    "val": "'Uploading photos...',"
+  },
+  {
+    "key": "location_title",
+    "val": "'Your Location',"
+  },
+  {
+    "key": "location_sub",
+    "val": "'Sync your GPS to see potential matches nearby and calculate distances.',"
+  },
+  {
+    "key": "city_neighborhood_label",
+    "val": "'City / Neighborhood',"
+  },
+  {
+    "key": "location_synced",
+    "val": "'Location Synchronized',"
+  },
+  {
+    "key": "location_not_set",
+    "val": "'Location Not Set',"
+  },
+  {
+    "key": "update_location_button",
+    "val": "'Update Location',"
+  },
+  {
+    "key": "sync_location_now_button",
+    "val": "'Sync Location Now',"
+  },
+  {
+    "key": "prompts_title",
+    "val": "'Prompts',"
+  },
+  {
+    "key": "perfect_date_prompt",
+    "val": "'A perfect date for me is...',"
+  },
+  {
+    "key": "fall_for_you_prompt",
+    "val": "'I\\'ll fall for you if...',"
+  },
+  {
+    "key": "green_flag_prompt",
+    "val": "'My biggest green flag is...',"
+  },
+  {
+    "key": "two_truths_prompt",
+    "val": "'Two truths and a lie...',"
+  },
+  {
+    "key": "verification_title",
+    "val": "'Profile Verification',"
+  },
+  {
+    "key": "verification_sub",
+    "val": "'Get verified to show everyone that you\\'re real! Verified profiles get 3x more matches.',"
+  },
+  {
+    "key": "profile_verified",
+    "val": "'Profile Verified',"
+  },
+  {
+    "key": "facial_verification",
+    "val": "'Facial Verification',"
+  },
+  {
+    "key": "verification_confirmed_sub",
+    "val": "'Your identity has been confirmed. You\\'re all set!',"
+  },
+  {
+    "key": "quick_scan_sub",
+    "val": "'A quick 3D face scan confirms you match your photos.',"
+  },
+  {
+    "key": "start_verification_button",
+    "val": "'Start Verification',"
+  },
+  {
+    "key": "profile_saved_snack",
+    "val": "'Profile saved successfully!',"
+  },
+  {
+    "key": "failed_save_profile_snack",
+    "val": "'Failed to save profile',"
+  },
+  {
+    "key": "location_services_disabled",
+    "val": "'Location services are disabled. Please enable them.',"
+  },
+  {
+    "key": "location_permission_denied",
+    "val": "'Location permissions are denied.',"
+  },
+  {
+    "key": "location_permission_denied_forever",
+    "val": "'Location permissions are permanently denied.',"
+  },
+  {
+    "key": "fetching_coordinates",
+    "val": "'Fetching high-accuracy coordinates...',"
+  },
+  {
+    "key": "location_updated_snack",
+    "val": "'Location updated and saved!',"
+  },
+  {
+    "key": "error_fetching_location",
+    "val": "'Error fetching location',"
+  },
+  {
+    "key": "select_date",
+    "val": "'Select Date',"
+  },
+  {
+    "key": "active_now",
+    "val": "'Active now',"
+  },
+  {
+    "key": "offline",
+    "val": "'Offline',"
+  },
+  {
+    "key": "voice_call_tooltip",
+    "val": "'Voice Call',"
+  },
+  {
+    "key": "video_call_tooltip",
+    "val": "'Video Call',"
+  },
+  {
+    "key": "search_messages_hint",
+    "val": "'Search...',"
+  },
+  {
+    "key": "no_messages_found",
+    "val": "'No messages found',"
+  },
+  {
+    "key": "say_hi_to",
+    "val": "'Say hi to {name}!',"
+  },
+  {
+    "key": "try_different_search",
+    "val": "'Try a different search term',"
+  },
+  {
+    "key": "start_conversation",
+    "val": "'Start the conversation',"
+  },
+  {
+    "key": "chat_emoji_tab",
+    "val": "'Emoji',"
+  },
+  {
+    "key": "chat_stickers_tab",
+    "val": "'Stickers',"
+  },
+  {
+    "key": "call_video_label",
+    "val": "'Video Call',"
+  },
+  {
+    "key": "call_voice_label",
+    "val": "'Voice Call',"
+  },
+  {
+    "key": "call_cancel_label",
+    "val": "'Cancel',"
+  },
+  {
+    "key": "call_go_label",
+    "val": "'Call',"
+  },
+  {
+    "key": "recording_label",
+    "val": "'Recording',"
+  },
+  {
+    "key": "cancel_recording",
+    "val": "'Cancel',"
+  },
+  {
+    "key": "chat_error_sending",
+    "val": "'Error sending message',"
+  },
+  {
+    "key": "microphone_permission_denied",
+    "val": "'Microphone permission denied',"
+  },
+  {
+    "key": "error_sending_voice",
+    "val": "'Error sending voice note',"
+  },
+  {
+    "key": "error_uploading_image",
+    "val": "'Error uploading image',"
+  },
+  {
+    "key": "clear_chat_title",
+    "val": "'Clear Chat',"
+  },
+  {
+    "key": "clear_chat_confirm_message",
+    "val": "'All messages with {name} will be permanently deleted. This cannot be undone.',"
+  },
+  {
+    "key": "chat_cleared_snack",
+    "val": "'Chat cleared',"
+  },
+  {
+    "key": "explore_header",
+    "val": "'Explore',"
+  },
+  {
+    "key": "looking_for_header",
+    "val": "'What are you looking for?',"
+  },
+  {
+    "key": "people_count_suffix",
+    "val": "'people',"
+  },
+  {
+    "key": "cat_marriage",
+    "val": "'Marriage',"
+  },
+  {
+    "key": "cat_marriage_sub",
+    "val": "'Lifelong commitment',"
+  },
+  {
+    "key": "cat_long_term",
+    "val": "'Long Term',"
+  },
+  {
+    "key": "cat_long_term_sub",
+    "val": "'Serious partner',"
+  },
+  {
+    "key": "cat_hookups",
+    "val": "'Casual',"
+  },
+  {
+    "key": "cat_hookups_sub",
+    "val": "'Casual & fun',"
+  },
+  {
+    "key": "cat_short_term",
+    "val": "'Short Term Fun',"
+  },
+  {
+    "key": "cat_short_term_sub",
+    "val": "'No strings attached',"
+  },
+  {
+    "key": "cat_new_friends",
+    "val": "'New Friends',"
+  },
+  {
+    "key": "cat_new_friends_sub",
+    "val": "'Platonic only',"
+  },
+  {
+    "key": "cat_coffee_date",
+    "val": "'Coffee Date',"
+  },
+  {
+    "key": "cat_coffee_date_sub",
+    "val": "'Relaxed vibes',"
+  },
+  {
+    "key": "cat_movie_night",
+    "val": "'Learn Cultures',"
+  },
+  {
+    "key": "cat_movie_night_sub",
+    "val": "'Explore the world',"
+  },
+  {
+    "key": "cat_fitness_duo",
+    "val": "'Fitness Duo',"
+  },
+  {
+    "key": "cat_fitness_duo_sub",
+    "val": "'Gym buddies',"
+  },
+  {
+    "key": "cat_gaming_duo",
+    "val": "'Gaming Duo',"
+  },
+  {
+    "key": "cat_gaming_duo_sub",
+    "val": "'Player 2?',"
+  },
+  {
+    "key": "just_now",
+    "val": "'Just now',"
+  },
+  {
+    "key": "min_ago",
+    "val": "'{n} min ago',"
+  },
+  {
+    "key": "hr_ago",
+    "val": "'{n} hr ago',"
+  },
+  {
+    "key": "yesterday",
+    "val": "'Yesterday',"
+  },
+  {
+    "key": "days_ago",
+    "val": "'{n} days ago',"
+  },
+  {
+    "key": "today",
+    "val": "'Today',"
+  },
+  {
+    "key": "earlier",
+    "val": "'Earlier',"
+  },
+  {
+    "key": "call_cancelled",
+    "val": "'Call Cancelled',"
+  },
+  {
+    "key": "incoming_video_call",
+    "val": "'INCOMING VIDEO CALL',"
+  },
+  {
+    "key": "incoming_voice_call",
+    "val": "'INCOMING VOICE CALL',"
+  },
+  {
+    "key": "decline",
+    "val": "'Decline',"
+  },
+  {
+    "key": "accept",
+    "val": "'Accept',"
+  },
+  {
+    "key": "call_ended",
+    "val": "'Call Ended',"
+  },
+  {
+    "key": "dialing_video_call",
+    "val": "'Dialing Video Call...',"
+  },
+  {
+    "key": "dialing_voice_call",
+    "val": "'Dialing Voice Call...',"
+  },
+  {
+    "key": "mark_all_read",
+    "val": "'Mark all as read',"
+  },
+  {
+    "key": "liked_profile_suffix",
+    "val": "'liked your profile',"
+  },
+  {
+    "key": "missed_call_suffix",
+    "val": "'missed your call',"
+  },
+  {
+    "key": "viewed_profile_suffix",
+    "val": "'viewed your profile',"
+  },
+  {
+    "key": "no_notifications_title",
+    "val": "'Keep it quiet?',"
+  },
+  {
+    "key": "no_notifications_sub",
+    "val": "'New likes and views will appear here',"
+  },
+  {
+    "key": "rewind_confirm_title",
+    "val": "'Rewind Profile',"
+  },
+  {
+    "key": "rewind_confirm_message",
+    "val": "'Spend 100 sparks to rewind and see the last profile again?',"
+  },
+  {
+    "key": "confirm_button",
+    "val": "'Confirm',"
+  },
+  {
+    "key": "get_credits_button",
+    "val": "'Get Sparks',"
+  },
+  {
+    "key": "insufficient_credits_title",
+    "val": "'Insufficient Sparks',"
+  },
+  {
+    "key": "insufficient_credits_message",
+    "val": "'You need at least 100 sparks to rewind. Would you like to get more now?',"
+  },
+  {
+    "key": "unlock_for_credits",
+    "val": "'Unlock for 20 Sparks',"
+  },
+  {
+    "key": "unlock_title",
+    "val": "'Unlock Profile',"
+  },
+  {
+    "key": "unlock_message",
+    "val": "'See who liked you for 20 sparks or upgrade to Premium for unlimited access.',"
+  },
+  {
+    "key": "locked_profile",
+    "val": "'Locked Profile',"
+  },
+  {
+    "key": "edit",
+    "val": "'Edit',"
+  },
+  {
+    "key": "delete",
+    "val": "'Delete',"
+  },
+  {
+    "key": "delete_chat",
+    "val": "'Delete Chat',"
+  },
+  {
+    "key": "delete_chat_title",
+    "val": "'Delete Conversation',"
+  },
+  {
+    "key": "delete_chat_confirm",
+    "val": "'Are you sure you want to delete this chat with {name}? This will remove it from your messages list.',"
+  },
+  {
+    "key": "chat_deleted_snack",
+    "val": "'Chat deleted',"
+  },
+  {
+    "key": "delete_message_title",
+    "val": "'Delete Message',"
+  },
+  {
+    "key": "delete_message_confirm",
+    "val": "'Are you sure you want to delete this message?',"
+  },
+  {
+    "key": "message_deleted",
+    "val": "'This message was deleted',"
+  },
+  {
+    "key": "edited_badge",
+    "val": "'(edited)',"
+  },
+  {
+    "key": "edit_message",
+    "val": "'Edit Message',"
+  },
+  {
+    "key": "insufficient_credits_msg",
+    "val": "'You need 10 sparks to send a message. Upgrade to Premium for unlimited messaging!',"
+  },
+  {
+    "key": "premium_benefit_msg",
+    "val": "'Premium members enjoy unlimited messaging!',"
+  },
+  {
+    "key": "get_credits",
+    "val": "'Get Sparks',"
+  },
+  {
+    "key": "cat_short_term_rel",
+    "val": "'Short Term Relationship',"
+  },
+  {
+    "key": "cat_short_term_rel_sub",
+    "val": "'Something in between',"
+  },
+  {
+    "key": "cat_sponsor",
+    "val": "'Travel the world',"
+  },
+  {
+    "key": "cat_sponsor_sub",
+    "val": "'Let\\'s explore together',"
+  },
+  {
+    "key": "cat_figuring_out",
+    "val": "'Figuring Out',"
+  },
+  {
+    "key": "cat_figuring_out_sub",
+    "val": "'Seeing where it goes',"
+  },
+  {
+    "key": "nudge_send_more_likes",
+    "val": "'Send {count} more likes to get started',"
+  },
+  {
+    "key": "chat_waiting_for_reply",
+    "val": "'Waiting for {name} to accept your request. You can send more messages once they reply.',"
+  },
+  {
+    "key": "chat_waiting_for_reply_hint",
+    "val": "'Waiting for reply...',"
+  },
+  {
+    "key": "message_request_title",
+    "val": "'Message Request',"
+  },
+  {
+    "key": "message_request_desc",
+    "val": "'Do you want to let {name} message you? They won\\'t know you\\'ve seen their message until you accept.',"
+  },
+  {
+    "key": "accept_request",
+    "val": "'Accept',"
+  },
+  {
+    "key": "decline_request",
+    "val": "'Decline',"
+  },
+  {
+    "key": "request_declined",
+    "val": "'Request declined. You cannot send messages.',"
+  },
+  {
+    "key": "booking_section_title",
+    "val": "'Meetup Settings',"
+  },
+  {
+    "key": "verification_status_unverified",
+    "val": "'Verify Identity',"
+  },
+  {
+    "key": "verification_status_unverified_sub",
+    "val": "'Verify with Stripe Identity checks',"
+  },
+  {
+    "key": "verification_status_pending",
+    "val": "'Verification Pending',"
+  },
+  {
+    "key": "verification_status_pending_sub",
+    "val": "'Your ID is being reviewed by Stripe',"
+  },
+  {
+    "key": "verification_status_failed",
+    "val": "'Verification Failed',"
+  },
+  {
+    "key": "verification_status_failed_sub",
+    "val": "'Verification was canceled or declined. Tap to try again.',"
+  },
+  {
+    "key": "verification_status_verified",
+    "val": "'Identity Verified',"
+  },
+  {
+    "key": "verification_status_verified_sub",
+    "val": "'Your identity has been fully confirmed',"
+  },
+  {
+    "key": "national_id_number",
+    "val": "'National ID Number',"
+  },
+  {
+    "key": "full_name_on_id",
+    "val": "'Full Name on ID',"
+  },
+  {
+    "key": "id_document_photo",
+    "val": "'ID Document Photo',"
+  },
+  {
+    "key": "submit_verification",
+    "val": "'Submit for Verification',"
+  },
+  {
+    "key": "verification_submitted_success",
+    "val": "'Verification started successfully!',"
+  },
+  {
+    "key": "use_mock_id",
+    "val": "'Use Mock ID Card',"
+  },
+  {
+    "key": "simulated_admin_panel",
+    "val": "'Simulated Admin Action',"
+  },
+  {
+    "key": "approve_request",
+    "val": "'Approve Request',"
+  },
+  {
+    "key": "reject_request",
+    "val": "'Reject Request',"
+  },
+  {
+    "key": "continue_with_phone",
+    "val": "'Continue with Phone',"
+  },
+  {
+    "key": "verify_phone_code",
+    "val": "'Verify Phone Code',"
+  },
+  {
+    "key": "enter_phone_prompt",
+    "val": "'Enter your registered phone number to receive \\na verification code.',"
+  },
+  {
+    "key": "enter_code_sent_to",
+    "val": "'Enter the 6-digit code sent to \\n{phone}',"
+  },
+  {
+    "key": "send_code",
+    "val": "'Send Code',"
+  },
+  {
+    "key": "verify_and_continue",
+    "val": "'Verify & Continue',"
+  },
+  {
+    "key": "change_phone_number",
+    "val": "'Change Phone Number',"
+  },
+  {
+    "key": "resend_code_sms",
+    "val": "'Resend Code via SMS',"
+  },
+  {
+    "key": "resend_available_in",
+    "val": "'Resend available in {sec}s',"
+  },
+  {
+    "key": "rewards",
+    "val": "'Rewards',"
+  },
+  {
+    "key": "boost_profile",
+    "val": "'Boost Profile',"
+  },
+  {
+    "key": "manage_subscription",
+    "val": "'Manage Subscription',"
+  },
+  {
+    "key": "manage_or_upgrade_plan",
+    "val": "'Manage or Upgrade Plan',"
+  },
+  {
+    "key": "upgrade_to_premium",
+    "val": "'Upgrade to Premium',"
+  },
+  {
+    "key": "active_status",
+    "val": "'ACTIVE',"
+  },
+  {
+    "key": "expired_status",
+    "val": "'EXPIRED',"
+  },
+  {
+    "key": "standard_status",
+    "val": "'STANDARD',"
+  },
+  {
+    "key": "cancel_membership",
+    "val": "'Cancel Membership',"
+  },
+  {
+    "key": "cancel_membership_confirm",
+    "val": "'Are you sure you want to cancel your membership?',"
+  },
+  {
+    "key": "activate_now",
+    "val": "'Activate Now',"
+  },
+  {
+    "key": "expires_at",
+    "val": "'Expires at',"
+  },
+  {
+    "key": "purchased_on",
+    "val": "'Purchased on',"
+  },
+  {
+    "key": "nav_premium",
+    "val": "'Premium',"
+  },
+  {
+    "key": "boost_profile_sub",
+    "val": "'Get 10x more visibility',"
+  },
+  {
+    "key": "active_plan_manage",
+    "val": "'Active Plan • Manage or Upgrade',"
+  },
+  {
+    "key": "my_memberships",
+    "val": "'My Memberships',"
+  },
+  {
+    "key": "tap_activate_switch",
+    "val": "'Tap Activate to switch',"
+  },
+  {
+    "key": "activate",
+    "val": "'Activate',"
+  },
+  {
+    "key": "keep_plan",
+    "val": "'Keep Plan',"
+  },
+  {
+    "key": "yes_cancel",
+    "val": "'Yes, Cancel',"
+  },
+  {
+    "key": "subscription_plan",
+    "val": "'Subscription & Plan',"
+  },
+  {
+    "key": "updating_membership",
+    "val": "'Updating membership...',"
+  },
+  {
+    "key": "active_challenges",
+    "val": "'ACTIVE CHALLENGES',"
+  },
+  {
+    "key": "invite_earn",
+    "val": "'INVITE & EARN',"
+  },
+  {
+    "key": "invite_earn_sub",
+    "val": "'Earn 500 sparks for every friend who joins and verifies their email — no limit!',"
+  },
+  {
+    "key": "sparks_label",
+    "val": "'Sparks',"
+  },
+  {
+    "key": "claimed_label",
+    "val": "'Claimed',"
+  },
+  {
+    "key": "invited_label",
+    "val": "'Invited',"
+  },
+  {
+    "key": "invite_friends",
+    "val": "'Invite Friends',"
+  },
+  {
+    "key": "invite_friends_sub",
+    "val": "'No limit — earn sparks for every verified friend',"
+  },
+  {
+    "key": "your_invite_link",
+    "val": "'YOUR INVITE LINK',"
+  },
+  {
+    "key": "copy_link",
+    "val": "'Copy Link',"
+  },
+  {
+    "key": "share_link",
+    "val": "'Share Link',"
+  },
+  {
+    "key": "people_you_invited",
+    "val": "'PEOPLE YOU INVITED',"
+  },
+  {
+    "key": "link_copied",
+    "val": "'Link copied!',"
+  },
+  {
+    "key": "no_one_yet",
+    "val": "'No one yet — share your link!',"
+  },
+  {
+    "key": "every_friend_earns",
+    "val": "'Every friend who verifies their email earns you 500 sparks',"
+  },
+  {
+    "key": "email_verified",
+    "val": "'Email verified',"
+  },
+  {
+    "key": "email_not_verified",
+    "val": "'Email not verified yet',"
+  },
+  {
+    "key": "already_claimed_badge",
+    "val": "'✓ CLAIMED',"
+  },
+  {
+    "key": "pending_badge",
+    "val": "'PENDING',"
+  },
+  {
+    "key": "free_tier_label",
+    "val": "'FREE TIER',"
+  },
+  {
+    "key": "free_account",
+    "val": "'FREE ACCOUNT',"
+  },
+  {
+    "key": "queued_memberships",
+    "val": "'Queued Memberships',"
+  },
+  {
+    "key": "queued_preserved_sub",
+    "val": "'These memberships are preserved and will activate automatically, or you can switch to one now.',"
+  },
+  {
+    "key": "switch_label",
+    "val": "'Switch',"
+  },
+  {
+    "key": "preserved_in_queue",
+    "val": "'Preserved in queue',"
+  },
+  {
+    "key": "days_remaining",
+    "val": "'days remaining',"
+  },
+  {
+    "key": "your_plan_privileges",
+    "val": "'Your Plan Privileges',"
+  },
+  {
+    "key": "current_tier_privileges",
+    "val": "'Current Tier Privileges',"
+  },
+  {
+    "key": "change_or_upgrade",
+    "val": "'Change or Upgrade Tier',"
+  },
+  {
+    "key": "monthly_subscription",
+    "val": "'Monthly Subscription',"
+  },
+  {
+    "key": "weekly_subscription",
+    "val": "'Weekly Subscription',"
+  },
+  {
+    "key": "standard_free_access",
+    "val": "'Standard free access tier',"
+  },
+  {
+    "key": "membership_cancelled_success",
+    "val": "'Your membership has been cancelled successfully.',"
+  },
+  {
+    "key": "go_premium_sub",
+    "val": "'Upgrade to unlock all VIP perks & boosts',"
+  },
+  {
+    "key": "monthly_membership",
+    "val": "'Monthly Membership',"
+  },
+  {
+    "key": "weekly_membership",
+    "val": "'Weekly Membership',"
+  },
+  {
+    "key": "rewards_header",
+    "val": "'REWARDS',"
+  },
+  {
+    "key": "sparks_count_label",
+    "val": "'Sparks',"
+  },
+  {
+    "key": "complete_challenges",
+    "val": "'Complete challenges and claim rewards',"
+  },
+  {
+    "key": "boost_profile_active",
+    "val": "'⚡ Active until {date}',"
+  },
+  {
+    "key": "settings",
+    "val": "'Settings',"
+  },
+  {
+    "key": "get_premium",
+    "val": "'Get Premium',"
+  },
+  {
+    "key": "no_active_period",
+    "val": "'No active period',"
+  },
+  {
+    "key": "days_remaining_label",
+    "val": "'{n} days remaining',"
+  },
+  {
+    "key": "hours_minutes_remaining",
+    "val": "'{h}h {m}m remaining',"
+  },
+  {
+    "key": "minutes_remaining",
+    "val": "'{m} minutes remaining',"
+  },
+  {
+    "key": "expiring_soon",
+    "val": "'Expiring soon',"
+  },
+  {
+    "key": "expiring_less_than_minute",
+    "val": "'Expiring in less than a minute',"
+  },
+  {
+    "key": "percent_left",
+    "val": "'{n}% left',"
+  },
+  {
+    "key": "activated_on",
+    "val": "'Activated On',"
+  },
+  {
+    "key": "expires_renews",
+    "val": "'Expires / Renews',"
+  },
+  {
+    "key": "access_level",
+    "val": "'Access Level',"
+  },
+  {
+    "key": "full_vip_access",
+    "val": "'Full VIP Access',"
+  },
+  {
+    "key": "standard_tier",
+    "val": "'Standard Tier',"
+  },
+  {
+    "key": "active_badge",
+    "val": "'ACTIVE',"
+  },
+  {
+    "key": "expired_badge",
+    "val": "'EXPIRED',"
+  },
+  {
+    "key": "standard_badge",
+    "val": "'STANDARD',"
+  },
+  {
+    "key": "done_badge",
+    "val": "'DONE',"
+  },
+  {
+    "key": "ready_badge",
+    "val": "'READY',"
+  },
+  {
+    "key": "open_badge",
+    "val": "'OPEN',"
+  },
+  {
+    "key": "claim_reward",
+    "val": "'CLAIM REWARD',"
+  },
+  {
+    "key": "in_progress",
+    "val": "'IN PROGRESS',"
+  },
+  {
+    "key": "claimed",
+    "val": "'CLAIMED',"
+  },
+  {
+    "key": "limit_reached",
+    "val": "'LIMIT REACHED',"
+  },
+  {
+    "key": "free_usage",
+    "val": "'FREE USAGE',"
+  },
+  {
+    "key": "sparks_claimed_success",
+    "val": "'Successfully claimed {amount} sparks!',"
+  },
+  {
+    "key": "already_claimed",
+    "val": "'Already claimed for this user',"
+  },
+  {
+    "key": "sparks_claimed_snack",
+    "val": "'+500 Sparks claimed!',"
+  },
+  {
+    "key": "share_link_snack",
+    "val": "'Link copied! Share it with friends.',"
+  },
+  {
+    "key": "manage_subscription_screen_title",
+    "val": "'Subscription & Plan',"
+  },
+  {
+    "key": "yes_label",
+    "val": "'Yes, Cancel',"
+  },
+  {
+    "key": "keep_plan_label",
+    "val": "'Keep Plan',"
+  },
+  {
+    "key": "cancel_confirm_body",
+    "val": "'Are you sure you want to cancel your membership? You will immediately lose all premium privileges and return to the standard Free tier.',"
+  },
+  {
+    "key": "remove_from_queue",
+    "val": "'Remove from Queue',"
+  },
+  {
+    "key": "are_you_sure_remove",
+    "val": "'Are you sure you want to remove this queued membership? This cannot be undone.',"
+  },
+  {
+    "key": "keep_label",
+    "val": "'Keep',"
+  },
+  {
+    "key": "remove_label",
+    "val": "'Remove',"
+  },
+  {
+    "key": "queued_removed",
+    "val": "'Queued subscription removed',"
+  },
+  {
+    "key": "activate_membership_title",
+    "val": "'Activate {plan} Membership',"
+  },
+  {
+    "key": "activate_membership_body",
+    "val": "'This will make {plan} your active membership. Your current {current} plan will be safely queued with its remaining time preserved.',"
+  },
+  {
+    "key": "switch_to_plan",
+    "val": "'Switch to {plan}?',"
+  },
+  {
+    "key": "switch_to_plan_body",
+    "val": "'This will activate {plan} right away. Your current plan will be placed into the queue with remaining days preserved.',"
+  },
+  {
+    "key": "membership_activated",
+    "val": "'{plan} membership is now active!',"
+  },
+  {
+    "key": "membership_activated_snack",
+    "val": "'{plan} Membership activated!',"
+  },
+  {
+    "key": "get_sparks_button",
+    "val": "'Get Sparks',"
+  },
+  {
+    "key": "month_label",
+    "val": "'1 Month',"
+  },
+  {
+    "key": "days_label",
+    "val": "'{n} Days',"
+  },
+  {
+    "key": "go_premium_sub_small",
+    "val": "'Upgrade to unlock all VIP perks',"
+  },
+  {
+    "key": "subscription_title",
+    "val": "'Subscription & Plan',"
+  },
+  {
+    "key": "discovery_filters",
+    "val": "'Discovery Filters',"
+  },
+  {
+    "key": "basic_demographics",
+    "val": "'Basic Demographics',"
+  },
+  {
+    "key": "show_me",
+    "val": "'Show me',"
+  },
+  {
+    "key": "looking_for",
+    "val": "'Looking For',"
+  },
+  {
+    "key": "age_range",
+    "val": "'Age Range',"
+  },
+  {
+    "key": "strict_age_match",
+    "val": "'Strict Age Match',"
+  },
+  {
+    "key": "strict_age_sub",
+    "val": "\"We'll slip in a few outliers if you run out.\","
+  },
+  {
+    "key": "maximum_distance",
+    "val": "'Maximum Distance',"
+  },
+  {
+    "key": "strict_distance_match",
+    "val": "'Strict Distance Match',"
+  },
+  {
+    "key": "strict_distance_sub",
+    "val": "\"We'll suggest folks further away if you run out.\","
+  },
+  {
+    "key": "premium_advanced_filters",
+    "val": "'Premium Advanced Filters',"
+  },
+  {
+    "key": "relationship_status",
+    "val": "'Relationship Status',"
+  },
+  {
+    "key": "religion_beliefs",
+    "val": "'Religion / Beliefs',"
+  },
+  {
+    "key": "smoking_habits",
+    "val": "'Smoking Habits',"
+  },
+  {
+    "key": "drinking_habits",
+    "val": "'Drinking Habits',"
+  },
+  {
+    "key": "zodiac_sign",
+    "val": "'Zodiac Sign',"
+  },
+  {
+    "key": "education_level",
+    "val": "'Education level',"
+  },
+  {
+    "key": "online_now_only",
+    "val": "'Online Now Only',"
+  },
+  {
+    "key": "online_now_sub",
+    "val": "'Only show users who are currently active.',"
+  },
+  {
+    "key": "kids_children",
+    "val": "'Kids / Children',"
+  },
+  {
+    "key": "pets",
+    "val": "'Pets',"
+  },
+  {
+    "key": "personality_type",
+    "val": "'Personality Type',"
+  },
+  {
+    "key": "max_photos_needed",
+    "val": "'Max Photos Needed',"
+  },
+  {
+    "key": "photos_count",
+    "val": "'{n} photos',"
+  },
+  {
+    "key": "any_count",
+    "val": "'Any',"
+  },
+  {
+    "key": "must_have_bio",
+    "val": "'Must Have a Bio',"
+  },
+  {
+    "key": "must_have_bio_sub",
+    "val": "'Only show users who have written a bio.',"
+  },
+  {
+    "key": "family_plans",
+    "val": "'Family Plans',"
+  },
+  {
+    "key": "communication_style",
+    "val": "'Communication Style',"
+  },
+  {
+    "key": "love_style",
+    "val": "'Love Style',"
+  },
+  {
+    "key": "elite_advanced_filters",
+    "val": "'Elite Advanced Filters',"
+  },
+  {
+    "key": "verified_profiles_only",
+    "val": "'Verified Profiles Only',"
+  },
+  {
+    "key": "verified_profiles_sub",
+    "val": "'Only show users who have verified their identity.',"
+  },
+  {
+    "key": "partner_country",
+    "val": "'Partner Country (Green Card)',"
+  },
+  {
+    "key": "apply_filters",
+    "val": "'Apply Filters',"
+  },
+  {
+    "key": "feature_exclusive",
+    "val": "'{tier} Feature',"
+  },
+  {
+    "key": "feature_exclusive_desc",
+    "val": "'Advanced filters are exclusive to {tier} members. Upgrade your plan to get unlimited access and unlock {tier} filters!',"
+  },
+  {
+    "key": "maybe_later",
+    "val": "'Maybe Later',"
+  },
+  {
+    "key": "upgrade",
+    "val": "'Upgrade',"
+  },
+  {
+    "key": "error_saving_filters",
+    "val": "'Error saving filters: {e}',"
+  },
+  {
+    "key": "tap_to_unlock",
+    "val": "'Tap to unlock',"
+  },
+  {
+    "key": "verify_first_love",
+    "val": "'Verify First Love For Real',"
+  },
+  {
+    "key": "dont_act_be_you",
+    "val": "\"Don't act just be you for 60 seconds.\","
+  },
+  {
+    "key": "match_preferences",
+    "val": "'Match preferences',"
+  },
+  {
+    "key": "match_preferences_sub",
+    "val": "'These are used before the full-screen camera search.',"
+  },
+  {
+    "key": "partner_language",
+    "val": "'Partner Language',"
+  },
+  {
+    "key": "premium_elite_filters",
+    "val": "'Premium & Elite filters',"
+  },
+  {
+    "key": "desired_gender",
+    "val": "'Desired Gender',"
+  },
+  {
+    "key": "chatting_now",
+    "val": "'chatting now',"
+  },
+  {
+    "key": "filters_on",
+    "val": "'filters on',"
+  },
+  {
+    "key": "filters_limited",
+    "val": "'filters limited',"
+  },
+  {
+    "key": "start_matching",
+    "val": "'Start Matching',"
+  },
+  {
+    "key": "cancel_search",
+    "val": "'Cancel Search',"
+  },
+  {
+    "key": "finding_your_match",
+    "val": "'Finding your Match...',"
+  },
+  {
+    "key": "search_language_hint",
+    "val": "'Search language...',"
+  },
+  {
+    "key": "search_country_hint",
+    "val": "'Search country...',"
+  },
+  {
+    "key": "select_partner_language",
+    "val": "'Select Partner Language',"
+  },
+  {
+    "key": "select_partner_country",
+    "val": "'Select Partner Country',"
+  },
+  {
+    "key": "reply",
+    "val": "'Reply',"
+  },
+  {
+    "key": "image_unavailable",
+    "val": "'Image unavailable',"
+  },
+  {
+    "key": "you_sent_gift",
+    "val": "'You sent a {gift}!',"
+  },
+  {
+    "key": "sent_you_gift",
+    "val": "'Sent you a {gift}!',"
+  },
+  {
+    "key": "credits_amount",
+    "val": "'{n} credits',"
+  },
+  {
+    "key": "replying_to_yourself",
+    "val": "'Replying to yourself',"
+  },
+  {
+    "key": "replying_to_user",
+    "val": "'Replying to {user}',"
+  },
+  {
+    "key": "its_a_match",
+    "val": "'IT\\'S A MATCH!',"
+  },
+  {
+    "key": "you_and_liked_each_other",
+    "val": "'You and {name} liked each other.',"
+  },
+  {
+    "key": "send_a_message",
+    "val": "'SEND A MESSAGE',"
+  },
+  {
+    "key": "keep_swiping",
+    "val": "'KEEP SWIPING',"
+  },
+  {
+    "key": "keep_swiping_title",
+    "val": "'Keep Swiping',"
+  },
+  {
+    "key": "you_missed_a_match",
+    "val": "'YOU MISSED A MATCH!',"
+  },
+  {
+    "key": "missed_match_desc",
+    "val": "'Someone who liked your profile was just passed. They were interested in you!',"
+  },
+  {
+    "key": "rewind_match",
+    "val": "'Rewind Match',"
+  },
+  {
+    "key": "unlock_rewind",
+    "val": "'Unlock Rewind',"
+  },
+  {
+    "key": "send_gift_title",
+    "val": "'Send a Gift',"
+  },
+  {
+    "key": "gift_not_enough_credits",
+    "val": "'Not enough credits!',"
+  },
+  {
+    "key": "setup_profile",
+    "val": "'Setup Profile',"
+  },
+  {
+    "key": "step_n_of_total",
+    "val": "'Step {step} of {total}',"
+  },
+  {
+    "key": "score_n",
+    "val": "'Score: {n}%',"
+  },
+  {
+    "key": "the_basics",
+    "val": "'The Basics',"
+  },
+  {
+    "key": "the_basics_sub",
+    "val": "'Introduce yourself to the community',"
+  },
+  {
+    "key": "enter_first_name",
+    "val": "'Enter your first name',"
+  },
+  {
+    "key": "identity_title",
+    "val": "'Identity',"
+  },
+  {
+    "key": "identity_sub",
+    "val": "'Who are you and who matches your vibe?',"
+  },
+  {
+    "key": "goals_status_title",
+    "val": "'Goals & Status',"
+  },
+  {
+    "key": "goals_status_sub",
+    "val": "'What are you looking for on Snellum?',"
+  },
+  {
+    "key": "habits_lifestyle_title",
+    "val": "'Habits & Lifestyle',"
+  },
+  {
+    "key": "habits_lifestyle_sub",
+    "val": "'Help matches understand your daily habits',"
+  },
+  {
+    "key": "personality_vibe_title",
+    "val": "'Personality & Vibe',"
+  },
+  {
+    "key": "personality_vibe_sub",
+    "val": "'What makes you unique?',"
+  },
+  {
+    "key": "tell_us_more_title",
+    "val": "'Tell Us More',"
+  },
+  {
+    "key": "tell_us_more_sub",
+    "val": "'Where do you live and what is your story?',"
+  },
+  {
+    "key": "photos_title",
+    "val": "'Photos',"
+  },
+  {
+    "key": "photos_sub",
+    "val": "'Show off your best angles!',"
+  },
+  {
+    "key": "upload_photos",
+    "val": "'Upload Photos',"
+  },
+  {
+    "key": "upload_photos_wizard_desc",
+    "val": "'Upload up to 6 high-quality photos. Adding photos significantly boosts your completion score.',"
+  },
+  {
+    "key": "uploading_photos_progress",
+    "val": "'Uploading selected photos...',"
+  },
+  {
+    "key": "profile_completion_alert",
+    "val": "'Your profile is currently {n}% complete. Upload more details or photos to reach 40%!',"
+  },
+  {
+    "key": "select_your_country",
+    "val": "'Select Your Country',"
+  },
+  {
+    "key": "your_country_location",
+    "val": "'Your Location / Country',"
+  },
+  {
+    "key": "select_country_hint",
+    "val": "'Select your country',"
+  },
+  {
+    "key": "bio_hint",
+    "val": "'Tell us a bit about who you are...',"
+  },
+  {
+    "key": "max_6_photos_wizard",
+    "val": "'You can only have up to 6 photos in the wizard.',"
+  },
+  {
+    "key": "or_type_own",
+    "val": "'Or type your own',"
+  },
+  {
+    "key": "reward_history",
+    "val": "'REWARD HISTORY',"
+  },
+  {
+    "key": "total_sparks_received",
+    "val": "'TOTAL SPARKS RECEIVED',"
+  },
+  {
+    "key": "no_rewards_yet",
+    "val": "'No rewards yet',"
+  },
+  {
+    "key": "no_rewards_sub",
+    "val": "'Receive gifts from other users or complete daily activity to earn rewards!',"
+  },
+  {
+    "key": "daily_activity_reward",
+    "val": "'Daily Activity Reward',"
+  },
+  {
+    "key": "gift_received",
+    "val": "'Gift Received',"
+  },
+  {
+    "key": "sparks_count",
+    "val": "'+{n} Sparks',"
+  },
+  {
+    "key": "you_received_a_gift",
+    "val": "'You received a gift!',"
+  },
+  {
+    "key": "received_tab",
+    "val": "'Received',"
+  },
+  {
+    "key": "sent_tab",
+    "val": "'Sent',"
+  },
+  {
+    "key": "no_sent_requests",
+    "val": "'No sent requests yet.',"
+  },
+  {
+    "key": "no_received_requests",
+    "val": "'No received requests yet.',"
+  },
+  {
+    "key": "to_user",
+    "val": "'To: {name}',"
+  },
+  {
+    "key": "from_user",
+    "val": "'From: {name}',"
+  },
+  {
+    "key": "date_time_label",
+    "val": "'Date & Time',"
+  },
+  {
+    "key": "location_label",
+    "val": "'Location',"
+  },
+  {
+    "key": "rate_req_label",
+    "val": "'Rate / Req.',"
+  },
+  {
+    "key": "message_label",
+    "val": "'Message',"
+  },
+  {
+    "key": "chat_btn",
+    "val": "'Chat',"
+  },
+  {
+    "key": "accept_btn",
+    "val": "'Accept',"
+  },
+  {
+    "key": "decline_btn",
+    "val": "'Decline',"
+  },
+  {
+    "key": "cancel_request_btn",
+    "val": "'Cancel Request',"
+  },
+  {
+    "key": "meetup_status_updated",
+    "val": "'Meetup {status}!',"
+  },
+  {
+    "key": "error_updating_status",
+    "val": "'Error updating status: {e}',      // Notification Settings"
+  },
+  {
+    "key": "notif_master_control",
+    "val": "'MASTER CONTROL',"
+  },
+  {
+    "key": "notif_alert_preferences",
+    "val": "'ALERT PREFERENCES',"
+  },
+  {
+    "key": "notif_types_section",
+    "val": "'NOTIFICATION TYPES',"
+  },
+  {
+    "key": "notif_allow",
+    "val": "'Allow Notifications',"
+  },
+  {
+    "key": "notif_allow_sub",
+    "val": "'Enable or disable all notifications',"
+  },
+  {
+    "key": "notif_sound",
+    "val": "'Notification Sound',"
+  },
+  {
+    "key": "notif_sound_sub",
+    "val": "'Play a sound for incoming alerts',"
+  },
+  {
+    "key": "notif_vibrate",
+    "val": "'Vibrate',"
+  },
+  {
+    "key": "notif_vibrate_sub",
+    "val": "'Vibrate on notifications',"
+  },
+  {
+    "key": "notif_matches",
+    "val": "'New Matches',"
+  },
+  {
+    "key": "notif_matches_sub",
+    "val": "'Get notified when you get a new match',"
+  },
+  {
+    "key": "notif_messages",
+    "val": "'Messages',"
+  },
+  {
+    "key": "notif_messages_sub",
+    "val": "'Get notified for new chat messages',"
+  },
+  {
+    "key": "notif_likes",
+    "val": "'Likes',"
+  },
+  {
+    "key": "notif_likes_sub",
+    "val": "'Get notified when someone likes your profile',"
+  },
+  {
+    "key": "notif_calls",
+    "val": "'Calls',"
+  },
+  {
+    "key": "notif_calls_sub",
+    "val": "'Get notified for voice and video calls',      // Security Settings"
+  },
+  {
+    "key": "app_lock_section",
+    "val": "'APP LOCK SECURITY',"
+  },
+  {
+    "key": "social_boundaries_section",
+    "val": "'SOCIAL BOUNDARIES',"
+  },
+  {
+    "key": "update_credentials_section",
+    "val": "'UPDATE SECURITY CREDENTIALS',"
+  },
+  {
+    "key": "lock_app_pin",
+    "val": "'Lock App with PIN',"
+  },
+  {
+    "key": "lock_app_pin_sub",
+    "val": "'Require a 4-digit PIN code on launch',"
+  },
+  {
+    "key": "change_access_pin",
+    "val": "'Change Access PIN',"
+  },
+  {
+    "key": "lock_app_biometrics",
+    "val": "'Lock App with Biometrics',"
+  },
+  {
+    "key": "lock_app_biometrics_sub",
+    "val": "'Use fingerprint or face recognition',"
+  },
+  {
+    "key": "blocked_users_manage_sub",
+    "val": "'Manage your limits and blocked profiles',"
+  },
+  {
+    "key": "blocked_count",
+    "val": "'{n} Blocked',"
+  },
+  {
+    "key": "total_count",
+    "val": "'{n} total',"
+  },
+  {
+    "key": "change_password",
+    "val": "'Change Password',"
+  },
+  {
+    "key": "change_password_sub",
+    "val": "'Ensure your account uses a secure password to prevent unauthorized login.',"
+  },
+  {
+    "key": "current_password",
+    "val": "'Current Password',"
+  },
+  {
+    "key": "new_password",
+    "val": "'New Password',"
+  },
+  {
+    "key": "confirm_new_password",
+    "val": "'Confirm New Password',"
+  },
+  {
+    "key": "show_label",
+    "val": "'Show',"
+  },
+  {
+    "key": "hide_label",
+    "val": "'Hide',"
+  },
+  {
+    "key": "update_password",
+    "val": "'Update Password',"
+  },
+  {
+    "key": "send_reset_email",
+    "val": "'Send Password Reset Email',"
+  },
+  {
+    "key": "pin_setup_title_create",
+    "val": "'Create a 4-digit PIN',"
+  },
+  {
+    "key": "pin_setup_title_confirm",
+    "val": "'Confirm your 4-digit PIN',"
+  },
+  {
+    "key": "pin_setup_sub",
+    "val": "'This PIN will secure your access to Snellum.',"
+  },
+  {
+    "key": "enter_current_pin",
+    "val": "'Enter current App PIN',"
+  },
+  {
+    "key": "verify_identity_action",
+    "val": "'Please verify your identity to perform this action.',"
+  },
+  {
+    "key": "pin_setup_success",
+    "val": "'App Lock PIN setup successful!',"
+  },
+  {
+    "key": "pin_mismatch",
+    "val": "'PIN codes do not match. Please try again.',"
+  },
+  {
+    "key": "pin_disabled_success",
+    "val": "'PIN Lock disabled successfully.',"
+  },
+  {
+    "key": "pin_incorrect",
+    "val": "'Incorrect PIN code. Please try again.',"
+  },
+  {
+    "key": "biometric_enabled",
+    "val": "'Biometric verification enabled.',"
+  },
+  {
+    "key": "biometric_disabled",
+    "val": "'Biometric verification disabled.',"
+  },
+  {
+    "key": "biometric_set_pin_first",
+    "val": "'Please set a PIN code first before enabling biometrics.',"
+  },
+  {
+    "key": "biometric_not_supported",
+    "val": "'Biometric hardware is not supported or configured on this device.',"
+  },
+  {
+    "key": "biometric_no_enrolled",
+    "val": "'No fingerprints or Face ID enrolled on this device.',"
+  },
+  {
+    "key": "biometric_auth_failed",
+    "val": "'Biometric authentication failed. Could not enable biometric lock.',"
+  },
+  {
+    "key": "biometric_error_prefix",
+    "val": "'Biometric error: ',"
+  },
+  {
+    "key": "unblocked_success",
+    "val": "'Unblocked {name} successfully.',"
+  },
+  {
+    "key": "unblock_label",
+    "val": "'Unblock',"
+  },
+  {
+    "key": "clean_slate",
+    "val": "'Clean Slate!',"
+  },
+  {
+    "key": "no_blocked_users_sub",
+    "val": "'No blocked users. Swipe with safety and fun.',"
+  },
+  {
+    "key": "blocked_users_cannot_message",
+    "val": "'Users in this list cannot swipe, message, or view your profile card.',"
+  },
+  {
+    "key": "validate_current_password",
+    "val": "'Please enter current password',"
+  },
+  {
+    "key": "validate_new_password",
+    "val": "'Please enter new password',"
+  },
+  {
+    "key": "validate_password_min",
+    "val": "'Password must be at least 6 characters',"
+  },
+  {
+    "key": "validate_confirm_password",
+    "val": "'Please confirm new password',"
+  },
+  {
+    "key": "validate_passwords_match",
+    "val": "'Passwords do not match',"
+  },
+  {
+    "key": "password_updated_success",
+    "val": "'Password updated successfully!',"
+  },
+  {
+    "key": "password_reset_email_sent",
+    "val": "'Password reset email sent to {email}.',"
+  },
+  {
+    "key": "no_email_found",
+    "val": "'No registered email address found.',      // Transactions Screen"
+  },
+  {
+    "key": "no_transactions_yet",
+    "val": "'No transactions yet',"
+  },
+  {
+    "key": "payment_history_here",
+    "val": "'Your payment history will appear here',"
+  },
+  {
+    "key": "error_loading_transactions",
+    "val": "'Error loading transactions',"
+  },
+  {
+    "key": "payment_confirmed",
+    "val": "'Payment confirmed! Your account has been updated.',"
+  },
+  {
+    "key": "reverify_payment_tooltip",
+    "val": "'Re-verify Payment',"
+  },
+  {
+    "key": "verification_error_prefix",
+    "val": "'Verification error: ',"
+  },
+  {
+    "key": "error_no_tracking_id",
+    "val": "'Error: No tracking ID found for this transaction',      // Rewards Screen challenge labels"
+  },
+  {
+    "key": "challenge_daily_explorer_title",
+    "val": "'Daily Explorer',"
+  },
+  {
+    "key": "challenge_daily_explorer_desc",
+    "val": "'Use Snellum for 3 hours today',"
+  },
+  {
+    "key": "challenge_profile_pro_title",
+    "val": "'Profile Pro',"
+  },
+  {
+    "key": "challenge_profile_pro_desc",
+    "val": "'Complete 100% of your profile',"
+  },
+  {
+    "key": "challenge_trusted_member_title",
+    "val": "'Trusted Member',"
+  },
+  {
+    "key": "challenge_trusted_member_desc",
+    "val": "'Verify your account',"
+  },
+  {
+    "key": "challenge_welcome_bonus_title",
+    "val": "'Welcome Gift',"
+  },
+  {
+    "key": "challenge_welcome_bonus_desc",
+    "val": "'Join the Snellum community',"
+  },
+  {
+    "key": "challenge_completed_label",
+    "val": "'Completed',"
+  },
+  {
+    "key": "not_logged_in",
+    "val": "'Not logged in',"
+  },
+  {
+    "key": "error_loading_meetups",
+    "val": "'Error loading meetups: {error}',"
+  },
+  {
+    "key": "call_ended_by_partner_finding_match",
+    "val": "'Call ended by partner. Finding new match...',"
+  },
+  {
+    "key": "insufficient_sparks_message_unlimited",
+    "val": "'Insufficient Sparks! You need 10 sparks per message or buy a membership for unlimited messaging.',"
+  },
+  {
+    "key": "report_user_title",
+    "val": "'Report User',"
+  },
+  {
+    "key": "report_partner_guidelines",
+    "val": "'Report {name} for violating guidelines:',"
+  },
+  {
+    "key": "submit_report",
+    "val": "'Submit Report',"
+  },
+  {
+    "key": "report_submitted_skipping_next",
+    "val": "'Report submitted. Skipping to next user...',"
+  },
+  {
+    "key": "block_user_title",
+    "val": "'Block User',"
+  },
+  {
+    "key": "block_user_confirmation",
+    "val": "'Are you sure you want to block {partnerName}? You will disconnect and won\\'t match with them again.',"
+  },
+  {
+    "key": "blocked_partner_skipping_next",
+    "val": "'Blocked {partnerName}. Skipping to next user...',"
+  },
+  {
+    "key": "one_on_one_chat_with",
+    "val": "'1-on-1 Chat with {partnerName}',"
+  },
+  {
+    "key": "chat_unlocks_in_seconds",
+    "val": "'🔒 Unlocks in {seconds}s...',"
+  },
+  {
+    "key": "chat_locked_by_you",
+    "val": "'🔒 Chat locked by you',"
+  },
+  {
+    "key": "chat_locked_by_partner",
+    "val": "'🔒 Chat locked by {partnerName}',"
+  },
+  {
+    "key": "messages_save_to_inbox",
+    "val": "'🔓 Messages save directly to Inbox',"
+  },
+  {
+    "key": "unlock_chat",
+    "val": "'Unlock Chat',"
+  },
+  {
+    "key": "lock_chat",
+    "val": "'Lock Chat',"
+  },
+  {
+    "key": "chat_unlocks_after_two_minutes",
+    "val": "'Chat unlocks after 2 minutes (120s) of call',"
+  },
+  {
+    "key": "you_have_locked_chat",
+    "val": "'You have locked the chat',"
+  },
+  {
+    "key": "partner_has_locked_chat",
+    "val": "'{partnerName} has locked the chat',"
+  },
+  {
+    "key": "say_hi_to_partner",
+    "val": "'Say hi to {partnerName}!',"
+  },
+  {
+    "key": "sender_sent_gift",
+    "val": "'{senderName} sent {giftName}!',"
+  },
+  {
+    "key": "sender_colon_message",
+    "val": "'{senderName}: {message}',"
+  },
+  {
+    "key": "chat_unlocks_in_seconds_hint",
+    "val": "'Chat unlocks in {seconds}s...',"
+  },
+  {
+    "key": "chat_locked_by_you_hint",
+    "val": "'Chat locked by you (tap lock icon to unlock)',"
+  },
+  {
+    "key": "chat_locked_by_partner_hint",
+    "val": "'Chat locked by {partnerName}',"
+  },
+  {
+    "key": "type_message_saves_to_inbox",
+    "val": "'Type a message (saves to Inbox)...',"
+  },
+  {
+    "key": "report",
+    "val": "'Report',"
+  },
+  {
+    "key": "block",
+    "val": "'Block',"
+  },
+  {
+    "key": "end_call",
+    "val": "'End Call',"
+  },
+  {
+    "key": "next",
+    "val": "'NEXT',"
+  },
+  {
+    "key": "failed_to_delete",
+    "val": "'Failed to delete: {error}',"
+  },
+  {
+    "key": "super",
+    "val": "'SUPER',"
+  },
+  {
+    "key": "failed_to_unlock",
+    "val": "'Failed to unlock: {error}',"
+  },
+  {
+    "key": "best_value",
+    "val": "'BEST VALUE',"
+  },
+  {
+    "key": "could_not_open_chat",
+    "val": "'Could not open chat: {error}',"
+  },
+  {
+    "key": "your_balance_sparks",
+    "val": "'Your Balance: {credits} Sparks',"
+  },
+  {
+    "key": "email_verified_snack",
+    "val": "'Email verified successfully. Welcome to Snellum.',"
+  },
+  {
+    "key": "error_generic",
+    "val": "'An error occurred',"
+  },
+  {
+    "key": "not_logged_in_screen",
+    "val": "'Not logged in',"
+  },
+  {
+    "key": "no_account_found_phone",
+    "val": "'No account found with this phone number. Please check the number or sign up.',"
+  },
+  {
+    "key": "valid_phone_required",
+    "val": "'Please enter a valid phone number',"
+  },
+  {
+    "key": "code_sent_check_inbox",
+    "val": "'Verification code sent to {email}. Check your inbox.',"
+  },
+  {
+    "key": "send_code_failed_with_error",
+    "val": "'Could not send verification code: {error}',"
+  },
+  {
+    "key": "error_with_details",
+    "val": "'Error: {error}',"
+  },
+  {
+    "key": "verification_code_sent_to_phone",
+    "val": "'Verification code sent to {phone}',"
+  },
+  {
+    "key": "invalid_verification_code",
+    "val": "'Invalid verification code. Please check and try again.',"
+  },
+  {
+    "key": "phone_number",
+    "val": "'Phone Number',"
+  },
+  {
+    "key": "phone_number_hint",
+    "val": "'Phone Number',"
+  },
+  {
+    "key": "search_country",
+    "val": "'Search country',"
+  },
+  {
+    "key": "enter_full_6_digit_code",
+    "val": "'Please enter the full 6-digit code',"
+  },
+  {
+    "key": "email_verified_welcome",
+    "val": "'Email verified successfully. Welcome to Snellum.',"
+  },
+  {
+    "key": "authentication_failed",
+    "val": "'Authentication failed.',"
+  },
+  {
+    "key": "verification_error_with_details",
+    "val": "'Verification error: {error}',"
+  },
+  {
+    "key": "verify_email_title",
+    "val": "'Verify Your Email',"
+  },
+  {
+    "key": "we_sent_code_to",
+    "val": "'We sent a 6-digit verification code to',"
+  },
+  {
+    "key": "check_spam_junk_folder",
+    "val": "'If you do not see the email, check your spam or junk folder.',"
+  },
+  {
+    "key": "didnt_get_code_resend",
+    "val": "'Didn\\'t get the code? Resend Code',"
+  },
+  {
+    "key": "not_logged_in_meetups",
+    "val": "'Not logged in',"
+  },
+  {
+    "key": "failed_cancel_membership",
+    "val": "'Failed to cancel membership: {error}',"
+  },
+  {
+    "key": "switch_plan_title",
+    "val": "'Switch to {newPlanName}?',"
+  },
+  {
+    "key": "switch_plan_desc",
+    "val": "'This will activate {newPlanName} right away. Your current plan will be placed into the queue with remaining days preserved.',"
+  },
+  {
+    "key": "error_activating_plan",
+    "val": "'Error activating plan: {error}',"
+  },
+  {
+    "key": "remove_queue_title",
+    "val": "'Remove {planName} from Queue?',"
+  },
+  {
+    "key": "remove_queue_desc",
+    "val": "'Are you sure you want to remove this queued membership? This cannot be undone.',"
+  },
+  {
+    "key": "keep",
+    "val": "'Keep',"
+  },
+  {
+    "key": "error_remove_queued",
+    "val": "'Error removing queued subscription: {error}',"
+  },
+  {
+    "key": "hours_mins_remaining",
+    "val": "'{hours}h {mins}m remaining',"
+  },
+  {
+    "key": "expiring_minute",
+    "val": "'Expiring in less than a minute',"
+  },
+  {
+    "key": "free_tier",
+    "val": "'FREE TIER',"
+  },
+  {
+    "key": "plan_pass_status",
+    "val": "'{planName} PASS',"
+  },
+  {
+    "key": "status_active",
+    "val": "'ACTIVE',"
+  },
+  {
+    "key": "status_expired",
+    "val": "'EXPIRED',"
+  },
+  {
+    "key": "status_standard",
+    "val": "'STANDARD',"
+  },
+  {
+    "key": "standard_free_tier",
+    "val": "'Standard free access tier',"
+  },
+  {
+    "key": "unknown",
+    "val": "'Unknown',"
+  },
+  {
+    "key": "never",
+    "val": "'Never',"
+  },
+  {
+    "key": "plan_privileges",
+    "val": "'Your Plan Privileges',"
+  },
+  {
+    "key": "queued_memberships_count",
+    "val": "'Queued Memberships ({count})',"
+  },
+  {
+    "key": "queued_memberships_desc",
+    "val": "'These memberships are preserved and will activate automatically, or you can switch to one now.',"
+  },
+  {
+    "key": "plan_pass_status_premium",
+    "val": "'PREMIUM',"
+  },
+  {
+    "key": "cancel_plan_title",
+    "val": "'Cancel {planName} Membership?',"
+  },
+  {
+    "key": "cancel_plan_desc",
+    "val": "'Are you sure you want to cancel your membership? You will immediately lose all premium privileges and return to the standard Free tier.',"
+  },
+  {
+    "key": "loss_unlimited_likes",
+    "val": "'Unlimited likes & rewind swipes',"
+  },
+  {
+    "key": "loss_video_voice",
+    "val": "'HD video & voice calling privileges',"
+  },
+  {
+    "key": "loss_priority_visibility",
+    "val": "'Priority VIP matching & profile visibility',"
+  },
+  {
+    "key": "error_generic_error",
+    "val": "'Error: {error}',"
+  },
+  {
+    "key": "payment_pending_failed",
+    "val": "'Payment still pending or failed on server.',"
+  },
+  {
+    "key": "verification_error",
+    "val": "'Verification error: {error}',"
+  },
+  {
+    "key": "no_transactions",
+    "val": "'No transactions yet',"
+  },
+  {
+    "key": "sparks_amount",
+    "val": "'{sparkAmount} Sparks',"
+  },
+  {
+    "key": "reverify_payment",
+    "val": "'Re-verify Payment',"
+  },
+  {
+    "key": "plan_pro",
+    "val": "'PRO',"
+  },
+  {
+    "key": "plan_premium",
+    "val": "'PREMIUM',"
+  },
+  {
+    "key": "plan_elite",
+    "val": "'ELITE',"
+  },
+  {
+    "key": "subscriptions_tab",
+    "val": "'Subscriptions',"
+  },
+  {
+    "key": "sparks_tab",
+    "val": "'Sparks',"
+  },
+  {
+    "key": "billing_weekly",
+    "val": "'Weekly',"
+  },
+  {
+    "key": "billing_monthly",
+    "val": "'Monthly',"
+  },
+  {
+    "key": "plan_benefits_title",
+    "val": "'{title} BENEFITS',"
+  },
+  {
+    "key": "back_to_plans",
+    "val": "'BACK TO PLANS',"
+  },
+  {
+    "key": "most_popular",
+    "val": "'MOST POPULAR',"
+  },
+  {
+    "key": "elite_sparks_bonus",
+    "val": "'+2,000 SPARKS',"
+  },
+  {
+    "key": "view_all_benefits",
+    "val": "'View all {count} benefits',"
+  },
+  {
+    "key": "choose_plan",
+    "val": "'Choose Plan',"
+  },
+  {
+    "key": "available_balance",
+    "val": "'AVAILABLE BALANCE',"
+  },
+  {
+    "key": "sparks",
+    "val": "'Sparks',"
+  },
+  {
+    "key": "purchase_sparks",
+    "val": "'Purchase Sparks',"
+  },
+  {
+    "key": "bonus_10000_free",
+    "val": "'10,000 FREE',"
+  },
+  {
+    "key": "best_value_badge",
+    "val": "'BEST VALUE',"
+  },
+  {
+    "key": "confirm_details",
+    "val": "'Confirm Details',"
+  },
+  {
+    "key": "operator_payment",
+    "val": "'{operatorName} Payment',"
+  },
+  {
+    "key": "amount_to_pay",
+    "val": "'Amount to Pay',"
+  },
+  {
+    "key": "phone_hint_airtel",
+    "val": "'09xxxxxxx',"
+  },
+  {
+    "key": "phone_hint_tnm",
+    "val": "'08xxxxxxx',"
+  },
+  {
+    "key": "enter_valid_number",
+    "val": "'Please enter a valid number',"
+  },
+  {
+    "key": "confirm_and_pay",
+    "val": "'Confirm & Pay',"
+  },
+  {
+    "key": "change_payment_method",
+    "val": "'Change payment method',"
+  },
+  {
+    "key": "securely_processing",
+    "val": "'Securely Processing...',"
+  },
+  {
+    "key": "processing_prompt_desc",
+    "val": "'Confirm the payment prompt on your device. This may take a few seconds.',"
+  },
+  {
+    "key": "payment_successful",
+    "val": "'Payment Successful!',"
+  },
+  {
+    "key": "success_elite",
+    "val": "'High five! Your ELITE subscription is active and 2,000 Sparks have been added to your balance!',"
+  },
+  {
+    "key": "success_subscription",
+    "val": "'High five! Your {plan} subscription is now active and ready to go.',"
+  },
+  {
+    "key": "success_sparks_added",
+    "val": "'High five! {sparks} Sparks have been added to your balance!',"
+  },
+  {
+    "key": "sparks_added_badge",
+    "val": "'+{sparks} Sparks Added',"
+  },
+  {
+    "key": "done",
+    "val": "'Done!',"
+  },
+  {
+    "key": "payment_failed",
+    "val": "'Payment Failed',"
+  },
+  {
+    "key": "try_again",
+    "val": "'Try Again',"
+  },
+  {
+    "key": "payment_failed_short",
+    "val": "'Payment failed',"
+  },
+  {
+    "key": "payment_timeout",
+    "val": "'Timeout: Payment verification is taking too long. Please check your balance or contact support.',"
+  },
+  {
+    "key": "select_payment_method",
+    "val": "'Select Payment Method',"
+  },
+  {
+    "key": "choose_operator",
+    "val": "'Choose your preferred mobile money operator',"
+  },
+  {
+    "key": "failed_load_operators",
+    "val": "'Failed to load operators.',"
+  },
+  {
+    "key": "operator_country_currency",
+    "val": "'{countryName} • {currency}',"
+  },
+  {
+    "key": "amount_mwk",
+    "val": "'{price} MWK',"
+  },
+  {
+    "key": "mobile_number",
+    "val": "'Mobile Number',"
+  },
+  {
+    "key": "crop_image",
+    "val": "'Crop Image',"
+  },
+  {
+    "key": "failed_process_image",
+    "val": "'Failed to process image: {error}',"
+  },
+  {
+    "key": "add_caption_hint",
+    "val": "'Add a caption...',"
+  },
+  {
+    "key": "live_stream_default_title",
+    "val": "'Live Stream',"
+  },
+  {
+    "key": "gift_sent_chat_message",
+    "val": "'sent a {giftType}!',"
+  },
+  {
+    "key": "live_you_label",
+    "val": "'You',"
+  },
+  {
+    "key": "live_host_label",
+    "val": "'Host',"
+  },
+  {
+    "key": "live_guest_label",
+    "val": "'Guest',"
+  },
+  {
+    "key": "live_host_tag",
+    "val": "'{hostName} (Host)',"
+  },
+  {
+    "key": "live_cohost_tag",
+    "val": "'{guestName} (Co-host)',"
+  },
+  {
+    "key": "live_camera_off_message",
+    "val": "'{name}\\'s camera is off',"
+  },
+  {
+    "key": "live_fallback_name",
+    "val": "'Live',"
+  },
+  {
+    "key": "live_badge_label",
+    "val": "'LIVE',"
+  },
+  {
+    "key": "live_end_button",
+    "val": "'END',"
+  },
+  {
+    "key": "live_leave_button",
+    "val": "'LEAVE',"
+  },
+  {
+    "key": "live_unmute_label",
+    "val": "'Unmute',"
+  },
+  {
+    "key": "live_mute_label",
+    "val": "'Mute',"
+  },
+  {
+    "key": "live_show_camera_label",
+    "val": "'Show',"
+  },
+  {
+    "key": "live_hide_camera_label",
+    "val": "'Hide',"
+  },
+  {
+    "key": "live_leave_seat_label",
+    "val": "'Leave Seat',"
+  },
+  {
+    "key": "live_remove_guest_label",
+    "val": "'Remove Guest',"
+  },
+  {
+    "key": "live_invite_match_label",
+    "val": "'Invite Match',"
+  },
+  {
+    "key": "live_invite_a_match_title",
+    "val": "'Invite a Match',"
+  },
+  {
+    "key": "live_no_matches_found",
+    "val": "'No matches found. Swipe to get matches first!',"
+  },
+  {
+    "key": "invitation_sent_snack",
+    "val": "'Invitation sent to {match.firstName}!',"
+  },
+  {
+    "key": "invite_button",
+    "val": "'Invite',"
+  },
+  {
+    "key": "say_something_hint",
+    "val": "'Say something…',"
+  },
+  {
+    "key": "gender_option_male",
+    "val": "'Male',"
+  },
+  {
+    "key": "gender_option_female",
+    "val": "'Female',"
+  },
+  {
+    "key": "gender_option_non_binary",
+    "val": "'Non-Binary',"
+  },
+  {
+    "key": "gender_option_other",
+    "val": "'Other',"
+  },
+  {
+    "key": "interested_in_men",
+    "val": "'Men',"
+  },
+  {
+    "key": "interested_in_women",
+    "val": "'Women',"
+  },
+  {
+    "key": "interested_in_everyone",
+    "val": "'Everyone',"
+  },
+  {
+    "key": "relationship_single",
+    "val": "'Single',"
+  },
+  {
+    "key": "relationship_married",
+    "val": "'Married',"
+  },
+  {
+    "key": "relationship_divorced",
+    "val": "'Divorced',"
+  },
+  {
+    "key": "relationship_widowed",
+    "val": "'Widowed',"
+  },
+  {
+    "key": "relationship_separated",
+    "val": "'Separated',"
+  },
+  {
+    "key": "looking_for_marriage",
+    "val": "'Marriage',"
+  },
+  {
+    "key": "looking_for_long_term",
+    "val": "'Long Term Relationship',"
+  },
+  {
+    "key": "looking_for_short_term",
+    "val": "'Short Term Relationship',"
+  },
+  {
+    "key": "looking_for_casual",
+    "val": "'Casual',"
+  },
+  {
+    "key": "looking_for_short_term_fun",
+    "val": "'Short Term Fun',"
+  },
+  {
+    "key": "looking_for_coffee_date",
+    "val": "'Coffee Date',"
+  },
+  {
+    "key": "looking_for_new_friends",
+    "val": "'New Friends',"
+  },
+  {
+    "key": "looking_for_learn_cultures",
+    "val": "'Learn Cultures',"
+  },
+  {
+    "key": "looking_for_travel_world",
+    "val": "'Travel the World',"
+  },
+  {
+    "key": "looking_for_figuring_out",
+    "val": "'Figuring Out',"
+  },
+  {
+    "key": "smoking_yes",
+    "val": "'Yes',"
+  },
+  {
+    "key": "smoking_no",
+    "val": "'No',"
+  },
+  {
+    "key": "smoking_occasionally",
+    "val": "'Occasionally',"
+  },
+  {
+    "key": "drinking_yes",
+    "val": "'Yes',"
+  },
+  {
+    "key": "drinking_no",
+    "val": "'No',"
+  },
+  {
+    "key": "drinking_socially",
+    "val": "'Socially',"
+  },
+  {
+    "key": "want_kids_yes",
+    "val": "'Yes',"
+  },
+  {
+    "key": "want_kids_no",
+    "val": "'No',"
+  },
+  {
+    "key": "want_kids_maybe",
+    "val": "'Maybe',"
+  },
+  {
+    "key": "want_kids_already_have",
+    "val": "'Already have',"
+  },
+  {
+    "key": "occupation_student",
+    "val": "'Student',"
+  },
+  {
+    "key": "occupation_entrepreneur",
+    "val": "'Entrepreneur',"
+  },
+  {
+    "key": "occupation_teacher",
+    "val": "'Teacher',"
+  },
+  {
+    "key": "occupation_nurse",
+    "val": "'Nurse',"
+  },
+  {
+    "key": "occupation_engineer",
+    "val": "'Engineer',"
+  },
+  {
+    "key": "occupation_designer",
+    "val": "'Designer',"
+  },
+  {
+    "key": "occupation_developer",
+    "val": "'Developer',"
+  },
+  {
+    "key": "occupation_manager",
+    "val": "'Manager',"
+  },
+  {
+    "key": "family_plans_label",
+    "val": "'Family Plans',"
+  },
+  {
+    "key": "communication_style_label",
+    "val": "'Communication Style',"
+  },
+  {
+    "key": "love_style_label",
+    "val": "'Love Style',"
+  },
+  {
+    "key": "music_genres_hint",
+    "val": "'Pop, Rock, R&B...',"
+  },
+  {
+    "key": "core_values_hint",
+    "val": "'Family, Ambition, Honesty...',"
+  },
+  {
+    "key": "lat_long_display",
+    "val": "'Lat: {lat}, Long: {long}',"
+  },
+  {
+    "key": "required_badge",
+    "val": "'Required',"
+  },
+  {
+    "key": "max_8_photos_snack",
+    "val": "'You can only have up to 8 photos.',"
+  },
+  {
+    "key": "upload_starting_snack",
+    "val": "'Starting upload of {n} photos...',"
+  },
+  {
+    "key": "upload_server_error",
+    "val": "'Server Error: {message}',"
+  },
+  {
+    "key": "upload_http_error",
+    "val": "'HTTP Error: {code}',"
+  },
+  {
+    "key": "upload_connection_error",
+    "val": "'Connection Error: {e}',"
+  },
+  {
+    "key": "upload_all_saved_snack",
+    "val": "'All photos uploaded and saved!',"
+  },
+  {
+    "key": "upload_partial_snack",
+    "val": "'Uploaded {n} of {m} photos and saved profile.',"
+  },
+  {
+    "key": "upload_failed_snack",
+    "val": "'Upload failed. Check your server logs.',"
+  },
+  {
+    "key": "tap_to_enter_hint",
+    "val": "'Tap to enter...',"
+  },
+  {
+    "key": "add_custom_options_hint",
+    "val": "'Add custom options separated by commas',"
+  },
+  {
+    "key": "ask_me_option",
+    "val": "'Ask me',"
+  },
+  {
+    "key": "claim_pro",
+    "val": "'CLAIM {title}',"
+  },
+  {
+    "key": "claim_reward_button",
+    "val": "'Claim Now',"
+  },
+  {
+    "key": "status_badge_done",
+    "val": "'DONE',"
+  },
+  {
+    "key": "status_badge_ready",
+    "val": "'READY',"
+  },
+  {
+    "key": "status_badge_open",
+    "val": "'OPEN',"
+  },
+  {
+    "key": "challenge_daily_hours_progress",
+    "val": "'{hours}h / 3h',"
+  },
+  {
+    "key": "challenge_welcome_gift_title",
+    "val": "'Welcome Gift',"
+  },
+  {
+    "key": "challenge_welcome_gift_desc",
+    "val": "'Join the Snellum community',"
+  },
+  {
+    "key": "completed",
+    "val": "'Completed',"
+  },
+  {
+    "key": "invite_earn_title",
+    "val": "'Invite & Earn',"
+  },
+  {
+    "key": "invite_earn_title_claim",
+    "val": "'Claim Sparks',"
+  },
+  {
+    "key": "send_gift_title_fallback",
+    "val": "'Send a Gift',"
+  },
+  {
+    "key": "error_generic_gift",
+    "val": "'Error: {error}',"
+  },
+  {
+    "key": "progress_percent",
+    "val": "'{percent}%',"
+  },
+  {
+    "key": "activate_plan_title",
+    "val": "'Activate {newPlanName} Membership',"
+  },
+  {
+    "key": "activate_plan_desc",
+    "val": "'This will make {newPlanName} your active membership. Your current {currentPlanName} plan will be safely queued with its remaining time preserved.',"
+  },
+  {
+    "key": "failed_switch_membership",
+    "val": "'Failed to switch membership: {error}',"
+  },
+  {
+    "key": "premium_member_badge",
+    "val": "'{premiumType} MEMBER',"
+  },
+  {
+    "key": "plan_days_remaining",
+    "val": "'{days} days remaining',"
+  },
+  {
+    "key": "plan_hours_remaining",
+    "val": "'{hours} hours remaining',"
+  },
+  {
+    "key": "plan_mins_remaining",
+    "val": "'{mins} mins remaining',"
+  },
+  {
+    "key": "send_gift_button",
+    "val": "'Send Gift',"
+  },
+  {
+    "key": "gift_cost_label",
+    "val": "'Cost: {cost} Sparks',"
+  },
+  {
+    "key": "gift_error",
+    "val": "'Error sending gift: {error}',"
+  },
+  {
+    "key": "confirm_delete_message_title",
+    "val": "'Delete Message',"
+  },
+  {
+    "key": "confirm_delete_message_content",
+    "val": "'Are you sure you want to delete this message?',"
+  },
+  {
+    "key": "edit_message_label",
+    "val": "'Edit Message',"
+  },
+  {
+    "key": "cancel_delete",
+    "val": "'Cancel',"
+  },
+  {
+    "key": "confirm_delete",
+    "val": "'Delete',"
+  },
+  {
+    "key": "cancel_gift",
+    "val": "'Cancel',"
+  },
+  {
+    "key": "request_message_title",
+    "val": "'Message Request',"
+  },
+  {
+    "key": "request_message_desc",
+    "val": "'{senderName} wants to start a conversation with you',"
+  },
+  {
+    "key": "report_submitted_snack",
+    "val": "'Report submitted. Thank you for keeping {appName} safe.',"
+  },
+  {
+    "key": "not_enough_credits_to_unlock",
+    "val": "'Not enough Sparks. Please top up to unlock.',"
+  },
+  {
+    "key": "verify_otp_failed",
+    "val": "'Invalid verification code. Please check and try again.',"
+  },
+  {
+    "key": "session_expired_reroute",
+    "val": "'Session expired. Please re-enter your number.',"
+  },
+  {
+    "key": "login_failed_with_error",
+    "val": "'Login failed: {error}',"
+  },
+  {
+    "key": "send_otp_failed",
+    "val": "'Could not send verification code: {error}',"
+  },
+  {
+    "key": "invalid_otp",
+    "val": "'Invalid verification code. Please check and try again.',"
+  },
+  {
+    "key": "continue_with_phone_title",
+    "val": "'Continue with Phone',"
+  },
+  {
+    "key": "send_code_button",
+    "val": "'Send Code',"
+  },
+  {
+    "key": "verify_continue_button",
+    "val": "'Verify & Continue',"
+  },
+  {
+    "key": "resend_code_in",
+    "val": "'Resend code in {seconds}s',"
+  },
+  {
+    "key": "phone_auth_title",
+    "val": "'Phone Authentication',"
+  },
+  {
+    "key": "otp_hint",
+    "val": "'000000',};"
+  }
+]

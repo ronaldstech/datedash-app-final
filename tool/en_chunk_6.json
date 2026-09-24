@@ -1,0 +1,402 @@
+[
+  {
+    "key": "upload_photos",
+    "val": "'Upload Photos',"
+  },
+  {
+    "key": "upload_photos_wizard_desc",
+    "val": "'Upload up to 6 high-quality photos. Adding photos significantly boosts your completion score.',"
+  },
+  {
+    "key": "uploading_photos_progress",
+    "val": "'Uploading selected photos...',"
+  },
+  {
+    "key": "profile_completion_alert",
+    "val": "'Your profile is currently {n}% complete. Upload more details or photos to reach 40%!',"
+  },
+  {
+    "key": "select_your_country",
+    "val": "'Select Your Country',"
+  },
+  {
+    "key": "your_country_location",
+    "val": "'Your Location / Country',"
+  },
+  {
+    "key": "select_country_hint",
+    "val": "'Select your country',"
+  },
+  {
+    "key": "bio_hint",
+    "val": "'Tell us a bit about who you are...',"
+  },
+  {
+    "key": "max_6_photos_wizard",
+    "val": "'You can only have up to 6 photos in the wizard.',"
+  },
+  {
+    "key": "or_type_own",
+    "val": "'Or type your own',"
+  },
+  {
+    "key": "reward_history",
+    "val": "'REWARD HISTORY',"
+  },
+  {
+    "key": "total_sparks_received",
+    "val": "'TOTAL SPARKS RECEIVED',"
+  },
+  {
+    "key": "no_rewards_yet",
+    "val": "'No rewards yet',"
+  },
+  {
+    "key": "no_rewards_sub",
+    "val": "'Receive gifts from other users or complete daily activity to earn rewards!',"
+  },
+  {
+    "key": "daily_activity_reward",
+    "val": "'Daily Activity Reward',"
+  },
+  {
+    "key": "gift_received",
+    "val": "'Gift Received',"
+  },
+  {
+    "key": "sparks_count",
+    "val": "'+{n} Sparks',"
+  },
+  {
+    "key": "you_received_a_gift",
+    "val": "'You received a gift!',"
+  },
+  {
+    "key": "received_tab",
+    "val": "'Received',"
+  },
+  {
+    "key": "sent_tab",
+    "val": "'Sent',"
+  },
+  {
+    "key": "no_sent_requests",
+    "val": "'No sent requests yet.',"
+  },
+  {
+    "key": "no_received_requests",
+    "val": "'No received requests yet.',"
+  },
+  {
+    "key": "to_user",
+    "val": "'To: {name}',"
+  },
+  {
+    "key": "from_user",
+    "val": "'From: {name}',"
+  },
+  {
+    "key": "date_time_label",
+    "val": "'Date & Time',"
+  },
+  {
+    "key": "location_label",
+    "val": "'Location',"
+  },
+  {
+    "key": "rate_req_label",
+    "val": "'Rate / Req.',"
+  },
+  {
+    "key": "message_label",
+    "val": "'Message',"
+  },
+  {
+    "key": "chat_btn",
+    "val": "'Chat',"
+  },
+  {
+    "key": "accept_btn",
+    "val": "'Accept',"
+  },
+  {
+    "key": "decline_btn",
+    "val": "'Decline',"
+  },
+  {
+    "key": "cancel_request_btn",
+    "val": "'Cancel Request',"
+  },
+  {
+    "key": "meetup_status_updated",
+    "val": "'Meetup {status}!',"
+  },
+  {
+    "key": "error_updating_status",
+    "val": "'Error updating status: {e}',      // Notification Settings"
+  },
+  {
+    "key": "notif_master_control",
+    "val": "'MASTER CONTROL',"
+  },
+  {
+    "key": "notif_alert_preferences",
+    "val": "'ALERT PREFERENCES',"
+  },
+  {
+    "key": "notif_types_section",
+    "val": "'NOTIFICATION TYPES',"
+  },
+  {
+    "key": "notif_allow",
+    "val": "'Allow Notifications',"
+  },
+  {
+    "key": "notif_allow_sub",
+    "val": "'Enable or disable all notifications',"
+  },
+  {
+    "key": "notif_sound",
+    "val": "'Notification Sound',"
+  },
+  {
+    "key": "notif_sound_sub",
+    "val": "'Play a sound for incoming alerts',"
+  },
+  {
+    "key": "notif_vibrate",
+    "val": "'Vibrate',"
+  },
+  {
+    "key": "notif_vibrate_sub",
+    "val": "'Vibrate on notifications',"
+  },
+  {
+    "key": "notif_matches",
+    "val": "'New Matches',"
+  },
+  {
+    "key": "notif_matches_sub",
+    "val": "'Get notified when you get a new match',"
+  },
+  {
+    "key": "notif_messages",
+    "val": "'Messages',"
+  },
+  {
+    "key": "notif_messages_sub",
+    "val": "'Get notified for new chat messages',"
+  },
+  {
+    "key": "notif_likes",
+    "val": "'Likes',"
+  },
+  {
+    "key": "notif_likes_sub",
+    "val": "'Get notified when someone likes your profile',"
+  },
+  {
+    "key": "notif_calls",
+    "val": "'Calls',"
+  },
+  {
+    "key": "notif_calls_sub",
+    "val": "'Get notified for voice and video calls',      // Security Settings"
+  },
+  {
+    "key": "app_lock_section",
+    "val": "'APP LOCK SECURITY',"
+  },
+  {
+    "key": "social_boundaries_section",
+    "val": "'SOCIAL BOUNDARIES',"
+  },
+  {
+    "key": "update_credentials_section",
+    "val": "'UPDATE SECURITY CREDENTIALS',"
+  },
+  {
+    "key": "lock_app_pin",
+    "val": "'Lock App with PIN',"
+  },
+  {
+    "key": "lock_app_pin_sub",
+    "val": "'Require a 4-digit PIN code on launch',"
+  },
+  {
+    "key": "change_access_pin",
+    "val": "'Change Access PIN',"
+  },
+  {
+    "key": "lock_app_biometrics",
+    "val": "'Lock App with Biometrics',"
+  },
+  {
+    "key": "lock_app_biometrics_sub",
+    "val": "'Use fingerprint or face recognition',"
+  },
+  {
+    "key": "blocked_users_manage_sub",
+    "val": "'Manage your limits and blocked profiles',"
+  },
+  {
+    "key": "blocked_count",
+    "val": "'{n} Blocked',"
+  },
+  {
+    "key": "total_count",
+    "val": "'{n} total',"
+  },
+  {
+    "key": "change_password",
+    "val": "'Change Password',"
+  },
+  {
+    "key": "change_password_sub",
+    "val": "'Ensure your account uses a secure password to prevent unauthorized login.',"
+  },
+  {
+    "key": "current_password",
+    "val": "'Current Password',"
+  },
+  {
+    "key": "new_password",
+    "val": "'New Password',"
+  },
+  {
+    "key": "confirm_new_password",
+    "val": "'Confirm New Password',"
+  },
+  {
+    "key": "show_label",
+    "val": "'Show',"
+  },
+  {
+    "key": "hide_label",
+    "val": "'Hide',"
+  },
+  {
+    "key": "update_password",
+    "val": "'Update Password',"
+  },
+  {
+    "key": "send_reset_email",
+    "val": "'Send Password Reset Email',"
+  },
+  {
+    "key": "pin_setup_title_create",
+    "val": "'Create a 4-digit PIN',"
+  },
+  {
+    "key": "pin_setup_title_confirm",
+    "val": "'Confirm your 4-digit PIN',"
+  },
+  {
+    "key": "pin_setup_sub",
+    "val": "'This PIN will secure your access to Snellum.',"
+  },
+  {
+    "key": "enter_current_pin",
+    "val": "'Enter current App PIN',"
+  },
+  {
+    "key": "verify_identity_action",
+    "val": "'Please verify your identity to perform this action.',"
+  },
+  {
+    "key": "pin_setup_success",
+    "val": "'App Lock PIN setup successful!',"
+  },
+  {
+    "key": "pin_mismatch",
+    "val": "'PIN codes do not match. Please try again.',"
+  },
+  {
+    "key": "pin_disabled_success",
+    "val": "'PIN Lock disabled successfully.',"
+  },
+  {
+    "key": "pin_incorrect",
+    "val": "'Incorrect PIN code. Please try again.',"
+  },
+  {
+    "key": "biometric_enabled",
+    "val": "'Biometric verification enabled.',"
+  },
+  {
+    "key": "biometric_disabled",
+    "val": "'Biometric verification disabled.',"
+  },
+  {
+    "key": "biometric_set_pin_first",
+    "val": "'Please set a PIN code first before enabling biometrics.',"
+  },
+  {
+    "key": "biometric_not_supported",
+    "val": "'Biometric hardware is not supported or configured on this device.',"
+  },
+  {
+    "key": "biometric_no_enrolled",
+    "val": "'No fingerprints or Face ID enrolled on this device.',"
+  },
+  {
+    "key": "biometric_auth_failed",
+    "val": "'Biometric authentication failed. Could not enable biometric lock.',"
+  },
+  {
+    "key": "biometric_error_prefix",
+    "val": "'Biometric error: ',"
+  },
+  {
+    "key": "unblocked_success",
+    "val": "'Unblocked {name} successfully.',"
+  },
+  {
+    "key": "unblock_label",
+    "val": "'Unblock',"
+  },
+  {
+    "key": "clean_slate",
+    "val": "'Clean Slate!',"
+  },
+  {
+    "key": "no_blocked_users_sub",
+    "val": "'No blocked users. Swipe with safety and fun.',"
+  },
+  {
+    "key": "blocked_users_cannot_message",
+    "val": "'Users in this list cannot swipe, message, or view your profile card.',"
+  },
+  {
+    "key": "validate_current_password",
+    "val": "'Please enter current password',"
+  },
+  {
+    "key": "validate_new_password",
+    "val": "'Please enter new password',"
+  },
+  {
+    "key": "validate_password_min",
+    "val": "'Password must be at least 6 characters',"
+  },
+  {
+    "key": "validate_confirm_password",
+    "val": "'Please confirm new password',"
+  },
+  {
+    "key": "validate_passwords_match",
+    "val": "'Passwords do not match',"
+  },
+  {
+    "key": "password_updated_success",
+    "val": "'Password updated successfully!',"
+  },
+  {
+    "key": "password_reset_email_sent",
+    "val": "'Password reset email sent to {email}.',"
+  },
+  {
+    "key": "no_email_found",
+    "val": "'No registered email address found.',      // Transactions Screen"
+  }
+]

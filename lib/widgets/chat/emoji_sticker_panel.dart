@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/chat_emoji_data.dart';
+import '../../providers/language_provider.dart';
 
 class EmojiStickerPanel extends StatefulWidget {
   final ValueChanged<String> onEmojiSelected;
@@ -57,6 +59,7 @@ class _EmojiStickerPanelState extends State<EmojiStickerPanel> {
   }
 
   Widget _buildTabBar() {
+    final languageProvider = context.watch<LanguageProvider>();
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 14, 20, 6),
       padding: const EdgeInsets.all(4),
@@ -66,8 +69,8 @@ class _EmojiStickerPanelState extends State<EmojiStickerPanel> {
       ),
       child: Row(
         children: [
-          _buildTab(0, Iconsax.smileys, 'Emoji'),
-          _buildTab(1, Iconsax.magic_star, 'Stickers'),
+          _buildTab(0, Iconsax.smileys, languageProvider.getString('chat_emoji_tab')),
+          _buildTab(1, Iconsax.magic_star, languageProvider.getString('chat_stickers_tab')),
         ],
       ),
     );

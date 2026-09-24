@@ -72,12 +72,12 @@ class _GiftsScreenState extends State<GiftsScreen> {
                   const Icon(Iconsax.clock, size: 20, color: Colors.grey),
                   const SizedBox(width: 10),
                   Text(
-                    'REWARD HISTORY',
+                    lp.getString('reward_history'),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.5,
-                      color: Colors.grey.withValues(alpha: 	0.8),
+                      color: Colors.grey.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -115,6 +115,7 @@ class _GiftsScreenState extends State<GiftsScreen> {
                       (context, index) => _GiftRewardCard(
                         notification: items[index],
                         profileService: _profileService,
+                        languageProvider: lp,
                       ),
                       childCount: items.length,
                     ),
@@ -145,7 +146,7 @@ class _GiftsScreenState extends State<GiftsScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 	0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child:
@@ -163,9 +164,9 @@ class _GiftsScreenState extends State<GiftsScreen> {
               ),
             ),
             Text(
-              'TOTAL SPARKS RECEIVED',
+              lp.getString('total_sparks_received'),
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 	0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 1.2,
@@ -188,24 +189,24 @@ class _GiftsScreenState extends State<GiftsScreen> {
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: isDark
-                    ? Colors.white.withValues(alpha: 	0.05)
-                    : Colors.black.withValues(alpha: 	0.03),
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.black.withValues(alpha: 0.03),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Iconsax.gift, size: 64, color: Colors.blueGrey),
             ),
             const SizedBox(height: 24),
-            const Text(
-              'No rewards yet',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              lp.getString('no_rewards_yet'),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
               child: Text(
-                'Receive gifts from other users or complete daily activity to earn rewards!',
+                lp.getString('no_rewards_sub'),
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey),
+                style: const TextStyle(color: Colors.grey),
               ),
             ),
           ],
@@ -218,14 +219,17 @@ class _GiftsScreenState extends State<GiftsScreen> {
 class _GiftRewardCard extends StatelessWidget {
   final SnellumNotification notification;
   final ProfileService profileService;
+  final LanguageProvider languageProvider;
 
   const _GiftRewardCard({
     required this.notification,
     required this.profileService,
+    required this.languageProvider,
   });
 
   @override
   Widget build(BuildContext context) {
+    final lp = languageProvider;
     final isReward = notification.type == 'reward';
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final dateStr =
@@ -234,12 +238,12 @@ class _GiftRewardCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withValues(alpha: 	0.05) : Colors.white,
+        color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDark
-              ? Colors.white.withValues(alpha: 	0.05)
-              : Colors.black.withValues(alpha: 	0.03),
+              ? Colors.white.withValues(alpha: 0.05)
+              : Colors.black.withValues(alpha: 0.03),
         ),
       ),
       child: ListTile(
@@ -249,7 +253,7 @@ class _GiftRewardCard extends StatelessWidget {
           height: 52,
           decoration: BoxDecoration(
             color: (isReward ? Colors.orangeAccent : const Color(0xFFFF4D85))
-                .withValues(alpha: 	0.1),
+                .withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -259,7 +263,7 @@ class _GiftRewardCard extends StatelessWidget {
           ),
         ),
         title: Text(
-          isReward ? 'Daily Activity Reward' : 'Gift Received',
+          isReward ? lp.getString('daily_activity_reward') : lp.getString('gift_received'),
           style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
         ),
         subtitle: Column(
@@ -268,7 +272,9 @@ class _GiftRewardCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               notification.message ??
-                  (isReward ? '+50 Sparks' : 'You received a gift!'),
+                  (isReward
+                      ? lp.getString('sparks_count').replaceAll('{n}', '50')
+                      : lp.getString('you_received_a_gift')),
               style: TextStyle(
                 color: isReward
                     ? Colors.orangeAccent

@@ -1,0 +1,334 @@
+[
+  {
+    "key": "looking_for_travel_world",
+    "val": "'Travel the World',"
+  },
+  {
+    "key": "looking_for_figuring_out",
+    "val": "'Figuring Out',"
+  },
+  {
+    "key": "smoking_yes",
+    "val": "'Yes',"
+  },
+  {
+    "key": "smoking_no",
+    "val": "'No',"
+  },
+  {
+    "key": "smoking_occasionally",
+    "val": "'Occasionally',"
+  },
+  {
+    "key": "drinking_yes",
+    "val": "'Yes',"
+  },
+  {
+    "key": "drinking_no",
+    "val": "'No',"
+  },
+  {
+    "key": "drinking_socially",
+    "val": "'Socially',"
+  },
+  {
+    "key": "want_kids_yes",
+    "val": "'Yes',"
+  },
+  {
+    "key": "want_kids_no",
+    "val": "'No',"
+  },
+  {
+    "key": "want_kids_maybe",
+    "val": "'Maybe',"
+  },
+  {
+    "key": "want_kids_already_have",
+    "val": "'Already have',"
+  },
+  {
+    "key": "occupation_student",
+    "val": "'Student',"
+  },
+  {
+    "key": "occupation_entrepreneur",
+    "val": "'Entrepreneur',"
+  },
+  {
+    "key": "occupation_teacher",
+    "val": "'Teacher',"
+  },
+  {
+    "key": "occupation_nurse",
+    "val": "'Nurse',"
+  },
+  {
+    "key": "occupation_engineer",
+    "val": "'Engineer',"
+  },
+  {
+    "key": "occupation_designer",
+    "val": "'Designer',"
+  },
+  {
+    "key": "occupation_developer",
+    "val": "'Developer',"
+  },
+  {
+    "key": "occupation_manager",
+    "val": "'Manager',"
+  },
+  {
+    "key": "family_plans_label",
+    "val": "'Family Plans',"
+  },
+  {
+    "key": "communication_style_label",
+    "val": "'Communication Style',"
+  },
+  {
+    "key": "love_style_label",
+    "val": "'Love Style',"
+  },
+  {
+    "key": "music_genres_hint",
+    "val": "'Pop, Rock, R&B...',"
+  },
+  {
+    "key": "core_values_hint",
+    "val": "'Family, Ambition, Honesty...',"
+  },
+  {
+    "key": "lat_long_display",
+    "val": "'Lat: {lat}, Long: {long}',"
+  },
+  {
+    "key": "required_badge",
+    "val": "'Required',"
+  },
+  {
+    "key": "max_8_photos_snack",
+    "val": "'You can only have up to 8 photos.',"
+  },
+  {
+    "key": "upload_starting_snack",
+    "val": "'Starting upload of {n} photos...',"
+  },
+  {
+    "key": "upload_server_error",
+    "val": "'Server Error: {message}',"
+  },
+  {
+    "key": "upload_http_error",
+    "val": "'HTTP Error: {code}',"
+  },
+  {
+    "key": "upload_connection_error",
+    "val": "'Connection Error: {e}',"
+  },
+  {
+    "key": "upload_all_saved_snack",
+    "val": "'All photos uploaded and saved!',"
+  },
+  {
+    "key": "upload_partial_snack",
+    "val": "'Uploaded {n} of {m} photos and saved profile.',"
+  },
+  {
+    "key": "upload_failed_snack",
+    "val": "'Upload failed. Check your server logs.',"
+  },
+  {
+    "key": "tap_to_enter_hint",
+    "val": "'Tap to enter...',"
+  },
+  {
+    "key": "add_custom_options_hint",
+    "val": "'Add custom options separated by commas',"
+  },
+  {
+    "key": "ask_me_option",
+    "val": "'Ask me',"
+  },
+  {
+    "key": "claim_pro",
+    "val": "'CLAIM {title}',"
+  },
+  {
+    "key": "claim_reward_button",
+    "val": "'Claim Now',"
+  },
+  {
+    "key": "status_badge_done",
+    "val": "'DONE',"
+  },
+  {
+    "key": "status_badge_ready",
+    "val": "'READY',"
+  },
+  {
+    "key": "status_badge_open",
+    "val": "'OPEN',"
+  },
+  {
+    "key": "challenge_daily_hours_progress",
+    "val": "'{hours}h / 3h',"
+  },
+  {
+    "key": "challenge_welcome_gift_title",
+    "val": "'Welcome Gift',"
+  },
+  {
+    "key": "challenge_welcome_gift_desc",
+    "val": "'Join the Snellum community',"
+  },
+  {
+    "key": "completed",
+    "val": "'Completed',"
+  },
+  {
+    "key": "invite_earn_title",
+    "val": "'Invite & Earn',"
+  },
+  {
+    "key": "invite_earn_title_claim",
+    "val": "'Claim Sparks',"
+  },
+  {
+    "key": "send_gift_title_fallback",
+    "val": "'Send a Gift',"
+  },
+  {
+    "key": "error_generic_gift",
+    "val": "'Error: {error}',"
+  },
+  {
+    "key": "progress_percent",
+    "val": "'{percent}%',"
+  },
+  {
+    "key": "activate_plan_title",
+    "val": "'Activate {newPlanName} Membership',"
+  },
+  {
+    "key": "activate_plan_desc",
+    "val": "'This will make {newPlanName} your active membership. Your current {currentPlanName} plan will be safely queued with its remaining time preserved.',"
+  },
+  {
+    "key": "failed_switch_membership",
+    "val": "'Failed to switch membership: {error}',"
+  },
+  {
+    "key": "premium_member_badge",
+    "val": "'{premiumType} MEMBER',"
+  },
+  {
+    "key": "plan_days_remaining",
+    "val": "'{days} days remaining',"
+  },
+  {
+    "key": "plan_hours_remaining",
+    "val": "'{hours} hours remaining',"
+  },
+  {
+    "key": "plan_mins_remaining",
+    "val": "'{mins} mins remaining',"
+  },
+  {
+    "key": "send_gift_button",
+    "val": "'Send Gift',"
+  },
+  {
+    "key": "gift_cost_label",
+    "val": "'Cost: {cost} Sparks',"
+  },
+  {
+    "key": "gift_error",
+    "val": "'Error sending gift: {error}',"
+  },
+  {
+    "key": "confirm_delete_message_title",
+    "val": "'Delete Message',"
+  },
+  {
+    "key": "confirm_delete_message_content",
+    "val": "'Are you sure you want to delete this message?',"
+  },
+  {
+    "key": "edit_message_label",
+    "val": "'Edit Message',"
+  },
+  {
+    "key": "cancel_delete",
+    "val": "'Cancel',"
+  },
+  {
+    "key": "confirm_delete",
+    "val": "'Delete',"
+  },
+  {
+    "key": "cancel_gift",
+    "val": "'Cancel',"
+  },
+  {
+    "key": "request_message_title",
+    "val": "'Message Request',"
+  },
+  {
+    "key": "request_message_desc",
+    "val": "'{senderName} wants to start a conversation with you',"
+  },
+  {
+    "key": "report_submitted_snack",
+    "val": "'Report submitted. Thank you for keeping {appName} safe.',"
+  },
+  {
+    "key": "not_enough_credits_to_unlock",
+    "val": "'Not enough Sparks. Please top up to unlock.',"
+  },
+  {
+    "key": "verify_otp_failed",
+    "val": "'Invalid verification code. Please check and try again.',"
+  },
+  {
+    "key": "session_expired_reroute",
+    "val": "'Session expired. Please re-enter your number.',"
+  },
+  {
+    "key": "login_failed_with_error",
+    "val": "'Login failed: {error}',"
+  },
+  {
+    "key": "send_otp_failed",
+    "val": "'Could not send verification code: {error}',"
+  },
+  {
+    "key": "invalid_otp",
+    "val": "'Invalid verification code. Please check and try again.',"
+  },
+  {
+    "key": "continue_with_phone_title",
+    "val": "'Continue with Phone',"
+  },
+  {
+    "key": "send_code_button",
+    "val": "'Send Code',"
+  },
+  {
+    "key": "verify_continue_button",
+    "val": "'Verify & Continue',"
+  },
+  {
+    "key": "resend_code_in",
+    "val": "'Resend code in {seconds}s',"
+  },
+  {
+    "key": "phone_auth_title",
+    "val": "'Phone Authentication',"
+  },
+  {
+    "key": "otp_hint",
+    "val": "'000000',};"
+  }
+]

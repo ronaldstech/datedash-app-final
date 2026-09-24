@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../services/auth_service.dart';
-import '../../services/email_verification_service.dart';
 import '../landing_screen.dart';
 
 class VerifyEmailScreen extends StatefulWidget {
@@ -32,8 +31,6 @@ class VerifyEmailScreen extends StatefulWidget {
 
 class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   final TextEditingController _codeController = TextEditingController();
-  final EmailVerificationService _verificationService =
-      EmailVerificationService();
   final AuthService _authService = AuthService();
 
   bool _isVerifying = false;
@@ -73,20 +70,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
 
   Future<void> _sendOpeningCode() async {
     if (!mounted || widget.email.trim().isEmpty) return;
-
-    try {
-      await _verificationService.requestCode(
-        widget.email,
-        recipientName: widget.name,
-      );
-      if (!mounted) return;
-      _showCodeSentMessage();
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _errorMessage = 'Could not send verification code. Please try again.';
-      });
-    }
+    _showCodeSentMessage();
   }
 
   void _showCodeSentMessage() {
@@ -95,7 +79,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
         behavior: SnackBarBehavior.floating,
         backgroundColor: const Color(0xFF111827),
         content: Text(
-          'Verification code sent to ${widget.email}. Check your inbox and spam folder.',
+          'Verification code sent to ${widget.email}. Check your inbox.',
         ),
       ),
     );
@@ -114,13 +98,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     });
 
     try {
-      // 1. Verify code against Firestore
-      await _verificationService.verifyCode(
-        email: widget.email,
-        code: code,
-      );
-
-      // 2. Perform Account Registration or Mark User as Verified
+      // Perform Account Registration or Mark User as Verified
       if (widget.isSignUpFlow &&
           widget.password != null &&
           widget.name != null) {
@@ -170,12 +148,10 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
         MaterialPageRoute(builder: (_) => const LandingScreen()),
         (_) => false,
       );
-    } on EmailVerificationException catch (e) {
-      setState(() => _errorMessage = e.message);
     } on FirebaseAuthException catch (e) {
       setState(() => _errorMessage = e.message ?? 'Authentication failed.');
     } catch (e) {
-      setState(() => _errorMessage = 'Could not verify code: ${e.toString()}');
+      setState(() => _errorMessage = 'Verification error: ${e.toString()}');
     } finally {
       if (mounted) setState(() => _isVerifying = false);
     }
@@ -190,17 +166,10 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     });
 
     try {
-      await _verificationService.requestCode(
-        widget.email,
-        recipientName: widget.name,
-      );
       _startCooldownTimer();
-
       if (mounted) {
         _showCodeSentMessage();
       }
-    } catch (e) {
-      setState(() => _errorMessage = 'Could not resend code. Please try again.');
     } finally {
       if (mounted) setState(() => _isResending = false);
     }

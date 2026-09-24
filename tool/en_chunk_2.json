@@ -1,0 +1,402 @@
+[
+  {
+    "key": "matches_3x_likely",
+    "val": "'Matches are 3x more likely with a full profile.',"
+  },
+  {
+    "key": "views_label",
+    "val": "'Views',"
+  },
+  {
+    "key": "edit_profile_label",
+    "val": "'Edit Profile',"
+  },
+  {
+    "key": "saving_label",
+    "val": "'Saving...',"
+  },
+  {
+    "key": "save_profile_button",
+    "val": "'Save Profile',"
+  },
+  {
+    "key": "category_basic",
+    "val": "'Basic',"
+  },
+  {
+    "key": "category_personal",
+    "val": "'Personal',"
+  },
+  {
+    "key": "category_goals",
+    "val": "'Goals',"
+  },
+  {
+    "key": "category_work",
+    "val": "'Work',"
+  },
+  {
+    "key": "category_lifestyle",
+    "val": "'Lifestyle',"
+  },
+  {
+    "key": "category_interests",
+    "val": "'Interests',"
+  },
+  {
+    "key": "category_personality",
+    "val": "'Personality',"
+  },
+  {
+    "key": "category_media",
+    "val": "'Media',"
+  },
+  {
+    "key": "category_location",
+    "val": "'Location',"
+  },
+  {
+    "key": "category_prompts",
+    "val": "'Prompts',"
+  },
+  {
+    "key": "category_verification",
+    "val": "'Verification',"
+  },
+  {
+    "key": "username_label",
+    "val": "'User Name',"
+  },
+  {
+    "key": "gender_label",
+    "val": "'Gender',"
+  },
+  {
+    "key": "dob_label",
+    "val": "'Date of Birth',"
+  },
+  {
+    "key": "interested_in_label",
+    "val": "'Interested In',"
+  },
+  {
+    "key": "bio_about_label",
+    "val": "'Bio / About Me',"
+  },
+  {
+    "key": "height_hint",
+    "val": "'e.g., 5\\'10\" or 178cm',"
+  },
+  {
+    "key": "relationship_status_label",
+    "val": "'Relationship Status',"
+  },
+  {
+    "key": "looking_for_label",
+    "val": "'Looking For',"
+  },
+  {
+    "key": "open_to_long_distance_label",
+    "val": "'Open to long-distance?',"
+  },
+  {
+    "key": "fitness_label",
+    "val": "'Fitness Level',"
+  },
+  {
+    "key": "sleeping_habits_label",
+    "val": "'Sleeping Habits',"
+  },
+  {
+    "key": "hobbies_label",
+    "val": "'Hobbies',"
+  },
+  {
+    "key": "music_genres_label",
+    "val": "'Favorite Music Genres',"
+  },
+  {
+    "key": "movies_shows_label",
+    "val": "'Favorite Movies/Shows',"
+  },
+  {
+    "key": "weekend_activities_label",
+    "val": "'Weekend Activities',"
+  },
+  {
+    "key": "political_views_label",
+    "val": "'Political Views',"
+  },
+  {
+    "key": "add_photos_title",
+    "val": "'Add Your Photos',"
+  },
+  {
+    "key": "upload_photos_sub",
+    "val": "'Upload at least 4 photos to stand out. Max 8.',"
+  },
+  {
+    "key": "uploading_photos",
+    "val": "'Uploading photos...',"
+  },
+  {
+    "key": "location_title",
+    "val": "'Your Location',"
+  },
+  {
+    "key": "location_sub",
+    "val": "'Sync your GPS to see potential matches nearby and calculate distances.',"
+  },
+  {
+    "key": "city_neighborhood_label",
+    "val": "'City / Neighborhood',"
+  },
+  {
+    "key": "location_synced",
+    "val": "'Location Synchronized',"
+  },
+  {
+    "key": "location_not_set",
+    "val": "'Location Not Set',"
+  },
+  {
+    "key": "update_location_button",
+    "val": "'Update Location',"
+  },
+  {
+    "key": "sync_location_now_button",
+    "val": "'Sync Location Now',"
+  },
+  {
+    "key": "prompts_title",
+    "val": "'Prompts',"
+  },
+  {
+    "key": "perfect_date_prompt",
+    "val": "'A perfect date for me is...',"
+  },
+  {
+    "key": "fall_for_you_prompt",
+    "val": "'I\\'ll fall for you if...',"
+  },
+  {
+    "key": "green_flag_prompt",
+    "val": "'My biggest green flag is...',"
+  },
+  {
+    "key": "two_truths_prompt",
+    "val": "'Two truths and a lie...',"
+  },
+  {
+    "key": "verification_title",
+    "val": "'Profile Verification',"
+  },
+  {
+    "key": "verification_sub",
+    "val": "'Get verified to show everyone that you\\'re real! Verified profiles get 3x more matches.',"
+  },
+  {
+    "key": "profile_verified",
+    "val": "'Profile Verified',"
+  },
+  {
+    "key": "facial_verification",
+    "val": "'Facial Verification',"
+  },
+  {
+    "key": "verification_confirmed_sub",
+    "val": "'Your identity has been confirmed. You\\'re all set!',"
+  },
+  {
+    "key": "quick_scan_sub",
+    "val": "'A quick 3D face scan confirms you match your photos.',"
+  },
+  {
+    "key": "start_verification_button",
+    "val": "'Start Verification',"
+  },
+  {
+    "key": "profile_saved_snack",
+    "val": "'Profile saved successfully!',"
+  },
+  {
+    "key": "failed_save_profile_snack",
+    "val": "'Failed to save profile',"
+  },
+  {
+    "key": "location_services_disabled",
+    "val": "'Location services are disabled. Please enable them.',"
+  },
+  {
+    "key": "location_permission_denied",
+    "val": "'Location permissions are denied.',"
+  },
+  {
+    "key": "location_permission_denied_forever",
+    "val": "'Location permissions are permanently denied.',"
+  },
+  {
+    "key": "fetching_coordinates",
+    "val": "'Fetching high-accuracy coordinates...',"
+  },
+  {
+    "key": "location_updated_snack",
+    "val": "'Location updated and saved!',"
+  },
+  {
+    "key": "error_fetching_location",
+    "val": "'Error fetching location',"
+  },
+  {
+    "key": "select_date",
+    "val": "'Select Date',"
+  },
+  {
+    "key": "active_now",
+    "val": "'Active now',"
+  },
+  {
+    "key": "offline",
+    "val": "'Offline',"
+  },
+  {
+    "key": "voice_call_tooltip",
+    "val": "'Voice Call',"
+  },
+  {
+    "key": "video_call_tooltip",
+    "val": "'Video Call',"
+  },
+  {
+    "key": "search_messages_hint",
+    "val": "'Search...',"
+  },
+  {
+    "key": "no_messages_found",
+    "val": "'No messages found',"
+  },
+  {
+    "key": "say_hi_to",
+    "val": "'Say hi to {name}!',"
+  },
+  {
+    "key": "try_different_search",
+    "val": "'Try a different search term',"
+  },
+  {
+    "key": "start_conversation",
+    "val": "'Start the conversation',"
+  },
+  {
+    "key": "chat_emoji_tab",
+    "val": "'Emoji',"
+  },
+  {
+    "key": "chat_stickers_tab",
+    "val": "'Stickers',"
+  },
+  {
+    "key": "call_video_label",
+    "val": "'Video Call',"
+  },
+  {
+    "key": "call_voice_label",
+    "val": "'Voice Call',"
+  },
+  {
+    "key": "call_cancel_label",
+    "val": "'Cancel',"
+  },
+  {
+    "key": "call_go_label",
+    "val": "'Call',"
+  },
+  {
+    "key": "recording_label",
+    "val": "'Recording',"
+  },
+  {
+    "key": "cancel_recording",
+    "val": "'Cancel',"
+  },
+  {
+    "key": "chat_error_sending",
+    "val": "'Error sending message',"
+  },
+  {
+    "key": "microphone_permission_denied",
+    "val": "'Microphone permission denied',"
+  },
+  {
+    "key": "error_sending_voice",
+    "val": "'Error sending voice note',"
+  },
+  {
+    "key": "error_uploading_image",
+    "val": "'Error uploading image',"
+  },
+  {
+    "key": "clear_chat_title",
+    "val": "'Clear Chat',"
+  },
+  {
+    "key": "clear_chat_confirm_message",
+    "val": "'All messages with {name} will be permanently deleted. This cannot be undone.',"
+  },
+  {
+    "key": "chat_cleared_snack",
+    "val": "'Chat cleared',"
+  },
+  {
+    "key": "explore_header",
+    "val": "'Explore',"
+  },
+  {
+    "key": "looking_for_header",
+    "val": "'What are you looking for?',"
+  },
+  {
+    "key": "people_count_suffix",
+    "val": "'people',"
+  },
+  {
+    "key": "cat_marriage",
+    "val": "'Marriage',"
+  },
+  {
+    "key": "cat_marriage_sub",
+    "val": "'Lifelong commitment',"
+  },
+  {
+    "key": "cat_long_term",
+    "val": "'Long Term',"
+  },
+  {
+    "key": "cat_long_term_sub",
+    "val": "'Serious partner',"
+  },
+  {
+    "key": "cat_hookups",
+    "val": "'Casual',"
+  },
+  {
+    "key": "cat_hookups_sub",
+    "val": "'Casual & fun',"
+  },
+  {
+    "key": "cat_short_term",
+    "val": "'Short Term Fun',"
+  },
+  {
+    "key": "cat_short_term_sub",
+    "val": "'No strings attached',"
+  },
+  {
+    "key": "cat_new_friends",
+    "val": "'New Friends',"
+  },
+  {
+    "key": "cat_new_friends_sub",
+    "val": "'Platonic only',"
+  }
+]

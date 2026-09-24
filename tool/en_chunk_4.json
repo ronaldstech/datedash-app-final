@@ -1,0 +1,402 @@
+[
+  {
+    "key": "expired_status",
+    "val": "'EXPIRED',"
+  },
+  {
+    "key": "standard_status",
+    "val": "'STANDARD',"
+  },
+  {
+    "key": "cancel_membership",
+    "val": "'Cancel Membership',"
+  },
+  {
+    "key": "cancel_membership_confirm",
+    "val": "'Are you sure you want to cancel your membership?',"
+  },
+  {
+    "key": "activate_now",
+    "val": "'Activate Now',"
+  },
+  {
+    "key": "expires_at",
+    "val": "'Expires at',"
+  },
+  {
+    "key": "purchased_on",
+    "val": "'Purchased on',"
+  },
+  {
+    "key": "nav_premium",
+    "val": "'Premium',"
+  },
+  {
+    "key": "boost_profile_sub",
+    "val": "'Get 10x more visibility',"
+  },
+  {
+    "key": "active_plan_manage",
+    "val": "'Active Plan • Manage or Upgrade',"
+  },
+  {
+    "key": "my_memberships",
+    "val": "'My Memberships',"
+  },
+  {
+    "key": "tap_activate_switch",
+    "val": "'Tap Activate to switch',"
+  },
+  {
+    "key": "activate",
+    "val": "'Activate',"
+  },
+  {
+    "key": "keep_plan",
+    "val": "'Keep Plan',"
+  },
+  {
+    "key": "yes_cancel",
+    "val": "'Yes, Cancel',"
+  },
+  {
+    "key": "subscription_plan",
+    "val": "'Subscription & Plan',"
+  },
+  {
+    "key": "updating_membership",
+    "val": "'Updating membership...',"
+  },
+  {
+    "key": "active_challenges",
+    "val": "'ACTIVE CHALLENGES',"
+  },
+  {
+    "key": "invite_earn",
+    "val": "'INVITE & EARN',"
+  },
+  {
+    "key": "invite_earn_sub",
+    "val": "'Earn 500 sparks for every friend who joins and verifies their email — no limit!',"
+  },
+  {
+    "key": "sparks_label",
+    "val": "'Sparks',"
+  },
+  {
+    "key": "claimed_label",
+    "val": "'Claimed',"
+  },
+  {
+    "key": "invited_label",
+    "val": "'Invited',"
+  },
+  {
+    "key": "invite_friends",
+    "val": "'Invite Friends',"
+  },
+  {
+    "key": "invite_friends_sub",
+    "val": "'No limit — earn sparks for every verified friend',"
+  },
+  {
+    "key": "your_invite_link",
+    "val": "'YOUR INVITE LINK',"
+  },
+  {
+    "key": "copy_link",
+    "val": "'Copy Link',"
+  },
+  {
+    "key": "share_link",
+    "val": "'Share Link',"
+  },
+  {
+    "key": "people_you_invited",
+    "val": "'PEOPLE YOU INVITED',"
+  },
+  {
+    "key": "link_copied",
+    "val": "'Link copied!',"
+  },
+  {
+    "key": "no_one_yet",
+    "val": "'No one yet — share your link!',"
+  },
+  {
+    "key": "every_friend_earns",
+    "val": "'Every friend who verifies their email earns you 500 sparks',"
+  },
+  {
+    "key": "email_verified",
+    "val": "'Email verified',"
+  },
+  {
+    "key": "email_not_verified",
+    "val": "'Email not verified yet',"
+  },
+  {
+    "key": "already_claimed_badge",
+    "val": "'✓ CLAIMED',"
+  },
+  {
+    "key": "pending_badge",
+    "val": "'PENDING',"
+  },
+  {
+    "key": "free_tier_label",
+    "val": "'FREE TIER',"
+  },
+  {
+    "key": "free_account",
+    "val": "'FREE ACCOUNT',"
+  },
+  {
+    "key": "queued_memberships",
+    "val": "'Queued Memberships',"
+  },
+  {
+    "key": "queued_preserved_sub",
+    "val": "'These memberships are preserved and will activate automatically, or you can switch to one now.',"
+  },
+  {
+    "key": "switch_label",
+    "val": "'Switch',"
+  },
+  {
+    "key": "preserved_in_queue",
+    "val": "'Preserved in queue',"
+  },
+  {
+    "key": "days_remaining",
+    "val": "'days remaining',"
+  },
+  {
+    "key": "your_plan_privileges",
+    "val": "'Your Plan Privileges',"
+  },
+  {
+    "key": "current_tier_privileges",
+    "val": "'Current Tier Privileges',"
+  },
+  {
+    "key": "change_or_upgrade",
+    "val": "'Change or Upgrade Tier',"
+  },
+  {
+    "key": "monthly_subscription",
+    "val": "'Monthly Subscription',"
+  },
+  {
+    "key": "weekly_subscription",
+    "val": "'Weekly Subscription',"
+  },
+  {
+    "key": "standard_free_access",
+    "val": "'Standard free access tier',"
+  },
+  {
+    "key": "membership_cancelled_success",
+    "val": "'Your membership has been cancelled successfully.',"
+  },
+  {
+    "key": "go_premium_sub",
+    "val": "'Upgrade to unlock all VIP perks & boosts',"
+  },
+  {
+    "key": "monthly_membership",
+    "val": "'Monthly Membership',"
+  },
+  {
+    "key": "weekly_membership",
+    "val": "'Weekly Membership',"
+  },
+  {
+    "key": "rewards_header",
+    "val": "'REWARDS',"
+  },
+  {
+    "key": "sparks_count_label",
+    "val": "'Sparks',"
+  },
+  {
+    "key": "complete_challenges",
+    "val": "'Complete challenges and claim rewards',"
+  },
+  {
+    "key": "boost_profile_active",
+    "val": "'⚡ Active until {date}',"
+  },
+  {
+    "key": "settings",
+    "val": "'Settings',"
+  },
+  {
+    "key": "get_premium",
+    "val": "'Get Premium',"
+  },
+  {
+    "key": "no_active_period",
+    "val": "'No active period',"
+  },
+  {
+    "key": "days_remaining_label",
+    "val": "'{n} days remaining',"
+  },
+  {
+    "key": "hours_minutes_remaining",
+    "val": "'{h}h {m}m remaining',"
+  },
+  {
+    "key": "minutes_remaining",
+    "val": "'{m} minutes remaining',"
+  },
+  {
+    "key": "expiring_soon",
+    "val": "'Expiring soon',"
+  },
+  {
+    "key": "expiring_less_than_minute",
+    "val": "'Expiring in less than a minute',"
+  },
+  {
+    "key": "percent_left",
+    "val": "'{n}% left',"
+  },
+  {
+    "key": "activated_on",
+    "val": "'Activated On',"
+  },
+  {
+    "key": "expires_renews",
+    "val": "'Expires / Renews',"
+  },
+  {
+    "key": "access_level",
+    "val": "'Access Level',"
+  },
+  {
+    "key": "full_vip_access",
+    "val": "'Full VIP Access',"
+  },
+  {
+    "key": "standard_tier",
+    "val": "'Standard Tier',"
+  },
+  {
+    "key": "active_badge",
+    "val": "'ACTIVE',"
+  },
+  {
+    "key": "expired_badge",
+    "val": "'EXPIRED',"
+  },
+  {
+    "key": "standard_badge",
+    "val": "'STANDARD',"
+  },
+  {
+    "key": "done_badge",
+    "val": "'DONE',"
+  },
+  {
+    "key": "ready_badge",
+    "val": "'READY',"
+  },
+  {
+    "key": "open_badge",
+    "val": "'OPEN',"
+  },
+  {
+    "key": "claim_reward",
+    "val": "'CLAIM REWARD',"
+  },
+  {
+    "key": "in_progress",
+    "val": "'IN PROGRESS',"
+  },
+  {
+    "key": "claimed",
+    "val": "'CLAIMED',"
+  },
+  {
+    "key": "limit_reached",
+    "val": "'LIMIT REACHED',"
+  },
+  {
+    "key": "free_usage",
+    "val": "'FREE USAGE',"
+  },
+  {
+    "key": "sparks_claimed_success",
+    "val": "'Successfully claimed {amount} sparks!',"
+  },
+  {
+    "key": "already_claimed",
+    "val": "'Already claimed for this user',"
+  },
+  {
+    "key": "sparks_claimed_snack",
+    "val": "'+500 Sparks claimed!',"
+  },
+  {
+    "key": "share_link_snack",
+    "val": "'Link copied! Share it with friends.',"
+  },
+  {
+    "key": "manage_subscription_screen_title",
+    "val": "'Subscription & Plan',"
+  },
+  {
+    "key": "yes_label",
+    "val": "'Yes, Cancel',"
+  },
+  {
+    "key": "keep_plan_label",
+    "val": "'Keep Plan',"
+  },
+  {
+    "key": "cancel_confirm_body",
+    "val": "'Are you sure you want to cancel your membership? You will immediately lose all premium privileges and return to the standard Free tier.',"
+  },
+  {
+    "key": "remove_from_queue",
+    "val": "'Remove from Queue',"
+  },
+  {
+    "key": "are_you_sure_remove",
+    "val": "'Are you sure you want to remove this queued membership? This cannot be undone.',"
+  },
+  {
+    "key": "keep_label",
+    "val": "'Keep',"
+  },
+  {
+    "key": "remove_label",
+    "val": "'Remove',"
+  },
+  {
+    "key": "queued_removed",
+    "val": "'Queued subscription removed',"
+  },
+  {
+    "key": "activate_membership_title",
+    "val": "'Activate {plan} Membership',"
+  },
+  {
+    "key": "activate_membership_body",
+    "val": "'This will make {plan} your active membership. Your current {current} plan will be safely queued with its remaining time preserved.',"
+  },
+  {
+    "key": "switch_to_plan",
+    "val": "'Switch to {plan}?',"
+  },
+  {
+    "key": "switch_to_plan_body",
+    "val": "'This will activate {plan} right away. Your current plan will be placed into the queue with remaining days preserved.',"
+  },
+  {
+    "key": "membership_activated",
+    "val": "'{plan} membership is now active!',"
+  }
+]

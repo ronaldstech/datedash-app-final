@@ -3,6 +3,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
 import '../models/user_profile_model.dart';
 import '../providers/profile_provider.dart';
+import '../providers/language_provider.dart';
 import '../screens/premium_screen.dart';
 
 class ManageSubscriptionScreen extends StatefulWidget {
@@ -26,7 +27,9 @@ class _ManageSubscriptionScreenState extends State<ManageSubscriptionScreen> {
         final profile = profileProvider.userProfile;
         if (profile == null) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Manage Subscription')),
+            appBar: AppBar(title: Consumer<LanguageProvider>(
+              builder: (_, lp, __) => Text(lp.getString('subscription_title')),
+            )),
             body: const Center(child: CircularProgressIndicator()),
           );
         }
@@ -110,26 +113,30 @@ class _ManageSubscriptionScreenState extends State<ManageSubscriptionScreen> {
               ),
               onPressed: () => Navigator.pop(context),
             ),
-            title: Text(
-              'Subscription & Plan',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: isDark ? Colors.white : Colors.black87,
-                letterSpacing: 0.2,
+            title: Consumer<LanguageProvider>(
+              builder: (_, lp, __) => Text(
+                lp.getString('subscription_title'),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: isDark ? Colors.white : Colors.black87,
+                  letterSpacing: 0.2,
+                ),
               ),
             ),
           ),
           body: _isProcessing
-              ? const Center(
+              ? Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      CircularProgressIndicator(color: Color(0xFFFF4D85)),
-                      SizedBox(height: 16),
-                      Text(
-                        'Updating membership...',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                      const CircularProgressIndicator(color: Color(0xFFFF4D85)),
+                      const SizedBox(height: 16),
+                      Consumer<LanguageProvider>(
+                        builder: (_, lp, __) => Text(
+                          lp.getString('updating_membership'),
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
                       ),
                     ],
                   ),
@@ -853,20 +860,22 @@ class _ManageSubscriptionScreenState extends State<ManageSubscriptionScreen> {
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Iconsax.flash_1, size: 18),
-                const SizedBox(width: 8),
-                Text(
-                  isActive ? 'Change or Upgrade Tier' : 'Upgrade to Premium',
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.3,
+            child: Consumer<LanguageProvider>(
+              builder: (_, lp, __) => Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Iconsax.flash_1, size: 18),
+                  const SizedBox(width: 8),
+                  Text(
+                    isActive ? lp.getString('change_or_upgrade') : lp.getString('upgrade_to_premium'),
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.3,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -896,16 +905,18 @@ class _ManageSubscriptionScreenState extends State<ManageSubscriptionScreen> {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Iconsax.close_circle, size: 16),
-                  SizedBox(width: 8),
-                  Text(
-                    'Cancel Membership',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
-                  ),
-                ],
+              child: Consumer<LanguageProvider>(
+                builder: (_, lp, __) => Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Iconsax.close_circle, size: 16),
+                    const SizedBox(width: 8),
+                    Text(
+                      lp.getString('cancel_membership'),
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -1074,18 +1085,20 @@ class _ManageSubscriptionScreenState extends State<ManageSubscriptionScreen> {
         );
         if (mounted) {
           messenger.showSnackBar(
-            const SnackBar(
-              backgroundColor: Color(0xFF1E1E26),
+            SnackBar(
+              backgroundColor: const Color(0xFF1E1E26),
               content: Row(
                 children: [
-                  Icon(Icons.check_circle, color: Color(0xFF00C853), size: 20),
-                  SizedBox(width: 10),
+                  const Icon(Icons.check_circle, color: Color(0xFF00C853), size: 20),
+                  const SizedBox(width: 10),
                   Expanded(
-                    child: Text(
-                      'Your membership has been cancelled successfully.',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
+                    child: Consumer<LanguageProvider>(
+                      builder: (_, lp, __) => Text(
+                        lp.getString('membership_cancelled_success'),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -1148,7 +1161,7 @@ class _ManageSubscriptionScreenState extends State<ManageSubscriptionScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+      child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
@@ -1156,7 +1169,9 @@ class _ManageSubscriptionScreenState extends State<ManageSubscriptionScreen> {
               backgroundColor: const Color(0xFFFF4D85),
               foregroundColor: Colors.white,
             ),
-            child: const Text('Activate Now'),
+      child: Consumer<LanguageProvider>(
+        builder: (_, lp, __) => Text(lp.getString('activate_now')),
+      ),
           ),
         ],
       ),
@@ -1214,11 +1229,13 @@ class _ManageSubscriptionScreenState extends State<ManageSubscriptionScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'Remove',
-              style: TextStyle(
-                color: Color(0xFFFF5252),
-                fontWeight: FontWeight.bold,
+            child: Consumer<LanguageProvider>(
+              builder: (_, lp, __) => Text(
+                lp.getString('remove_label'),
+                style: const TextStyle(
+                  color: Color(0xFFFF5252),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -1232,8 +1249,10 @@ class _ManageSubscriptionScreenState extends State<ManageSubscriptionScreen> {
         await profileProvider.removeQueuedSubscription(index);
         if (mounted) {
           messenger.showSnackBar(
-            const SnackBar(
-              content: Text('Queued subscription removed'),
+            SnackBar(
+              content: Consumer<LanguageProvider>(
+                builder: (_, lp, __) => Text(lp.getString('queued_removed')),
+              ),
               behavior: SnackBarBehavior.floating,
             ),
           );

@@ -44,7 +44,8 @@ class CallSheet extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            isVideo ? 'Video Call' : 'Voice Call',
+            languageProvider.getString(
+                isVideo ? 'call_video_label' : 'call_voice_label'),
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),

@@ -20,6 +20,7 @@ class ChatMessage {
   final String? replyToText;
   final String? replyToSenderName;
   final bool isSuperRequest;
+  final Map<String, String> reactions; // userId -> emoji
 
   ChatMessage({
     required this.id,
@@ -39,6 +40,7 @@ class ChatMessage {
     this.replyToText,
     this.replyToSenderName,
     this.isSuperRequest = false,
+    this.reactions = const {},
   });
 
   factory ChatMessage.fromDoc(DocumentSnapshot doc) {

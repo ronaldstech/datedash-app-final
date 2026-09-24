@@ -1,0 +1,402 @@
+[
+  {
+    "key": "no_transactions_yet",
+    "val": "'No transactions yet',"
+  },
+  {
+    "key": "payment_history_here",
+    "val": "'Your payment history will appear here',"
+  },
+  {
+    "key": "error_loading_transactions",
+    "val": "'Error loading transactions',"
+  },
+  {
+    "key": "payment_confirmed",
+    "val": "'Payment confirmed! Your account has been updated.',"
+  },
+  {
+    "key": "reverify_payment_tooltip",
+    "val": "'Re-verify Payment',"
+  },
+  {
+    "key": "verification_error_prefix",
+    "val": "'Verification error: ',"
+  },
+  {
+    "key": "error_no_tracking_id",
+    "val": "'Error: No tracking ID found for this transaction',      // Rewards Screen challenge labels"
+  },
+  {
+    "key": "challenge_daily_explorer_title",
+    "val": "'Daily Explorer',"
+  },
+  {
+    "key": "challenge_daily_explorer_desc",
+    "val": "'Use Snellum for 3 hours today',"
+  },
+  {
+    "key": "challenge_profile_pro_title",
+    "val": "'Profile Pro',"
+  },
+  {
+    "key": "challenge_profile_pro_desc",
+    "val": "'Complete 100% of your profile',"
+  },
+  {
+    "key": "challenge_trusted_member_title",
+    "val": "'Trusted Member',"
+  },
+  {
+    "key": "challenge_trusted_member_desc",
+    "val": "'Verify your account',"
+  },
+  {
+    "key": "challenge_welcome_bonus_title",
+    "val": "'Welcome Gift',"
+  },
+  {
+    "key": "challenge_welcome_bonus_desc",
+    "val": "'Join the Snellum community',"
+  },
+  {
+    "key": "challenge_completed_label",
+    "val": "'Completed',"
+  },
+  {
+    "key": "not_logged_in",
+    "val": "'Not logged in',"
+  },
+  {
+    "key": "error_loading_meetups",
+    "val": "'Error loading meetups: {error}',"
+  },
+  {
+    "key": "call_ended_by_partner_finding_match",
+    "val": "'Call ended by partner. Finding new match...',"
+  },
+  {
+    "key": "insufficient_sparks_message_unlimited",
+    "val": "'Insufficient Sparks! You need 10 sparks per message or buy a membership for unlimited messaging.',"
+  },
+  {
+    "key": "report_user_title",
+    "val": "'Report User',"
+  },
+  {
+    "key": "report_partner_guidelines",
+    "val": "'Report {name} for violating guidelines:',"
+  },
+  {
+    "key": "submit_report",
+    "val": "'Submit Report',"
+  },
+  {
+    "key": "report_submitted_skipping_next",
+    "val": "'Report submitted. Skipping to next user...',"
+  },
+  {
+    "key": "block_user_title",
+    "val": "'Block User',"
+  },
+  {
+    "key": "block_user_confirmation",
+    "val": "'Are you sure you want to block {partnerName}? You will disconnect and won\\'t match with them again.',"
+  },
+  {
+    "key": "blocked_partner_skipping_next",
+    "val": "'Blocked {partnerName}. Skipping to next user...',"
+  },
+  {
+    "key": "one_on_one_chat_with",
+    "val": "'1-on-1 Chat with {partnerName}',"
+  },
+  {
+    "key": "chat_unlocks_in_seconds",
+    "val": "'🔒 Unlocks in {seconds}s...',"
+  },
+  {
+    "key": "chat_locked_by_you",
+    "val": "'🔒 Chat locked by you',"
+  },
+  {
+    "key": "chat_locked_by_partner",
+    "val": "'🔒 Chat locked by {partnerName}',"
+  },
+  {
+    "key": "messages_save_to_inbox",
+    "val": "'🔓 Messages save directly to Inbox',"
+  },
+  {
+    "key": "unlock_chat",
+    "val": "'Unlock Chat',"
+  },
+  {
+    "key": "lock_chat",
+    "val": "'Lock Chat',"
+  },
+  {
+    "key": "chat_unlocks_after_two_minutes",
+    "val": "'Chat unlocks after 2 minutes (120s) of call',"
+  },
+  {
+    "key": "you_have_locked_chat",
+    "val": "'You have locked the chat',"
+  },
+  {
+    "key": "partner_has_locked_chat",
+    "val": "'{partnerName} has locked the chat',"
+  },
+  {
+    "key": "say_hi_to_partner",
+    "val": "'Say hi to {partnerName}!',"
+  },
+  {
+    "key": "sender_sent_gift",
+    "val": "'{senderName} sent {giftName}!',"
+  },
+  {
+    "key": "sender_colon_message",
+    "val": "'{senderName}: {message}',"
+  },
+  {
+    "key": "chat_unlocks_in_seconds_hint",
+    "val": "'Chat unlocks in {seconds}s...',"
+  },
+  {
+    "key": "chat_locked_by_you_hint",
+    "val": "'Chat locked by you (tap lock icon to unlock)',"
+  },
+  {
+    "key": "chat_locked_by_partner_hint",
+    "val": "'Chat locked by {partnerName}',"
+  },
+  {
+    "key": "type_message_saves_to_inbox",
+    "val": "'Type a message (saves to Inbox)...',"
+  },
+  {
+    "key": "report",
+    "val": "'Report',"
+  },
+  {
+    "key": "block",
+    "val": "'Block',"
+  },
+  {
+    "key": "end_call",
+    "val": "'End Call',"
+  },
+  {
+    "key": "next",
+    "val": "'NEXT',"
+  },
+  {
+    "key": "failed_to_delete",
+    "val": "'Failed to delete: {error}',"
+  },
+  {
+    "key": "super",
+    "val": "'SUPER',"
+  },
+  {
+    "key": "failed_to_unlock",
+    "val": "'Failed to unlock: {error}',"
+  },
+  {
+    "key": "best_value",
+    "val": "'BEST VALUE',"
+  },
+  {
+    "key": "could_not_open_chat",
+    "val": "'Could not open chat: {error}',"
+  },
+  {
+    "key": "your_balance_sparks",
+    "val": "'Your Balance: {credits} Sparks',"
+  },
+  {
+    "key": "email_verified_snack",
+    "val": "'Email verified successfully. Welcome to Snellum.',"
+  },
+  {
+    "key": "error_generic",
+    "val": "'An error occurred',"
+  },
+  {
+    "key": "not_logged_in_screen",
+    "val": "'Not logged in',"
+  },
+  {
+    "key": "no_account_found_phone",
+    "val": "'No account found with this phone number. Please check the number or sign up.',"
+  },
+  {
+    "key": "valid_phone_required",
+    "val": "'Please enter a valid phone number',"
+  },
+  {
+    "key": "code_sent_check_inbox",
+    "val": "'Verification code sent to {email}. Check your inbox.',"
+  },
+  {
+    "key": "send_code_failed_with_error",
+    "val": "'Could not send verification code: {error}',"
+  },
+  {
+    "key": "error_with_details",
+    "val": "'Error: {error}',"
+  },
+  {
+    "key": "verification_code_sent_to_phone",
+    "val": "'Verification code sent to {phone}',"
+  },
+  {
+    "key": "invalid_verification_code",
+    "val": "'Invalid verification code. Please check and try again.',"
+  },
+  {
+    "key": "phone_number",
+    "val": "'Phone Number',"
+  },
+  {
+    "key": "phone_number_hint",
+    "val": "'Phone Number',"
+  },
+  {
+    "key": "search_country",
+    "val": "'Search country',"
+  },
+  {
+    "key": "enter_full_6_digit_code",
+    "val": "'Please enter the full 6-digit code',"
+  },
+  {
+    "key": "email_verified_welcome",
+    "val": "'Email verified successfully. Welcome to Snellum.',"
+  },
+  {
+    "key": "authentication_failed",
+    "val": "'Authentication failed.',"
+  },
+  {
+    "key": "verification_error_with_details",
+    "val": "'Verification error: {error}',"
+  },
+  {
+    "key": "verify_email_title",
+    "val": "'Verify Your Email',"
+  },
+  {
+    "key": "we_sent_code_to",
+    "val": "'We sent a 6-digit verification code to',"
+  },
+  {
+    "key": "check_spam_junk_folder",
+    "val": "'If you do not see the email, check your spam or junk folder.',"
+  },
+  {
+    "key": "didnt_get_code_resend",
+    "val": "'Didn\\'t get the code? Resend Code',"
+  },
+  {
+    "key": "not_logged_in_meetups",
+    "val": "'Not logged in',"
+  },
+  {
+    "key": "failed_cancel_membership",
+    "val": "'Failed to cancel membership: {error}',"
+  },
+  {
+    "key": "switch_plan_title",
+    "val": "'Switch to {newPlanName}?',"
+  },
+  {
+    "key": "switch_plan_desc",
+    "val": "'This will activate {newPlanName} right away. Your current plan will be placed into the queue with remaining days preserved.',"
+  },
+  {
+    "key": "error_activating_plan",
+    "val": "'Error activating plan: {error}',"
+  },
+  {
+    "key": "remove_queue_title",
+    "val": "'Remove {planName} from Queue?',"
+  },
+  {
+    "key": "remove_queue_desc",
+    "val": "'Are you sure you want to remove this queued membership? This cannot be undone.',"
+  },
+  {
+    "key": "keep",
+    "val": "'Keep',"
+  },
+  {
+    "key": "error_remove_queued",
+    "val": "'Error removing queued subscription: {error}',"
+  },
+  {
+    "key": "hours_mins_remaining",
+    "val": "'{hours}h {mins}m remaining',"
+  },
+  {
+    "key": "expiring_minute",
+    "val": "'Expiring in less than a minute',"
+  },
+  {
+    "key": "free_tier",
+    "val": "'FREE TIER',"
+  },
+  {
+    "key": "plan_pass_status",
+    "val": "'{planName} PASS',"
+  },
+  {
+    "key": "status_active",
+    "val": "'ACTIVE',"
+  },
+  {
+    "key": "status_expired",
+    "val": "'EXPIRED',"
+  },
+  {
+    "key": "status_standard",
+    "val": "'STANDARD',"
+  },
+  {
+    "key": "standard_free_tier",
+    "val": "'Standard free access tier',"
+  },
+  {
+    "key": "unknown",
+    "val": "'Unknown',"
+  },
+  {
+    "key": "never",
+    "val": "'Never',"
+  },
+  {
+    "key": "plan_privileges",
+    "val": "'Your Plan Privileges',"
+  },
+  {
+    "key": "queued_memberships_count",
+    "val": "'Queued Memberships ({count})',"
+  },
+  {
+    "key": "queued_memberships_desc",
+    "val": "'These memberships are preserved and will activate automatically, or you can switch to one now.',"
+  },
+  {
+    "key": "plan_pass_status_premium",
+    "val": "'PREMIUM',"
+  },
+  {
+    "key": "cancel_plan_title",
+    "val": "'Cancel {planName} Membership?',"
+  },
+  {
+    "key": "cancel_plan_desc",
+    "val": "'Are you sure you want to cancel your membership? You will immediately lose all premium privileges and return to the standard Free tier.',"
+  }
+]

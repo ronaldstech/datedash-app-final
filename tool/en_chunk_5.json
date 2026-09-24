@@ -1,0 +1,402 @@
+[
+  {
+    "key": "membership_activated_snack",
+    "val": "'{plan} Membership activated!',"
+  },
+  {
+    "key": "get_sparks_button",
+    "val": "'Get Sparks',"
+  },
+  {
+    "key": "month_label",
+    "val": "'1 Month',"
+  },
+  {
+    "key": "days_label",
+    "val": "'{n} Days',"
+  },
+  {
+    "key": "go_premium_sub_small",
+    "val": "'Upgrade to unlock all VIP perks',"
+  },
+  {
+    "key": "subscription_title",
+    "val": "'Subscription & Plan',"
+  },
+  {
+    "key": "discovery_filters",
+    "val": "'Discovery Filters',"
+  },
+  {
+    "key": "basic_demographics",
+    "val": "'Basic Demographics',"
+  },
+  {
+    "key": "show_me",
+    "val": "'Show me',"
+  },
+  {
+    "key": "looking_for",
+    "val": "'Looking For',"
+  },
+  {
+    "key": "age_range",
+    "val": "'Age Range',"
+  },
+  {
+    "key": "strict_age_match",
+    "val": "'Strict Age Match',"
+  },
+  {
+    "key": "strict_age_sub",
+    "val": "\"We'll slip in a few outliers if you run out.\","
+  },
+  {
+    "key": "maximum_distance",
+    "val": "'Maximum Distance',"
+  },
+  {
+    "key": "strict_distance_match",
+    "val": "'Strict Distance Match',"
+  },
+  {
+    "key": "strict_distance_sub",
+    "val": "\"We'll suggest folks further away if you run out.\","
+  },
+  {
+    "key": "premium_advanced_filters",
+    "val": "'Premium Advanced Filters',"
+  },
+  {
+    "key": "relationship_status",
+    "val": "'Relationship Status',"
+  },
+  {
+    "key": "religion_beliefs",
+    "val": "'Religion / Beliefs',"
+  },
+  {
+    "key": "smoking_habits",
+    "val": "'Smoking Habits',"
+  },
+  {
+    "key": "drinking_habits",
+    "val": "'Drinking Habits',"
+  },
+  {
+    "key": "zodiac_sign",
+    "val": "'Zodiac Sign',"
+  },
+  {
+    "key": "education_level",
+    "val": "'Education level',"
+  },
+  {
+    "key": "online_now_only",
+    "val": "'Online Now Only',"
+  },
+  {
+    "key": "online_now_sub",
+    "val": "'Only show users who are currently active.',"
+  },
+  {
+    "key": "kids_children",
+    "val": "'Kids / Children',"
+  },
+  {
+    "key": "pets",
+    "val": "'Pets',"
+  },
+  {
+    "key": "personality_type",
+    "val": "'Personality Type',"
+  },
+  {
+    "key": "max_photos_needed",
+    "val": "'Max Photos Needed',"
+  },
+  {
+    "key": "photos_count",
+    "val": "'{n} photos',"
+  },
+  {
+    "key": "any_count",
+    "val": "'Any',"
+  },
+  {
+    "key": "must_have_bio",
+    "val": "'Must Have a Bio',"
+  },
+  {
+    "key": "must_have_bio_sub",
+    "val": "'Only show users who have written a bio.',"
+  },
+  {
+    "key": "family_plans",
+    "val": "'Family Plans',"
+  },
+  {
+    "key": "communication_style",
+    "val": "'Communication Style',"
+  },
+  {
+    "key": "love_style",
+    "val": "'Love Style',"
+  },
+  {
+    "key": "elite_advanced_filters",
+    "val": "'Elite Advanced Filters',"
+  },
+  {
+    "key": "verified_profiles_only",
+    "val": "'Verified Profiles Only',"
+  },
+  {
+    "key": "verified_profiles_sub",
+    "val": "'Only show users who have verified their identity.',"
+  },
+  {
+    "key": "partner_country",
+    "val": "'Partner Country (Green Card)',"
+  },
+  {
+    "key": "apply_filters",
+    "val": "'Apply Filters',"
+  },
+  {
+    "key": "feature_exclusive",
+    "val": "'{tier} Feature',"
+  },
+  {
+    "key": "feature_exclusive_desc",
+    "val": "'Advanced filters are exclusive to {tier} members. Upgrade your plan to get unlimited access and unlock {tier} filters!',"
+  },
+  {
+    "key": "maybe_later",
+    "val": "'Maybe Later',"
+  },
+  {
+    "key": "upgrade",
+    "val": "'Upgrade',"
+  },
+  {
+    "key": "error_saving_filters",
+    "val": "'Error saving filters: {e}',"
+  },
+  {
+    "key": "tap_to_unlock",
+    "val": "'Tap to unlock',"
+  },
+  {
+    "key": "verify_first_love",
+    "val": "'Verify First Love For Real',"
+  },
+  {
+    "key": "dont_act_be_you",
+    "val": "\"Don't act just be you for 60 seconds.\","
+  },
+  {
+    "key": "match_preferences",
+    "val": "'Match preferences',"
+  },
+  {
+    "key": "match_preferences_sub",
+    "val": "'These are used before the full-screen camera search.',"
+  },
+  {
+    "key": "partner_language",
+    "val": "'Partner Language',"
+  },
+  {
+    "key": "premium_elite_filters",
+    "val": "'Premium & Elite filters',"
+  },
+  {
+    "key": "desired_gender",
+    "val": "'Desired Gender',"
+  },
+  {
+    "key": "chatting_now",
+    "val": "'chatting now',"
+  },
+  {
+    "key": "filters_on",
+    "val": "'filters on',"
+  },
+  {
+    "key": "filters_limited",
+    "val": "'filters limited',"
+  },
+  {
+    "key": "start_matching",
+    "val": "'Start Matching',"
+  },
+  {
+    "key": "cancel_search",
+    "val": "'Cancel Search',"
+  },
+  {
+    "key": "finding_your_match",
+    "val": "'Finding your Match...',"
+  },
+  {
+    "key": "search_language_hint",
+    "val": "'Search language...',"
+  },
+  {
+    "key": "search_country_hint",
+    "val": "'Search country...',"
+  },
+  {
+    "key": "select_partner_language",
+    "val": "'Select Partner Language',"
+  },
+  {
+    "key": "select_partner_country",
+    "val": "'Select Partner Country',"
+  },
+  {
+    "key": "reply",
+    "val": "'Reply',"
+  },
+  {
+    "key": "image_unavailable",
+    "val": "'Image unavailable',"
+  },
+  {
+    "key": "you_sent_gift",
+    "val": "'You sent a {gift}!',"
+  },
+  {
+    "key": "sent_you_gift",
+    "val": "'Sent you a {gift}!',"
+  },
+  {
+    "key": "credits_amount",
+    "val": "'{n} credits',"
+  },
+  {
+    "key": "replying_to_yourself",
+    "val": "'Replying to yourself',"
+  },
+  {
+    "key": "replying_to_user",
+    "val": "'Replying to {user}',"
+  },
+  {
+    "key": "its_a_match",
+    "val": "'IT\\'S A MATCH!',"
+  },
+  {
+    "key": "you_and_liked_each_other",
+    "val": "'You and {name} liked each other.',"
+  },
+  {
+    "key": "send_a_message",
+    "val": "'SEND A MESSAGE',"
+  },
+  {
+    "key": "keep_swiping",
+    "val": "'KEEP SWIPING',"
+  },
+  {
+    "key": "keep_swiping_title",
+    "val": "'Keep Swiping',"
+  },
+  {
+    "key": "you_missed_a_match",
+    "val": "'YOU MISSED A MATCH!',"
+  },
+  {
+    "key": "missed_match_desc",
+    "val": "'Someone who liked your profile was just passed. They were interested in you!',"
+  },
+  {
+    "key": "rewind_match",
+    "val": "'Rewind Match',"
+  },
+  {
+    "key": "unlock_rewind",
+    "val": "'Unlock Rewind',"
+  },
+  {
+    "key": "send_gift_title",
+    "val": "'Send a Gift',"
+  },
+  {
+    "key": "gift_not_enough_credits",
+    "val": "'Not enough credits!',"
+  },
+  {
+    "key": "setup_profile",
+    "val": "'Setup Profile',"
+  },
+  {
+    "key": "step_n_of_total",
+    "val": "'Step {step} of {total}',"
+  },
+  {
+    "key": "score_n",
+    "val": "'Score: {n}%',"
+  },
+  {
+    "key": "the_basics",
+    "val": "'The Basics',"
+  },
+  {
+    "key": "the_basics_sub",
+    "val": "'Introduce yourself to the community',"
+  },
+  {
+    "key": "enter_first_name",
+    "val": "'Enter your first name',"
+  },
+  {
+    "key": "identity_title",
+    "val": "'Identity',"
+  },
+  {
+    "key": "identity_sub",
+    "val": "'Who are you and who matches your vibe?',"
+  },
+  {
+    "key": "goals_status_title",
+    "val": "'Goals & Status',"
+  },
+  {
+    "key": "goals_status_sub",
+    "val": "'What are you looking for on Snellum?',"
+  },
+  {
+    "key": "habits_lifestyle_title",
+    "val": "'Habits & Lifestyle',"
+  },
+  {
+    "key": "habits_lifestyle_sub",
+    "val": "'Help matches understand your daily habits',"
+  },
+  {
+    "key": "personality_vibe_title",
+    "val": "'Personality & Vibe',"
+  },
+  {
+    "key": "personality_vibe_sub",
+    "val": "'What makes you unique?',"
+  },
+  {
+    "key": "tell_us_more_title",
+    "val": "'Tell Us More',"
+  },
+  {
+    "key": "tell_us_more_sub",
+    "val": "'Where do you live and what is your story?',"
+  },
+  {
+    "key": "photos_title",
+    "val": "'Photos',"
+  },
+  {
+    "key": "photos_sub",
+    "val": "'Show off your best angles!',"
+  }
+]
