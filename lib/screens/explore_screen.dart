@@ -3,8 +3,6 @@ import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
 import 'package:snellum/config/app_config.dart';
 import 'package:snellum/providers/profile_provider.dart';
-import '../widgets/bordered_search_bar.dart';
-
 import '../services/profile_service.dart';
 import '../providers/language_provider.dart';
 
@@ -37,7 +35,6 @@ class ExploreScreen extends StatelessWidget {
             centerTitle: false,
             floating: true,
             snap: true,
-            actions: const [BorderedSearchBar(), SizedBox(width: 8)],
           ),
           SliverToBoxAdapter(
             child: Padding(

@@ -16,6 +16,7 @@ import '../screens/transactions_screen.dart';
 import '../screens/live_list_screen.dart';
 import '../screens/meetups_screen.dart';
 import '../screens/events_screen.dart';
+import '../screens/blog_screen.dart';
 import '../services/meetup_service.dart';
 import '../models/meetup_model.dart';
 import '../widgets/boost_sheet.dart';
@@ -411,6 +412,13 @@ class ProfileDrawer extends StatelessWidget {
                     context,
                     Iconsax.document_text,
                     languageProvider.getString('blog'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const BlogScreen()),
+                      );
+                    },
                   ),
 
                   _buildItem(

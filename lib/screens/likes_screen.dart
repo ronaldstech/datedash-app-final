@@ -156,13 +156,10 @@ class LikesScreen extends StatelessWidget {
                   : AppConfig.defaultProfileImageUrl;
 
               final profileProvider = context.watch<ProfileProvider>();
+              final currentProfile = profileProvider.userProfile;
               final isUnlocked =
-                  (profileProvider.userProfile?.isPremium == true &&
-                      profileProvider.userProfile?.premiumType?.toUpperCase() ==
-                          'ELITE') ||
-                  (profileProvider.userProfile?.unlockedLikes.contains(
-                        profile.uid,
-                      ) ??
+                  (currentProfile?.isSubscriptionActive ?? false) ||
+                  (currentProfile?.unlockedLikes.contains(profile.uid) ??
                       false);
 
               return GestureDetector(
@@ -246,14 +243,10 @@ class LikesScreen extends StatelessWidget {
               : AppConfig.defaultProfileImageUrl;
 
           final profileProvider = context.watch<ProfileProvider>();
+          final currentProfile = profileProvider.userProfile;
           final isUnlocked =
-              (profileProvider.userProfile?.isPremium == true &&
-                  profileProvider.userProfile?.premiumType?.toUpperCase() ==
-                      'ELITE') ||
-              (profileProvider.userProfile?.unlockedLikes.contains(
-                    profile.uid,
-                  ) ??
-                  false);
+              (currentProfile?.isSubscriptionActive ?? false) ||
+              (currentProfile?.unlockedLikes.contains(profile.uid) ?? false);
 
           return GestureDetector(
             onTap: isUnlocked
