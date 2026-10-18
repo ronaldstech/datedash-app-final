@@ -839,6 +839,103 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
     );
   }
 
+  List<BoxShadow> _cardShadow(BuildContext context) => [
+    BoxShadow(
+      color: Colors.black.withValues(
+        alpha: Theme.of(context).brightness == Brightness.light ? 0.035 : 0.12,
+      ),
+      blurRadius: 18,
+      offset: const Offset(0, 7),
+    ),
+  ];
+
+  Widget _buildSecurityOverview(
+    BuildContext context,
+    LanguageProvider languageProvider,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isDark
+              ? const [Color(0xFF442338), Color(0xFF261D32)]
+              : const [Color(0xFFFFE7EF), Color(0xFFFFF2F6)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: _primaryColor.withValues(alpha: 0.14)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: _primaryColor.withValues(alpha: 0.13),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(Iconsax.shield_tick5, color: _primaryColor, size: 25),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  languageProvider.getString('security'),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  _isPinEnabled
+                      ? languageProvider.getString('lock_app_pin')
+                      : languageProvider.getString('lock_app_pin_sub'),
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                    height: 1.4,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: _isPinEnabled
+                        ? Colors.green.withValues(alpha: 0.12)
+                        : Theme.of(context).cardColor.withValues(alpha: 0.75),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        _isPinEnabled ? Iconsax.tick_circle5 : Iconsax.info_circle,
+                        size: 14,
+                        color: _isPinEnabled ? Colors.green : Theme.of(context).hintColor,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        _isPinEnabled ? 'App lock enabled' : 'App lock not set up',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: _isPinEnabled ? Colors.green : Theme.of(context).hintColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final languageProvider = context.watch<LanguageProvider>();
@@ -851,6 +948,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
           style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         elevation: 0,
+        scrolledUnderElevation: 0,
         backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(Iconsax.arrow_left_2),
@@ -858,15 +956,20 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
+          _buildSecurityOverview(context, languageProvider),
+          const SizedBox(height: 24),
           // 🛡️ Passcode & Biometrics App Lock Section
           _buildSectionHeader(languageProvider.getString('app_lock_section')),
 
           Container(
+            clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
+              boxShadow: _cardShadow(context),
             ),
             child: Column(
               children: [
@@ -967,9 +1070,12 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
           // 🚫 Blocked Users Section
           _buildSectionHeader('Social Boundaries'),
           Container(
+            clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
+              boxShadow: _cardShadow(context),
             ),
             child: ListTile(
               leading: Container(
@@ -1026,7 +1132,9 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
+              boxShadow: _cardShadow(context),
             ),
             child: Form(
               key: _passwordFormKey,
@@ -1064,9 +1172,11 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                       prefixIcon: const Icon(Iconsax.lock, size: 18),
                       labelText: languageProvider.getString('current_password'),
                       labelStyle: const TextStyle(fontSize: 13),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+                      filled: true,
+                      fillColor: Theme.of(context).scaffoldBackgroundColor,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.22))),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: _primaryColor, width: 1.5)),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 12,
@@ -1094,9 +1204,11 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                       prefixIcon: const Icon(Iconsax.key, size: 18),
                       labelText: languageProvider.getString('new_password'),
                       labelStyle: const TextStyle(fontSize: 13),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+                      filled: true,
+                      fillColor: Theme.of(context).scaffoldBackgroundColor,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.22))),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: _primaryColor, width: 1.5)),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 12,
@@ -1126,9 +1238,11 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                         'confirm_new_password',
                       ),
                       labelStyle: const TextStyle(fontSize: 13),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+                      filled: true,
+                      fillColor: Theme.of(context).scaffoldBackgroundColor,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.22))),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: _primaryColor, width: 1.5)),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 12,

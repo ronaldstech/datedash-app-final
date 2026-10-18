@@ -109,9 +109,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         SnackBar(
           behavior: SnackBarBehavior.floating,
           backgroundColor: const Color(0xFF111827),
-          content: Text(
-            'Verification code sent to $email. Check your inbox.',
-          ),
+          content: Text('Verification code sent to $email. Check your inbox.'),
         ),
       );
 
@@ -146,6 +144,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isLoading = true);
     try {
       await _authService.signInWithGoogle();
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message ?? 'An error occurred')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _handleAppleSignIn() async {
+    setState(() => _isLoading = true);
+    try {
+      await _authService.signInWithApple();
     } on FirebaseAuthException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -352,6 +371,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   const Expanded(child: Divider()),
                 ],
+              ),
+              const SizedBox(height: 8),
+              SocialLoginButton(
+                text: languageProvider.getString('apple_signin'),
+                icon: Icons.apple,
+                onPressed: _isLoading ? () {} : _handleAppleSignIn,
               ),
               const SizedBox(height: 8),
               SocialLoginButton(

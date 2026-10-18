@@ -12,6 +12,8 @@ import 'edit_profile_screen.dart';
 import 'security_settings_screen.dart';
 import 'notification_settings_screen.dart';
 import 'auth/sign_in_screen.dart';
+import '../services/auth_service.dart';
+import '../services/profile_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -23,6 +25,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
 
   bool _isDeletingAccount = false;
+  bool _isDeactivatingAccount = false;
 
   @override
   Widget build(BuildContext context) {
@@ -238,6 +241,48 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final languageProvider = context.watch<LanguageProvider>();
     return Column(
       children: [
+        Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: Colors.orange.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.orange.withValues(alpha: 0.18)),
+          ),
+          child: ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.orange.withValues(alpha: 0.16),
+                shape: BoxShape.circle,
+              ),
+              child: _isDeactivatingAccount
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.orange,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Icon(Iconsax.user_remove, color: Colors.orange, size: 20),
+            ),
+            title: Text(
+              languageProvider.getString('deactivate_account'),
+              style: const TextStyle(
+                color: Colors.deepOrange,
+                fontWeight: FontWeight.w800,
+                fontSize: 15,
+              ),
+            ),
+            subtitle: Text(
+              languageProvider.getString('deactivate_account_sub'),
+              style: const TextStyle(color: Colors.deepOrange, fontSize: 11),
+            ),
+            onTap: _isDeactivatingAccount || _isDeletingAccount
+                ? null
+                : () => _showDeactivateAccountDialog(context, languageProvider),
+          ),
+        ),
         // Delete Account Tile
         Container(
           decoration: BoxDecoration(
@@ -275,13 +320,92 @@ class _SettingsScreenState extends State<SettingsScreen> {
               languageProvider.getString('delete_account_sub'),
               style: const TextStyle(color: Colors.redAccent, fontSize: 11),
             ),
-            onTap: _isDeletingAccount
+            onTap: _isDeletingAccount || _isDeactivatingAccount
                 ? null
                 : () => _showDeleteAccountDialog(context, languageProvider),
           ),
         ),
       ],
     );
+  }
+
+  Future<void> _showDeactivateAccountDialog(
+    BuildContext context,
+    LanguageProvider languageProvider,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: Theme.of(context).cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Row(
+          children: [
+            const Icon(Iconsax.user_remove, color: Colors.orange, size: 24),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                languageProvider.getString('deactivate_account'),
+                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          languageProvider.getString('deactivate_account_confirm'),
+          style: const TextStyle(height: 1.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(languageProvider.getString('cancel')),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(languageProvider.getString('deactivate')),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await _deactivateAccount(context, languageProvider);
+    }
+  }
+
+  Future<void> _deactivateAccount(
+    BuildContext context,
+    LanguageProvider languageProvider,
+  ) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    setState(() => _isDeactivatingAccount = true);
+    try {
+      await ProfileService().setAccountDeactivated(user.uid, true);
+      await AuthService().signOut();
+
+      if (!mounted) return;
+      Navigator.of(this.context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const SignInScreen()),
+        (route) => false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isDeactivatingAccount = false);
+      ScaffoldMessenger.of(this.context).showSnackBar(
+        SnackBar(
+          content: Text('${languageProvider.getString('deactivate_failed')}: $e'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   void _showDeleteAccountDialog(

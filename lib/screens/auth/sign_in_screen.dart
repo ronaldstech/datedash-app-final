@@ -138,9 +138,9 @@ class _SignInScreenState extends State<SignInScreen> {
                           height: 4,
                           margin: const EdgeInsets.only(bottom: 20),
                           decoration: BoxDecoration(
-                            color: Theme.of(context)
-                                .dividerColor
-                                .withValues(alpha: 0.7),
+                            color: Theme.of(
+                              context,
+                            ).dividerColor.withValues(alpha: 0.7),
                             borderRadius: BorderRadius.circular(99),
                           ),
                         ),
@@ -220,9 +220,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               )
                             : const Text(
                                 'SEND RESET LINK',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.w800),
                               ),
                       ),
                     ],
@@ -243,6 +241,27 @@ class _SignInScreenState extends State<SignInScreen> {
     setState(() => _isLoading = true);
     try {
       await _authService.signInWithGoogle();
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message ?? 'An error occurred')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _handleAppleSignIn() async {
+    setState(() => _isLoading = true);
+    try {
+      await _authService.signInWithApple();
     } on FirebaseAuthException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -367,6 +386,12 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                   const Expanded(child: Divider()),
                 ],
+              ),
+              const SizedBox(height: 8),
+              SocialLoginButton(
+                text: languageProvider.getString('apple_signin'),
+                icon: Icons.apple,
+                onPressed: _isLoading ? () {} : _handleAppleSignIn,
               ),
               const SizedBox(height: 8),
               SocialLoginButton(

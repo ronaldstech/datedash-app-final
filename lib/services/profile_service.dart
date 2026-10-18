@@ -119,6 +119,23 @@ class ProfileService {
     }
   }
 
+  /// Updates account deactivation without overwriting the rest of the profile.
+  Future<void> setAccountDeactivated(String uid, bool isDeactivated) async {
+    await _usersCollection.doc(uid).set({
+      'isAccountDeactivated': isDeactivated,
+      if (isDeactivated) 'isOnline': false,
+    }, SetOptions(merge: true));
+  }
+
+  /// Reactivates only accounts explicitly marked as deactivated.
+  Future<void> reactivateAccountIfNeeded(String uid) async {
+    final document = await _usersCollection.doc(uid).get();
+    final data = document.data() as Map<String, dynamic>?;
+    if (data?['isAccountDeactivated'] == true) {
+      await setAccountDeactivated(uid, false);
+    }
+  }
+
   /// Listens for changes to a UserProfile from Firestore
   Stream<UserProfile?> getUserProfileStream(String uid) {
     return _usersCollection.doc(uid).snapshots().map((doc) {
@@ -182,7 +199,7 @@ class ProfileService {
     List<UserProfile> relaxedProfiles = [];
 
     for (var profile in rawProfiles) {
-      if (profile.hideProfile == true) continue;
+      if (profile.hideProfile == true || profile.isAccountDeactivated) continue;
 
       // Apply gender filter (always strict)
       if (filterGender != 'Everyone' && filterGender.isNotEmpty) {
@@ -615,7 +632,8 @@ class ProfileService {
                 data['uid'] = doc.id;
                 return UserProfile.fromMap(data);
               })
-              .where((profile) => profile.hideProfile != true)
+              .where((profile) =>
+                  profile.hideProfile != true && !profile.isAccountDeactivated)
               .toList();
         });
   }

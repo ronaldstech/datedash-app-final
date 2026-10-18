@@ -15,6 +15,7 @@ import '../providers/language_provider.dart';
 import '../screens/transactions_screen.dart';
 import '../screens/live_list_screen.dart';
 import '../screens/meetups_screen.dart';
+import '../screens/events_screen.dart';
 import '../services/meetup_service.dart';
 import '../models/meetup_model.dart';
 import '../widgets/boost_sheet.dart';
@@ -187,7 +188,8 @@ class ProfileDrawer extends StatelessWidget {
                               title: languageProvider.getString('nav_premium'),
                               value:
                                   profileProvider.userProfile?.isPremium == true
-                                  ? (profileProvider.userProfile?.premiumType ?? 'Premium')
+                                  ? (profileProvider.userProfile?.premiumType ??
+                                        'Premium')
                                   : 'Free',
                               icon:
                                   profileProvider.userProfile?.isPremium == true
@@ -289,6 +291,19 @@ class ProfileDrawer extends StatelessWidget {
                   _buildSectionHeader(
                     context,
                     languageProvider.getString('activity_section'),
+                  ),
+                  _buildItem(
+                    context,
+                    Iconsax.calendar_1,
+                    languageProvider.getString('events'),
+                    color: const Color(0xFFFF8C65),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const EventsScreen()),
+                      );
+                    },
                   ),
                   _buildItem(
                     context,

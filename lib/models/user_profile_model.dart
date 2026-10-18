@@ -82,6 +82,7 @@ class UserProfile {
   bool allowMessages;
   bool allowMeetupRequests;
   bool hideProfile;
+  bool isAccountDeactivated;
   // 📅 Meetup Preferences (set by the user, shown to those who send requests)
   String? meetupLocation;
   String? meetupRate;
@@ -208,6 +209,7 @@ class UserProfile {
     this.allowMessages = true,
     this.allowMeetupRequests = true,
     this.hideProfile = false,
+    this.isAccountDeactivated = false,
     this.meetupLocation,
     this.meetupRate,
     this.meetupNotes,
@@ -399,6 +401,7 @@ class UserProfile {
         allowMessages: map['allowMessages'] ?? true,
         allowMeetupRequests: map['allowMeetupRequests'] ?? true,
         hideProfile: map['hideProfile'] ?? false,
+        isAccountDeactivated: map['isAccountDeactivated'] == true,
         meetupLocation: map['meetupLocation'],
         meetupRate: map['meetupRate'],
         meetupNotes: map['meetupNotes'],
@@ -545,6 +548,7 @@ class UserProfile {
       'allowMessages': allowMessages,
       'allowMeetupRequests': allowMeetupRequests,
       'hideProfile': hideProfile,
+      'isAccountDeactivated': isAccountDeactivated,
       'meetupLocation': meetupLocation,
       'meetupRate': meetupRate,
       'meetupNotes': meetupNotes,

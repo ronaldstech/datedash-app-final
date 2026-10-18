@@ -26,35 +26,31 @@ class SocialLoginButton extends StatelessWidget {
           width: 1.5,
         ),
         surfaceTintColor: Theme.of(context).cardColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           assetPath != null
-              ? Image.asset(
-                  assetPath!,
-                  height: 24,
-                  width: 24,
-                )
+              ? Image.asset(assetPath!, height: 24, width: 24)
               : Icon(
                   icon ?? Icons.g_mobiledata_rounded,
                   size: 24,
-                  color: icon != null ? const Color(0xFFFF4D85) : Colors.blueAccent,
+                  color: icon == Icons.apple
+                      ? (Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black)
+                      : icon != null
+                      ? const Color(0xFFFF4D85)
+                      : Colors.blueAccent,
                 ),
           const SizedBox(width: 12),
           Text(
             text,
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-            ),
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
           ),
         ],
       ),
     );
   }
 }
-
