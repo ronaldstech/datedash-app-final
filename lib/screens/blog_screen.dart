@@ -276,6 +276,10 @@ class _BlogPostCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (post.imageUrl?.trim().isNotEmpty == true) ...[
+                _BlogCoverImage(url: post.imageUrl!, height: 150),
+                const SizedBox(height: 13),
+              ],
               Row(
                 children: [
                   _TopicBadge(label: post.category),
@@ -363,6 +367,54 @@ class _TopicBadge extends StatelessWidget {
           fontSize: 9,
           letterSpacing: 0.5,
           fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+  }
+}
+
+class _BlogCoverImage extends StatelessWidget {
+  final String url;
+  final double height;
+
+  const _BlogCoverImage({required this.url, required this.height});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Image.network(
+        url,
+        width: double.infinity,
+        height: height,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, progress) {
+          if (progress == null) return child;
+          return Container(
+            height: height,
+            color: _blogPink.withValues(alpha: 0.08),
+            alignment: Alignment.center,
+            child: const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                color: _blogPink,
+                strokeWidth: 2,
+              ),
+            ),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) => Container(
+          height: height,
+          color: _blogPink.withValues(alpha: 0.08),
+          alignment: Alignment.center,
+          child: Icon(
+            Iconsax.gallery,
+            size: 30,
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.35),
+          ),
         ),
       ),
     );
@@ -478,6 +530,7 @@ class _BlogComposerScreenState extends State<BlogComposerScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _bodyController = TextEditingController();
+  final _imageUrlController = TextEditingController();
   final _blogService = BlogService();
   String _category = _blogTopics.first;
   bool _publishing = false;
@@ -486,6 +539,7 @@ class _BlogComposerScreenState extends State<BlogComposerScreen> {
   void dispose() {
     _titleController.dispose();
     _bodyController.dispose();
+    _imageUrlController.dispose();
     super.dispose();
   }
 
@@ -516,6 +570,7 @@ class _BlogComposerScreenState extends State<BlogComposerScreen> {
         title: _titleController.text,
         body: _bodyController.text,
         category: _category,
+        imageUrl: _imageUrlController.text,
       );
 
       if (mounted) Navigator.of(context).pop(true);
@@ -623,6 +678,40 @@ class _BlogComposerScreenState extends State<BlogComposerScreen> {
               }).toList(),
             ),
             const SizedBox(height: 22),
+            _FieldLabel(
+              text: language.getString('blog_image_label'),
+              optionalLabel: language.getString('blog_optional'),
+            ),
+            const SizedBox(height: 9),
+            TextFormField(
+              controller: _imageUrlController,
+              keyboardType: TextInputType.url,
+              textInputAction: TextInputAction.next,
+              maxLength: 2048,
+              decoration:
+                  _inputDecoration(
+                    context,
+                    hint: language.getString('blog_image_hint'),
+                  ).copyWith(
+                    prefixIcon: const Icon(Iconsax.link_1, color: _blogPink),
+                  ),
+              onChanged: (_) => setState(() {}),
+              validator: (value) {
+                final imageUrl = value?.trim() ?? '';
+                if (imageUrl.isEmpty || _isValidHttpsImageUrl(imageUrl)) {
+                  return null;
+                }
+                return language.getString('blog_image_validation');
+              },
+            ),
+            if (_isValidHttpsImageUrl(_imageUrlController.text)) ...[
+              const SizedBox(height: 8),
+              _BlogCoverImage(
+                url: _imageUrlController.text.trim(),
+                height: 170,
+              ),
+            ],
+            const SizedBox(height: 22),
             _FieldLabel(text: language.getString('blog_body_label')),
             const SizedBox(height: 9),
             TextFormField(
@@ -682,13 +771,32 @@ class _BlogComposerScreenState extends State<BlogComposerScreen> {
 
 class _FieldLabel extends StatelessWidget {
   final String text;
+  final String? optionalLabel;
 
-  const _FieldLabel({required this.text});
+  const _FieldLabel({required this.text, this.optionalLabel});
 
   @override
-  Widget build(BuildContext context) => Text(
-    text,
-    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+  Widget build(BuildContext context) => Row(
+    children: [
+      Expanded(
+        child: Text(
+          text,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+        ),
+      ),
+      if (optionalLabel != null)
+        Text(
+          optionalLabel!,
+          style: TextStyle(
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.48),
+            fontSize: 9,
+            letterSpacing: 0.7,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+    ],
   );
 }
 
@@ -796,6 +904,10 @@ class BlogDetailScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 24),
+            if (post.imageUrl?.trim().isNotEmpty == true) ...[
+              _BlogCoverImage(url: post.imageUrl!, height: 230),
+              const SizedBox(height: 24),
+            ],
             Container(
               height: 4,
               width: 48,
@@ -843,4 +955,9 @@ class BlogDetailScreen extends StatelessWidget {
 String _publishedDate(DateTime? date) {
   if (date == null) return 'Recently';
   return DateFormat.yMMMd().format(date.toLocal());
+}
+
+bool _isValidHttpsImageUrl(String value) {
+  final uri = Uri.tryParse(value.trim());
+  return uri != null && uri.scheme == 'https' && uri.host.isNotEmpty;
 }

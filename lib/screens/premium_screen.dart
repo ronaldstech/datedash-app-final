@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +24,9 @@ class _PremiumScreenState extends State<PremiumScreen>
   bool _isMonthly = true;
   int _currentPlanIndex = 1; // Default to 'Premium' (Index 1)
   final PaymentService _paymentService = PaymentService();
+  Map<String, dynamic>? _premiumPricingConfig;
+  late final StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>
+  _pricingSubscription;
 
   final Map<String, Map<String, dynamic>> _countryData = {
     'MW': {
@@ -146,21 +152,112 @@ class _PremiumScreenState extends State<PremiumScreen>
   };
 
   Map<String, dynamic> _getPricing(String? countryCode) {
-    if (countryCode != null && _countryData.containsKey(countryCode)) {
-      return _countryData[countryCode]!;
+    final country = countryCode?.toUpperCase();
+    final localPricing = country != null && _countryData.containsKey(country)
+        ? Map<String, dynamic>.from(_countryData[country]!)
+        : <String, dynamic>{
+            'currency': 'USD',
+            'pro_weekly': '4.99',
+            'pro_monthly': '9.99',
+            'premium_weekly': '6.99',
+            'premium_monthly': '14.99',
+            'elite_weekly': '9.99',
+            'elite_monthly': '29.99',
+            'credit_prefix': '\$',
+            'credit_multiplier': 0.001,
+          };
+
+    final config = _premiumPricingConfig;
+    final plans = config?['plans'];
+    if (config == null || plans is! Map) return localPricing;
+
+    final baseCurrency = (config['currency']?.toString() ?? 'USD')
+        .toUpperCase();
+    final isLocalizedUsd =
+        baseCurrency == 'USD' &&
+        country != null &&
+        _countryData.containsKey(country) &&
+        localPricing['currency'] != 'USD';
+    final conversionRate = isLocalizedUsd
+        ? (_parsePrice(localPricing['premium_monthly']) ?? 14.99) / 14.99
+        : 1.0;
+    final displayCurrency = isLocalizedUsd
+        ? localPricing['currency'] as String
+        : baseCurrency;
+
+    final resolvedPricing = Map<String, dynamic>.from(localPricing)
+      ..['currency'] = displayCurrency;
+    for (final planName in ['pro', 'premium', 'elite']) {
+      final plan = plans[planName];
+      if (plan is! Map) continue;
+      for (final period in ['weekly', 'monthly']) {
+        final usdPrice = _parsePrice(plan[period]);
+        if (usdPrice == null || usdPrice < 0) continue;
+        resolvedPricing['${planName}_$period'] = _formatPlanPrice(
+          usdPrice * conversionRate,
+          displayCurrency,
+        );
+      }
     }
-    // Default to USD
-    return {
-      'currency': 'USD',
-      'pro_weekly': '4.99',
-      'pro_monthly': '9.99',
-      'premium_weekly': '6.99',
-      'premium_monthly': '14.99',
-      'elite_weekly': '9.99',
-      'elite_monthly': '29.99',
-      'credit_prefix': '\$',
-      'credit_multiplier': 0.001,
-    };
+
+    final configuredBundles = config['creditBundles'];
+    if (configuredBundles is List) {
+      resolvedPricing['credit_bundles'] = configuredBundles
+          .whereType<Map>()
+          .map((bundle) {
+            final amount = _parsePrice(bundle['amount']);
+            final priceUsd = _parsePrice(bundle['priceUsd']);
+            final bonus = _parsePrice(bundle['bonus']) ?? 0;
+            if (amount == null || priceUsd == null || amount <= 0) return null;
+            return <String, dynamic>{
+              'amount': amount.round(),
+              'bonus': bonus.round().clamp(0, 100000000).toInt(),
+              'popular': bundle['popular'] == true,
+              'price': priceUsd * conversionRate,
+              'price_label': _formatPlanPrice(
+                priceUsd * conversionRate,
+                displayCurrency,
+              ),
+            };
+          })
+          .whereType<Map<String, dynamic>>()
+          .toList();
+    }
+
+    return resolvedPricing;
+  }
+
+  double? _parsePrice(dynamic value) {
+    if (value is num) {
+      final parsed = value.toDouble();
+      return parsed.isFinite ? parsed : null;
+    }
+    final parsed = double.tryParse(
+      value?.toString().replaceAll(',', '').trim() ?? '',
+    );
+    return parsed?.isFinite == true ? parsed : null;
+  }
+
+  String _formatPlanPrice(double amount, String currency) {
+    if (currency.toUpperCase() == 'USD') return amount.toStringAsFixed(2);
+    return _formatNumber(amount.round());
+  }
+
+  String? _currentCountryCode() {
+    final profile = context.read<ProfileProvider>().userProfile;
+    var countryCode = profile?.countryCode;
+    if (countryCode == null || countryCode.isEmpty) {
+      final phone = profile?.phoneNumber;
+      if (phone != null) {
+        for (final entry in _countryData.entries) {
+          if (phone.startsWith(entry.value['phone_prefix'] as String)) {
+            countryCode = entry.key;
+            break;
+          }
+        }
+      }
+    }
+    return countryCode?.toUpperCase();
   }
 
   final List<String> proFeatures = [
@@ -251,6 +348,21 @@ class _PremiumScreenState extends State<PremiumScreen>
     );
     // ViewportFraction < 1 lets adjacent cards peek out at the edges
     _pageController = PageController(viewportFraction: 0.95, initialPage: 1);
+    _pricingSubscription = FirebaseFirestore.instance
+        .collection('app_settings')
+        .doc('premium_pricing')
+        .snapshots()
+        .listen(
+          (snapshot) {
+            if (!mounted) return;
+            setState(() {
+              _premiumPricingConfig = snapshot.exists ? snapshot.data() : null;
+            });
+          },
+          onError: (Object error) {
+            debugPrint('Could not load Premium pricing: $error');
+          },
+        );
   }
 
   @override
@@ -265,6 +377,7 @@ class _PremiumScreenState extends State<PremiumScreen>
   void dispose() {
     _tabController.dispose();
     _pageController.dispose();
+    _pricingSubscription.cancel();
     super.dispose();
   }
 
@@ -354,8 +467,9 @@ class _PremiumScreenState extends State<PremiumScreen>
                             ],
                     ),
                     labelColor: isDark ? Colors.white : Colors.black,
-                    unselectedLabelColor:
-                        isDark ? Colors.white54 : Colors.black54,
+                    unselectedLabelColor: isDark
+                        ? Colors.white54
+                        : Colors.black54,
                     labelStyle: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -485,23 +599,7 @@ class _PremiumScreenState extends State<PremiumScreen>
   }
 
   Widget _getPlanCardForIndex(int index, bool isDark) {
-    final profileProvider = context.read<ProfileProvider>();
-    String? countryCode = profileProvider.userProfile?.countryCode;
-
-    // Smart fallback: if countryCode is null but phone exists, try to detect from prefix
-    if (countryCode == null || countryCode.isEmpty) {
-      final phone = profileProvider.userProfile?.phoneNumber;
-      if (phone != null) {
-        for (var entry in _countryData.entries) {
-          if (phone.startsWith(entry.value['phone_prefix'])) {
-            countryCode = entry.key;
-            break;
-          }
-        }
-      }
-    }
-
-    final pricing = _getPricing(countryCode?.toUpperCase());
+    final pricing = _getPricing(_currentCountryCode());
 
     if (index == 0) {
       return _buildPremiumGlassCard(
@@ -1083,6 +1181,40 @@ class _PremiumScreenState extends State<PremiumScreen>
   }
 
   Widget _buildCreditsTab(bool isDark) {
+    final pricing = _getPricing(_currentCountryCode());
+    final configuredBundles = pricing['credit_bundles'];
+    final List<Widget> bundleCards;
+    if (configuredBundles is List<Map<String, dynamic>>) {
+      bundleCards = configuredBundles.map((bundle) {
+        final amount = bundle['amount'] as int;
+        final bonus = bundle['bonus'] as int;
+        return _buildCreditGlassBundle(
+          amount,
+          isDark,
+          isPopular: bundle['popular'] == true,
+          bonus: bonus > 0 ? '${_formatNumber(bonus)} FREE' : null,
+          bonusSparks: bonus,
+          priceOverride: (bundle['price'] as num).toDouble(),
+        );
+      }).toList();
+    } else if (configuredBundles is List) {
+      bundleCards = [];
+    } else {
+      bundleCards = [
+        _buildCreditGlassBundle(1000, isDark),
+        _buildCreditGlassBundle(3000, isDark, isPopular: true),
+        _buildCreditGlassBundle(5000, isDark),
+        _buildCreditGlassBundle(10000, isDark),
+        _buildCreditGlassBundle(20000, isDark),
+        _buildCreditGlassBundle(
+          50000,
+          isDark,
+          bonus: '10,000 FREE',
+          bonusSparks: 10000,
+        ),
+      ];
+    }
+
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
@@ -1202,22 +1334,17 @@ class _PremiumScreenState extends State<PremiumScreen>
             right: 20,
             bottom: 60 + MediaQuery.of(context).padding.bottom,
           ),
-          sliver: SliverGrid(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 0.75,
-            ),
-            delegate: SliverChildListDelegate([
-              _buildCreditGlassBundle(1000, isDark),
-              _buildCreditGlassBundle(3000, isDark, isPopular: true),
-              _buildCreditGlassBundle(5000, isDark),
-              _buildCreditGlassBundle(10000, isDark),
-              _buildCreditGlassBundle(20000, isDark),
-              _buildCreditGlassBundle(50000, isDark, bonus: '10,000 FREE'),
-            ]),
-          ),
+          sliver: bundleCards.isEmpty
+              ? const SliverToBoxAdapter(child: SizedBox.shrink())
+              : SliverGrid(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.75,
+                  ),
+                  delegate: SliverChildListDelegate(bundleCards),
+                ),
         ),
       ],
     );
@@ -1228,30 +1355,18 @@ class _PremiumScreenState extends State<PremiumScreen>
     bool isDark, {
     bool isPopular = false,
     String? bonus,
+    int bonusSparks = 0,
+    double? priceOverride,
   }) {
     const themePink = Color(0xFFFF4D85);
-    final profileProvider = context.read<ProfileProvider>();
-    String? countryCode = profileProvider.userProfile?.countryCode;
-
-    // Smart fallback: if countryCode is null but phone exists, try to detect from prefix
-    if (countryCode == null || countryCode.isEmpty) {
-      final phone = profileProvider.userProfile?.phoneNumber;
-      if (phone != null) {
-        for (var entry in _countryData.entries) {
-          if (phone.startsWith(entry.value['phone_prefix'])) {
-            countryCode = entry.key;
-            break;
-          }
-        }
-      }
-    }
-
-    final pricing = _getPricing(countryCode?.toUpperCase());
+    final pricing = _getPricing(_currentCountryCode());
     final prefix = pricing['credit_prefix'];
     final multiplier = pricing['credit_multiplier'] as num;
-    final priceValue = (amount * multiplier).toStringAsFixed(
-      multiplier < 1 ? 2 : 0,
-    );
+    final double paymentPrice =
+        priceOverride ?? (amount * multiplier).toDouble();
+    final priceValue = priceOverride == null
+        ? paymentPrice.toStringAsFixed(multiplier < 1 ? 2 : 0)
+        : _formatPlanPrice(paymentPrice, pricing['currency'] as String);
 
     return Container(
       decoration: BoxDecoration(
@@ -1342,6 +1457,7 @@ class _PremiumScreenState extends State<PremiumScreen>
                         title: '$amount Sparks',
                         price: double.parse(priceValue.replaceAll(',', '')),
                         type: 'credits',
+                        bonusSparks: bonusSparks,
                       ),
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.zero,
@@ -1427,6 +1543,7 @@ class _PremiumScreenState extends State<PremiumScreen>
     required String title,
     required double price,
     required String type,
+    int bonusSparks = 0,
   }) {
     showModalBottomSheet(
       context: context,
@@ -1437,6 +1554,7 @@ class _PremiumScreenState extends State<PremiumScreen>
           title: title,
           price: price,
           type: type,
+          bonusSparks: bonusSparks,
           paymentService: _paymentService,
           isMonthly: _isMonthly,
         );
@@ -1449,6 +1567,7 @@ class _PaymentSheetContent extends StatefulWidget {
   final String title;
   final double price;
   final String type;
+  final int bonusSparks;
   final PaymentService paymentService;
   final bool isMonthly;
 
@@ -1456,6 +1575,7 @@ class _PaymentSheetContent extends StatefulWidget {
     required this.title,
     required this.price,
     required this.type,
+    this.bonusSparks = 0,
     required this.paymentService,
     required this.isMonthly,
   });
@@ -1485,14 +1605,26 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
     return int.parse(widget.title.split(' ')[0]);
   }
 
-  int _bonusCreditAmount(int amount) {
-    if (amount == 50000) return 10000;
-    return 0;
-  }
-
   int _totalCreditAmount() {
     final amount = _baseCreditAmount();
-    return amount + _bonusCreditAmount(amount);
+    return amount + (widget.type == 'credits' ? widget.bonusSparks : 0);
+  }
+
+  String _paymentCurrency() {
+    final operatorCurrency = _selectedOperator?.supportedCountry?.currency
+        .trim();
+    return operatorCurrency == null || operatorCurrency.isEmpty
+        ? 'MWK'
+        : operatorCurrency.toUpperCase();
+  }
+
+  String _formattedPaymentAmount() {
+    final currency = _paymentCurrency();
+    if (currency == 'USD') return widget.price.toStringAsFixed(2);
+    return widget.price.round().toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (match) => '${match[1]},',
+    );
   }
 
   Future<void> _startPayment() async {
@@ -1955,7 +2087,7 @@ class _PaymentSheetContentState extends State<_PaymentSheetContent> {
                     ),
                   ),
                   Text(
-                    '${widget.price.toInt()} MWK',
+                    '${_formattedPaymentAmount()} ${_paymentCurrency()}',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w900,

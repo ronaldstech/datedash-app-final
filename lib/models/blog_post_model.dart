@@ -8,6 +8,7 @@ class BlogPost {
   final String title;
   final String body;
   final String category;
+  final String? imageUrl;
   final DateTime? publishedAt;
 
   const BlogPost({
@@ -17,6 +18,7 @@ class BlogPost {
     required this.title,
     required this.body,
     required this.category,
+    this.imageUrl,
     this.authorPhotoUrl,
     this.publishedAt,
   });
@@ -35,6 +37,7 @@ class BlogPost {
       title: data['title']?.toString() ?? '',
       body: data['body']?.toString() ?? '',
       category: data['category']?.toString() ?? 'Stories',
+      imageUrl: data['imageUrl']?.toString(),
       publishedAt: publishedAt is Timestamp ? publishedAt.toDate() : null,
     );
   }

@@ -33,9 +33,12 @@ class BlogService {
     required String title,
     required String body,
     required String category,
+    String? imageUrl,
   }) async {
     if (FirebaseAuth.instance.currentUser?.uid != authorId) {
-      throw StateError('Sign in with the account that is publishing this story.');
+      throw StateError(
+        'Sign in with the account that is publishing this story.',
+      );
     }
 
     final cleanTitle = title.trim();
@@ -48,6 +51,13 @@ class BlogService {
         'The story must be between 30 and 12,000 characters.',
       );
     }
+    final cleanImageUrl = imageUrl?.trim() ?? '';
+    if (cleanImageUrl.isNotEmpty) {
+      final uri = Uri.tryParse(cleanImageUrl);
+      if (uri == null || uri.scheme != 'https' || uri.host.isEmpty) {
+        throw ArgumentError('Enter a valid HTTPS image URL.');
+      }
+    }
 
     await _blogs.add({
       'authorId': authorId,
@@ -58,6 +68,7 @@ class BlogService {
       'title': cleanTitle,
       'body': cleanBody,
       'category': category,
+      'imageUrl': cleanImageUrl.isEmpty ? null : cleanImageUrl,
       'status': 'published',
       'publishedAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
