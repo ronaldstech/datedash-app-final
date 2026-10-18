@@ -286,7 +286,7 @@ class _AppLockScreenState extends State<AppLockScreen>
                       ),
                       padding: const EdgeInsets.all(16),
                       child: Image.asset(
-                        'assets/images/signlogo.png',
+                        'assets/images/logo.png',
                         fit: BoxFit.contain,
                       ),
                     ),

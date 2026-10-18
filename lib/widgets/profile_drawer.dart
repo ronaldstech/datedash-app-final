@@ -18,6 +18,7 @@ import '../screens/meetups_screen.dart';
 import '../services/meetup_service.dart';
 import '../models/meetup_model.dart';
 import '../widgets/boost_sheet.dart';
+import '../screens/premium_screen.dart';
 
 class ProfileDrawer extends StatelessWidget {
   const ProfileDrawer({super.key});
@@ -168,7 +169,13 @@ class ProfileDrawer extends StatelessWidget {
                               iconColor: const Color(0xFFFFB300),
                               onTap: () {
                                 Navigator.pop(context);
-                                profileProvider.navigateToPremium(1);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        const PremiumScreen(initialTab: 1),
+                                  ),
+                                );
                               },
                               isDark: isDark,
                             ),
@@ -189,7 +196,13 @@ class ProfileDrawer extends StatelessWidget {
                               iconColor: const Color(0xFFFF4D85),
                               onTap: () {
                                 Navigator.pop(context);
-                                profileProvider.navigateToPremium(0);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        const PremiumScreen(initialTab: 0),
+                                  ),
+                                );
                               },
                               isDark: isDark,
                             ),

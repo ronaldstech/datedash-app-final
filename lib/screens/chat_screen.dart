@@ -80,10 +80,34 @@ class _ChatScreenState extends State<ChatScreen> {
   int _messagesFromOtherCount = 0;
   bool _otherUserAllowsMeetup = false;
 
+  // Message pagination
+  int _messagesLimit = 25;
+  bool _isLoadingMore = false;
+  bool _hasMoreMessages = true;
+
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     _initChat();
+  }
+
+  void _onScroll() {
+    if (_isLoadingMore || !_hasMoreMessages) return;
+
+    if (_scrollController.hasClients &&
+        _scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 250) {
+      _loadMoreMessages();
+    }
+  }
+
+  void _loadMoreMessages() {
+    if (_isLoadingMore || !_hasMoreMessages) return;
+    setState(() {
+      _isLoadingMore = true;
+      _messagesLimit += 25;
+    });
   }
 
   Future<void> _initChat() async {
@@ -124,7 +148,7 @@ class _ChatScreenState extends State<ChatScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
+          0.0,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
@@ -1081,6 +1105,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }
     _messageController.dispose();
     _searchController.dispose();
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     _recorder.dispose();
     super.dispose();
@@ -1467,6 +1492,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           child: StreamBuilder<List<ChatMessage>>(
                             stream: _chatService.getMessagesStreamSmart(
                               _chatId,
+                              limit: _messagesLimit,
                             ),
                             builder: (context, snapshot) {
                               final messages = snapshot.data ?? [];
@@ -1474,6 +1500,17 @@ class _ChatScreenState extends State<ChatScreen> {
                               WidgetsBinding.instance.addPostFrameCallback((_) {
                                 if (mounted) {
                                   bool needsUpdate = false;
+                                  if (_isLoadingMore) {
+                                    _isLoadingMore = false;
+                                    needsUpdate = true;
+                                  }
+                                  final hasMore =
+                                      messages.length >= _messagesLimit;
+                                  if (_hasMoreMessages != hasMore) {
+                                    _hasMoreMessages = hasMore;
+                                    needsUpdate = true;
+                                  }
+
                                   if (_messageCount != messages.length) {
                                     _messageCount = messages.length;
                                     needsUpdate = true;
@@ -1589,39 +1626,46 @@ class _ChatScreenState extends State<ChatScreen> {
                                 );
                               }
 
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                if (_scrollController.hasClients &&
-                                    _scrollController.position.maxScrollExtent >
-                                        0) {
-                                  _scrollController.animateTo(
-                                    _scrollController.position.maxScrollExtent,
-                                    duration: const Duration(milliseconds: 200),
-                                    curve: Curves.easeOut,
-                                  );
-                                }
-                              });
-
                               return ListView.builder(
                                 controller: _scrollController,
+                                reverse: true,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 16,
                                   vertical: 12,
                                 ),
-                                itemCount: filtered.length,
+                                itemCount: filtered.length +
+                                    (_isLoadingMore ? 1 : 0),
                                 itemBuilder: (context, index) {
+                                  if (index == filtered.length) {
+                                    return const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
+                                      child: Center(
+                                        child: SizedBox(
+                                          width: 22,
+                                          height: 22,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Color(0xFFFF4D85),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }
+
                                   final msg = filtered[index];
                                   final isMe = msg.senderId == _myUid;
-                                  final prevMsg = index > 0
-                                      ? filtered[index - 1]
+                                  final olderMsg = index < filtered.length - 1
+                                      ? filtered[index + 1]
                                       : null;
-                                  final showDateDivider =
-                                      prevMsg == null ||
+                                  final showDateDivider = olderMsg == null ||
                                       msg.timestamp.day !=
-                                          prevMsg.timestamp.day ||
+                                          olderMsg.timestamp.day ||
                                       msg.timestamp.month !=
-                                          prevMsg.timestamp.month ||
+                                          olderMsg.timestamp.month ||
                                       msg.timestamp.year !=
-                                          prevMsg.timestamp.year;
+                                          olderMsg.timestamp.year;
 
                                   return Column(
                                     children: [
@@ -1716,9 +1760,13 @@ class _ChatScreenState extends State<ChatScreen> {
                             if (!isTyping) return const SizedBox.shrink();
 
                             WidgetsBinding.instance.addPostFrameCallback((_) {
-                              if (_scrollController.hasClients) {
-                                _scrollController.jumpTo(
-                                  _scrollController.position.maxScrollExtent,
+                              if (_scrollController.hasClients &&
+                                  _scrollController.offset > 0 &&
+                                  _scrollController.offset < 100) {
+                                _scrollController.animateTo(
+                                  0.0,
+                                  duration: const Duration(milliseconds: 200),
+                                  curve: Curves.easeOut,
                                 );
                               }
                             });

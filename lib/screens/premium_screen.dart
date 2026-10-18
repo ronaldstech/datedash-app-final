@@ -304,54 +304,71 @@ class _PremiumScreenState extends State<PremiumScreen>
   }
 
   Widget _buildHeader(bool isDark) {
+    final canPop = Navigator.canPop(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
           const SizedBox(height: 4),
-          // Custom TabBar Container
-          Container(
-            height: 38,
-            decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.05)
-                  : Colors.black.withValues(alpha: 0.03),
-              borderRadius: BorderRadius.circular(19),
-              border: Border.all(
-                color: isDark ? Colors.white12 : Colors.black12,
-              ),
-            ),
-            padding: const EdgeInsets.all(2),
-            child: TabBar(
-              controller: _tabController,
-              indicatorSize: TabBarIndicatorSize.tab,
-              indicator: BoxDecoration(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.1)
-                    : Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: isDark
-                    ? []
-                    : [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-              ),
-              labelColor: isDark ? Colors.white : Colors.black,
-              unselectedLabelColor: isDark ? Colors.white54 : Colors.black54,
-              labelStyle: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-              dividerColor: Colors.transparent,
-              tabs: const [
-                Tab(text: 'Subscriptions'),
-                Tab(text: 'Sparks'),
+          Row(
+            children: [
+              if (canPop) ...[
+                IconButton(
+                  icon: const Icon(Iconsax.arrow_left_2),
+                  color: isDark ? Colors.white : Colors.black87,
+                  onPressed: () => Navigator.pop(context),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+                const SizedBox(width: 12),
               ],
-            ),
+              Expanded(
+                child: Container(
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : Colors.black.withValues(alpha: 0.03),
+                    borderRadius: BorderRadius.circular(19),
+                    border: Border.all(
+                      color: isDark ? Colors.white12 : Colors.black12,
+                    ),
+                  ),
+                  padding: const EdgeInsets.all(2),
+                  child: TabBar(
+                    controller: _tabController,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    indicator: BoxDecoration(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.1)
+                          : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: isDark
+                          ? []
+                          : [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                    ),
+                    labelColor: isDark ? Colors.white : Colors.black,
+                    unselectedLabelColor:
+                        isDark ? Colors.white54 : Colors.black54,
+                    labelStyle: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    dividerColor: Colors.transparent,
+                    tabs: const [
+                      Tab(text: 'Subscriptions'),
+                      Tab(text: 'Sparks'),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

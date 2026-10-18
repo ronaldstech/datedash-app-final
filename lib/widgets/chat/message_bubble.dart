@@ -449,7 +449,7 @@ class MessageBubble extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              languageProvider.getString('credits_amount').replaceAll('{n}', '${message.giftValue}'),
+              '${message.giftValue} ${languageProvider.getString('sparks_label')}',
               style: const TextStyle(
                 color: Colors.orangeAccent,
                 fontSize: 11,

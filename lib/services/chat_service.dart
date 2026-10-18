@@ -619,22 +619,30 @@ class ChatService {
     }
   }
 
-  /// Smart stream that combines cached + new messages
-  Stream<List<ChatMessage>> getMessagesStreamSmart(String chatId) async* {
+  /// Smart stream that combines cached + new messages with pagination support
+  Stream<List<ChatMessage>> getMessagesStreamSmart(
+    String chatId, {
+    int limit = 25,
+  }) async* {
     try {
-      // 1. First, yield cached messages from local DB for instant UX
+      // 1. First, yield cached messages from local DB for instant UX (limited to batch size)
       final cachedMessages = await _localDb.getMessagesForChat(chatId);
       if (cachedMessages.isNotEmpty) {
-        yield cachedMessages;
+        final recentCached = cachedMessages.length > limit
+            ? cachedMessages.sublist(cachedMessages.length - limit)
+            : cachedMessages;
+        final sortedCached = List<ChatMessage>.from(recentCached)
+          ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+        yield sortedCached;
       }
 
-      // 2. Stream all messages from Firestore for this chat.
-      // We don't filter by timestamp here to avoid missing updates to old messages
-      // and to ensure pending writes (null timestamp) are included.
+      // 2. Stream latest `limit` messages from Firestore for this chat.
       yield* _firestore
           .collection('chats')
           .doc(chatId)
           .collection('messages')
+          .orderBy('timestamp', descending: true)
+          .limit(limit)
           .snapshots(includeMetadataChanges: true)
           .map((snap) {
         final firestoreMessages = snap.docs.map(ChatMessage.fromDoc).toList();
@@ -644,22 +652,24 @@ class ChatService {
           _localDb.insertMessages(firestoreMessages, chatId);
         }
 
-        // Merge with cached messages and deduplicate by ID
+        // Deduplicate and ensure descending order (newest first)
         final Map<String, ChatMessage> messageMap = {};
-        for (var msg in cachedMessages) {
-          messageMap[msg.id] = msg;
-        }
         for (var msg in firestoreMessages) {
           messageMap[msg.id] = msg;
         }
 
         final combinedMessages = messageMap.values.toList();
-        combinedMessages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+        combinedMessages.sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
         return combinedMessages;
       }).handleError((error) {
         debugPrint('Error in smart message stream: $error');
-        return cachedMessages;
+        final fallback = cachedMessages.length > limit
+            ? cachedMessages.sublist(cachedMessages.length - limit)
+            : cachedMessages;
+        final sortedFallback = List<ChatMessage>.from(fallback)
+          ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+        return sortedFallback;
       });
     } catch (e) {
       debugPrint('Error in initial message load: $e');
