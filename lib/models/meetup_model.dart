@@ -36,32 +36,50 @@ class MeetupModel {
   });
 
   factory MeetupModel.fromDoc(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final data = (doc.data() as Map<String, dynamic>?) ?? {};
     return MeetupModel(
       id: doc.id,
-      senderId: data['senderId'] ?? '',
-      receiverId: data['receiverId'] ?? '',
-      senderName: data['senderName'],
-      receiverName: data['receiverName'],
-      senderPhoto: data['senderPhoto'],
-      receiverPhoto: data['receiverPhoto'],
-      dateTime: (data['dateTime'] as Timestamp).toDate(),
-      location: data['location'],
-      rate: data['rate'],
-      status: _parseStatus(data['status'] ?? 'pending'),
-      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      note: data['note'],
-      senderNote: data['senderNote'],
+      senderId: data['senderId']?.toString() ?? '',
+      receiverId: data['receiverId']?.toString() ?? '',
+      senderName: data['senderName']?.toString(),
+      receiverName: data['receiverName']?.toString(),
+      senderPhoto: data['senderPhoto']?.toString(),
+      receiverPhoto: data['receiverPhoto']?.toString(),
+      dateTime: _parseDate(data['dateTime']) ?? DateTime.now(),
+      location: data['location']?.toString(),
+      rate: data['rate']?.toString(),
+      status: _parseStatus(data['status']?.toString() ?? 'pending'),
+      timestamp: _parseDate(data['timestamp']) ?? DateTime.now(),
+      note: data['note']?.toString(),
+      senderNote: data['senderNote']?.toString(),
     );
   }
 
+  static DateTime? _parseDate(dynamic value) {
+    if (value == null) return null;
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is num) {
+      return DateTime.fromMillisecondsSinceEpoch(value.toInt());
+    }
+    if (value is String) {
+      try {
+        return DateTime.tryParse(value);
+      } catch (_) {
+        return null;
+      }
+    }
+    return null;
+  }
+
   static MeetupStatus _parseStatus(String status) {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'accepted':
         return MeetupStatus.accepted;
       case 'rejected':
         return MeetupStatus.rejected;
       case 'cancelled':
+      case 'canceled':
         return MeetupStatus.cancelled;
       case 'pending':
       default:

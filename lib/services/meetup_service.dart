@@ -61,7 +61,17 @@ class MeetupService {
         .orderBy('timestamp', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) => MeetupModel.fromDoc(doc)).toList();
+      return snapshot.docs
+          .map((doc) {
+            try {
+              return MeetupModel.fromDoc(doc);
+            } catch (e) {
+              debugPrint('Error parsing meetup doc ${doc.id}: $e');
+              return null;
+            }
+          })
+          .whereType<MeetupModel>()
+          .toList();
     });
   }
 
@@ -72,7 +82,17 @@ class MeetupService {
         .where('status', isEqualTo: 'pending')
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) => MeetupModel.fromDoc(doc)).toList();
+      return snapshot.docs
+          .map((doc) {
+            try {
+              return MeetupModel.fromDoc(doc);
+            } catch (e) {
+              debugPrint('Error parsing pending meetup doc ${doc.id}: $e');
+              return null;
+            }
+          })
+          .whereType<MeetupModel>()
+          .toList();
     });
   }
 

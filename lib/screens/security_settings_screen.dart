@@ -104,7 +104,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
 
         // Verify biometrics before enabling
         final bool didAuthenticate = await auth.authenticate(
-          localizedReason: lp.getString('biometric_not_supported'),
+          localizedReason: 'Authenticate to enable biometric app lock',
           biometricOnly: true,
           persistAcrossBackgrounding: true,
         );
